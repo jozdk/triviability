@@ -1,0 +1,50 @@
+/* .h-90-percent {
+    height: 90%;
+}
+
+.h-10-percent {
+    height:10%;
+}
+
+.my-color {
+    background-color: rgb(137, 228, 167);
+} */
+
+
+body, html {
+    width: 100%;
+    height: 100%;
+}
+
+#page-container {
+    width: 60%;
+    height: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    /* background-color: aliceblue; */
+}
+
+#my-container {
+    display: flex;
+    flex: 1;
+    background-color: azure;
+    justify-content: center;
+    align-items: center;
+}
+
+#selection-box {
+    display: grid;
+    grid-template-rows: auto auto auto;
+    grid-template-columns: auto auto auto;
+    row-gap: 22px;
+    /* background: beige; */
+}
+
+.quiz-category {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    background-color: cadetblue;
+}
