@@ -18,12 +18,12 @@ body, html {
 
 #layout {
     display: flex;
-    overflow-y: visible;
+    /* overflow-y: visible; */
     width: 100%;
-    min-width: 320px;
+    /* min-width: 320px; */
     min-height: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
+    /* max-width: 100%; */
+    /* overflow-x: hidden; */
 }
 
 #content {
@@ -56,4 +56,21 @@ body, html {
     align-items: center;
     margin: 0;
     background-color: cadetblue;
+} */
+
+/* a {
+    color: #212529;
+}
+
+a:link, a:visited {
+    text-decoration: none;
+} */
+
+.category:hover {
+     cursor: pointer;
+     filter: saturate(200%);
+}
+
+/* .cat-science {
+    background-color: #03FCBA;
 } */

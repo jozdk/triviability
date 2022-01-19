@@ -27,9 +27,9 @@
 
             <div id="main" class="flex-grow-1">
 
-                <div class="row gy-4 mt-3 mb-3">
-                    <div class="col-sm-12 col-md-6 col-lg-4">
-                        <div class="card" style="background-color: #03FCBA;">
+                <div class="row gy-4 mt-3 mb-3" id="category-selection">
+                    <div href="#" class="col-sm-12 col-md-6 col-lg-4">
+                        <div id="cat-science" class="card category" style="background-color: #03FCBA;">
                             <div class="card-body text-center">
                                 <div class="h1 mb-3">
                                     <img class="w-50" src="science.svg" alt="">
@@ -39,7 +39,7 @@
                         </div>
                     </div>
                     <div class="col-sm-12 col-md-6 col-lg-4">
-                        <div class="card" style="background-color: #FFF75C;">
+                        <div id="cat-history" class="card category" style="background-color: #FFF75C;">
                             <div class="card-body text-center">
                                 <div class="h1 mb-3">
                                     <img class="w-50" src="science.svg" alt="">
@@ -49,7 +49,7 @@
                         </div>
                     </div>
                     <div class="col-sm-12 col-md-6 col-lg-4">
-                        <div class="card" style="background-color: #D47AE8;">
+                        <div id="cat-geography" class="card category" style="background-color: #D47AE8;">
                             <div class="card-body text-center">
                                 <div class="h1 mb-3">
                                     <img class="w-50" src="science.svg" alt="">
@@ -58,7 +58,7 @@
                             </div>
                         </div>
                     </div><div class="col-sm-12 col-md-6 col-lg-4">
-                        <div class="card" style="background-color: #EA3452;">
+                        <div id="cat-movies" class="card category" style="background-color: #EA3452;">
                             <div class="card-body text-center">
                                 <div class="h1 mb-3">
                                     <img class="w-50" src="science.svg" alt="">
@@ -67,7 +67,7 @@
                             </div>
                         </div>
                     </div><div class="col-sm-12 col-md-6 col-lg-4">
-                        <div class="card" style="background-color: #71FEFA ;">
+                        <div id="cat-art-lit" class="card category" style="background-color: #71FEFA ;">
                             <div class="card-body text-center">
                                 <div class="h1 mb-3">
                                     <img class="w-50" src="science.svg" alt="">
@@ -76,7 +76,7 @@
                             </div>
                         </div>
                     </div><div class="col-sm-12 col-md-6 col-lg-4">
-                        <div class="card" style="background-color: #FFA552;">
+                        <div id="cat-music" class="card category" style="background-color: #FFA552;">
                             <div class="card-body text-center">
                                 <div class="h1 mb-3">
                                     <img class="w-50" src="science.svg" alt="">
@@ -85,7 +85,7 @@
                             </div>
                         </div>
                     </div><div class="col-sm-12 col-md-6 col-lg-4">
-                        <div class="card" style="background-color: #D2FF96;">
+                        <div id="cat-sport-leisure" class="card category" style="background-color: #D2FF96;">
                             <div class="card-body text-center">
                                 <div class="h1 mb-3">
                                     <img class="w-50" src="science.svg" alt="">
@@ -94,7 +94,7 @@
                             </div>
                         </div>
                     </div><div class="col-sm-12 col-md-6 col-lg-4">
-                        <div class="card" style="background-color: #C4AF9A;">
+                        <div id="cat-general-knowledge" class="card category" style="background-color: #C4AF9A;">
                             <div class="card-body text-center">
                                 <div class="h1 mb-3">
                                     <img class="w-50" src="science.svg" alt="">
@@ -103,7 +103,7 @@
                             </div>
                         </div>
                     </div><div class="col-sm-12 col-md-6 col-lg-4">
-                        <div class="card" style="background-color: #FF579F;">
+                        <div id="cat-society-culture" class="card category" style="background-color: #FF579F;">
                             <div class="card-body text-center">
                                 <div class="h1 mb-3">
                                     <img class="w-50" src="science.svg" alt="">
@@ -113,6 +113,8 @@
                         </div>
                     </div>
                 </div>
+
+                <button id="start-button">Start Quiz!</button>
 
             </div>
 
@@ -193,10 +195,10 @@
 
 
 
-    <!-- <button id="get-quiz">Get Quiz</button>
+    <button id="get-quiz">Get Quiz</button>
     <button id="start-quiz">Let's Go!</button>
     <div id="quiz-question"></div>
-    <div id="quiz-answers"></div> -->
+    <div id="quiz-answers"></div>
 
     <script src="main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
