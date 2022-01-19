@@ -1,7 +1,19 @@
 let res;
 let quiz;
 
-const getQuizBtn = document.querySelector("#get-quiz");
+
+const catScienceElement = document.querySelector("#cat-science");
+const catHistoryElement = document.querySelector("#cat-history");
+const catGeographyElement = document.querySelector("#cat-geography");
+const catMoviesElement = document.querySelector("#cat-movies");
+const catArtLitElement = document.querySelector("#cat-art-lit");
+const catMusicElement = document.querySelector("#cat-music");
+const catSportLeisureElement = document.querySelector("#cat-sport-leisure");
+const catGeneralKnowledgeElement = document.querySelector("#cat-general-knowledge");
+const catSocietyCultureElement = document.querySelector("#cat-society-culture");
+
+const categorySelection = document.querySelector("#category-selection");
+
 const startQuizBtn = document.querySelector("#start-quiz");
 const quizQuestionDiv = document.querySelector("#quiz-question");
 const quizAnswersDiv = document.querySelector("#quiz-answers");
@@ -29,13 +41,20 @@ const quizAnswersDiv = document.querySelector("#quiz-answers");
 
 // })
 
+categorySelection.addEventListener("click", (event) => {
+    const category = event.target.firstElementChild.lastElementChild.innerText;
+    switch (category) {
+        case "Science":
 
-getQuizBtn.addEventListener("click", fetchQuiz);
+    }
+})
+
+// categorySelection.addEventListener("click", fetchQuiz);
 
 startQuizBtn.addEventListener("click", askQuestion);
 
 
-async function fetchQuiz() {
+async function fetchQuiz(category) {
     res = await fetch("https://api.trivia.willfry.co.uk/questions?categories=geography&limit=9");
     quiz = await res.json();
 }
