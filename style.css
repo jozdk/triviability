@@ -67,10 +67,22 @@ a:link, a:visited {
 } */
 
 .category:hover {
-     cursor: pointer;
-     filter: saturate(200%);
+    cursor: pointer;
+}
+
+.highlight:hover {
+    filter: saturate(200%);
 }
 
 /* .cat-science {
     background-color: #03FCBA;
 } */
+
+.selected {
+    filter: opacity(25%);
+}
+
+.border-radius {
+    border: 2px hidden black;
+    border-radius: 25px;
+}
