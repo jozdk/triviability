@@ -14,26 +14,25 @@
 body, html {
     width: 100%;
     height: 100%;
+    /* overflow-y: hidden; */
 }
 
-#layout {
+/* #layout {
     display: flex;
-    /* overflow-y: visible; */
+    
     width: 100%;
-    /* min-width: 320px; */
+   
     min-height: 100%;
-    /* max-width: 100%; */
-    /* overflow-x: hidden; */
-}
+    
+} */
 
-#content {
+/* #content {
     width: 60%;
     min-height: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    /* background-color: aliceblue; */
-}
+} */
 
 
 

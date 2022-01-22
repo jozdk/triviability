@@ -13,201 +13,240 @@
 
 <body>
 
-    <div class="container-xxl">
+    <div class="min-vh-100 d-flex flex-column">
 
-    <div id="layou" class="row min-vh-100 justify-content-center">
+        <!-- Header -->
 
-        <div id="conten" class="col-12 col-xxl-10 d-flex flex-column px-0">
+        <header class="bg-light">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-xl-9">
+                        <div class="navbar navbar-light">
+                            <a href="#" class="navbar-brand">Triviability</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
 
-            <!-- <div class="container "> -->
+        <!-- Main Content -->
+
+        <div id="main" class="flex-grow-1 d-flex flex-column px-0">
+
+            <!-- Welcome Paragraph -->
+
+            <div class="container">
+                <div class="row mt-3 justify-content-center">
+                    <div class="col-xl-9">
+                        <p class="lead text-center">
+                            Welcome to Triviability! Choose your Categorie(s) and Click the Button below to Start your Quiz!
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Selection Element -->
+
+            <div class="container">
+                <div id="category-selection" class="row mt-3 mb-3 justify-content-center">
+                    <div class="col-xl-9">
+                        <div class="row justify-content-center gy-4">
+                            <div class="col-8 col-sm-6 col-lg-4">
+                                <div id="cat-science" class="card category highlight"
+                                    style="background-color: #03FCBA;">
+                                    <div class="card-body text-center">
+                                        <div class="h1 mb-3">
+                                            <img class="w-50" src="science.svg" alt="">
+                                        </div>
+                                        <h5 class="card-title">Science</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-8 col-sm-6 col-lg-4">
+                                <div id="cat-history" class="card category highlight"
+                                    style="background-color: #FFF75C;">
+                                    <div class="card-body text-center">
+                                        <div class="h1 mb-3">
+                                            <img class="w-50" src="science.svg" alt="">
+                                        </div>
+                                        <h5 class="card-title">History</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-8 col-sm-6 col-lg-4">
+                                <div id="cat-geography" class="card category highlight"
+                                    style="background-color: #D47AE8;">
+                                    <div class="card-body text-center">
+                                        <div class="h1 mb-3">
+                                            <img class="w-50" src="science.svg" alt="">
+                                        </div>
+                                        <h5 class="card-title">Geography</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-8 col-sm-6 col-lg-4">
+                                <div id="cat-movies" class="card category highlight" style="background-color: #EA3452;">
+                                    <div class="card-body text-center">
+                                        <div class="h1 mb-3">
+                                            <img class="w-50" src="science.svg" alt="">
+                                        </div>
+                                        <h5 class="card-title">Movies</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-8 col-sm-6 col-lg-4">
+                                <div id="cat-art-lit" class="card category highlight"
+                                    style="background-color: #71FEFA ;">
+                                    <div class="card-body text-center">
+                                        <div class="h1 mb-3">
+                                            <img class="w-50" src="science.svg" alt="">
+                                        </div>
+                                        <h5 class="card-title">Art & Literature</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-8 col-sm-6 col-lg-4">
+                                <div id="cat-music" class="card category highlight" style="background-color: #FFA552;">
+                                    <div class="card-body text-center">
+                                        <div class="h1 mb-3">
+                                            <img class="w-50" src="science.svg" alt="">
+                                        </div>
+                                        <h5 class="card-title">Music</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-8 col-sm-6 col-lg-4">
+                                <div id="cat-sport-leisure" class="card category highlight"
+                                    style="background-color: #D2FF96;">
+                                    <div class="card-body text-center">
+                                        <div class="h1 mb-3">
+                                            <img class="w-50" src="science.svg" alt="">
+                                        </div>
+                                        <h5 class="card-title">Sport & Leisure</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-8 col-sm-6 col-lg-4">
+                                <div id="cat-general-knowledge" class="card category highlight"
+                                    style="background-color: #C4AF9A;">
+                                    <div class="card-body text-center">
+                                        <div class="h1 mb-3">
+                                            <img class="w-50" src="science.svg" alt="">
+                                        </div>
+                                        <h5 class="card-title">General Knowledge</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-8 col-sm-6 col-lg-4">
+                                <div id="cat-society-culture" class="card category highlight"
+                                    style="background-color: #FF579F;">
+                                    <div class="card-body text-center">
+                                        <div class="h1 mb-3">
+                                            <img class="w-50" src="science.svg" alt="">
+                                        </div>
+                                        <h5 class="card-title" style="white-space: nowrap;">Society & Culture</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Start Button -->
+
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-xl-9">
+                        <button class="btn btn-outline-dark w-100" id="start-button">Start Quiz!</button>
+                    </div>
+                </div>
+            </div>
 
             
 
-            <div id="header">
-                <div class="navbar navbar-light bg-light">
-                    <div class="container">
-                        <a href="#" class="navbar-brand">Triviability</a>
-                    </div>
-                </div>
-            </div>
+            <!-- Quiz Element -->
 
-            <div id="main" class="container flex-grow-1 d-flex flex-column px-0">
+            <div id="quiz-element" class="container flex-grow-1 d-none">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-xl-10 col-xxl-8 bg-light mt-5 border-radius">
 
-                <!-- Selection Element -->
-
-                <div id="category-selection" class="row gy-4 mt-3 mb-3 justify-content-center">
-                    <div class="col-8 col-sm-6 col-lg-4">
-                        <div id="cat-science" class="card category highlight" style="background-color: #03FCBA;">
-                            <div class="card-body text-center">
-                                <div class="h1 mb-3">
-                                    <img class="w-50" src="science.svg" alt="">
-                                </div>
-                                <h5 class="card-title">Science</h5>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-8 col-sm-6 col-lg-4">
-                        <div id="cat-history" class="card category highlight" style="background-color: #FFF75C;">
-                            <div class="card-body text-center">
-                                <div class="h1 mb-3">
-                                    <img class="w-50" src="science.svg" alt="">
-                                </div>
-                                <h5 class="card-title">History</h5>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-8 col-sm-6 col-lg-4">
-                        <div id="cat-geography" class="card category highlight" style="background-color: #D47AE8;">
-                            <div class="card-body text-center">
-                                <div class="h1 mb-3">
-                                    <img class="w-50" src="science.svg" alt="">
-                                </div>
-                                <h5 class="card-title">Geography</h5>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-8 col-sm-6 col-lg-4">
-                        <div id="cat-movies" class="card category highlight" style="background-color: #EA3452;">
-                            <div class="card-body text-center">
-                                <div class="h1 mb-3">
-                                    <img class="w-50" src="science.svg" alt="">
-                                </div>
-                                <h5 class="card-title">Movies</h5>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-8 col-sm-6 col-lg-4">
-                        <div id="cat-art-lit" class="card category highlight" style="background-color: #71FEFA ;">
-                            <div class="card-body text-center">
-                                <div class="h1 mb-3">
-                                    <img class="w-50" src="science.svg" alt="">
-                                </div>
-                                <h5 class="card-title">Art & Literature</h5>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-8 col-sm-6 col-lg-4">
-                        <div id="cat-music" class="card category highlight" style="background-color: #FFA552;">
-                            <div class="card-body text-center">
-                                <div class="h1 mb-3">
-                                    <img class="w-50" src="science.svg" alt="">
-                                </div>
-                                <h5 class="card-title">Music</h5>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-8 col-sm-6 col-lg-4">
-                        <div id="cat-sport-leisure" class="card category highlight" style="background-color: #D2FF96;">
-                            <div class="card-body text-center">
-                                <div class="h1 mb-3">
-                                    <img class="w-50" src="science.svg" alt="">
-                                </div>
-                                <h5 class="card-title">Sport & Leisure</h5>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-8 col-sm-6 col-lg-4">
-                        <div id="cat-general-knowledge" class="card category highlight"
-                            style="background-color: #C4AF9A;">
-                            <div class="card-body text-center">
-                                <div class="h1 mb-3">
-                                    <img class="w-50" src="science.svg" alt="">
-                                </div>
-                                <h5 class="card-title">General Knowledge</h5>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-8 col-sm-6 col-lg-4">
-                        <div id="cat-society-culture" class="card category highlight"
-                            style="background-color: #FF579F;">
-                            <div class="card-body text-center">
-                                <div class="h1 mb-3">
-                                    <img class="w-50" src="science.svg" alt="">
-                                </div>
-                                <h5 class="card-title" style="white-space: nowrap;">Society & Culture</h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <button id="start-button" style="display: none;">Start Quiz!</button>
-
-                <!-- Quiz Element -->
-
-                <div id="quiz-element" class="container flex-grow-1 d-none">
-                    <div class="row justify-content-center">
-                        <div class="col-12 col-xl-10 col-xxl-8 bg-light mt-5 border-radius">
-
-                            <div class="row mb-1 p-2">
-                                <div class="col-12">
-                                    <div class="row border-radius" style="background-color: #03fcba62;">
-                                        <div class="col-2">
-                                            <p>Science</p>
-                                        </div>
-                                        <div class="col-2">
-                                            <p>1/10</p>
-                                        </div>
-                                        <div class="col-2">
-                                            <p>0 points</p>
-                                        </div>
+                        <div class="row mb-1 p-2">
+                            <div class="col-12">
+                                <div class="row border-radius" style="background-color: #03fcba62;">
+                                    <div class="col-2">
+                                        <p>Science</p>
                                     </div>
-
+                                    <div class="col-2">
+                                        <p>1/10</p>
+                                    </div>
+                                    <div class="col-2">
+                                        <p>0 points</p>
+                                    </div>
                                 </div>
 
-                            </div>
-
-                            <div class="row border-radius bg-light">
-                                <div class="col-sm-12 text-center border-radius p-5">
-                                    <p class="lead">
-                                        What does it take to make this quiz look good?
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="row text-center gy-1 lead">
-                                <div class="col-md-6 ps-md-3 px-2 px-md-2">
-                                    <p class="border-radius py-2 py-md-5 bg-white answer-highlight">Bootstrap</p>
-                                </div>
-                                <div class="col-md-6 pe-md-3 px-2 px-md-2">
-                                    <p class="border-radius py-2 py-md-5 bg-white answer-highlight">No Bootstrap</p>
-                                </div>
-                                <div class="col-md-6 ps-md-3 px-2 px-md-2">
-                                    <p class="border-radius py-2 py-md-5 bg-white answer-highlight">Bootstrap + Custom CSS</p>
-                                </div>
-                                <div class="col-md-6 pe-md-3 px-2 px-md-2">
-                                    <p class="border-radius py-2 py-md-5 bg-white answer-highlight">Magic</p>
-                                </div>
                             </div>
 
                         </div>
 
-                        <div class="row justify-content-center">
-                            <div class="mt-5 col-6 px-0 border-radius bg-light" id="progress">
-                                <div id="bar" class="border-radius"></div>
+                        <div class="row border-radius bg-light">
+                            <div class="col-sm-12 text-center border-radius p-5">
+                                <p class="lead">
+                                    What does it take to make this quiz look good?
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="row text-center gy-1 lead">
+                            <div class="col-md-6 ps-md-3 px-2 px-md-2">
+                                <p class="border-radius py-2 py-md-5 bg-white answer-highlight">Bootstrap</p>
+                            </div>
+                            <div class="col-md-6 pe-md-3 px-2 px-md-2">
+                                <p class="border-radius py-2 py-md-5 bg-white answer-highlight">No Bootstrap</p>
+                            </div>
+                            <div class="col-md-6 ps-md-3 px-2 px-md-2">
+                                <p class="border-radius py-2 py-md-5 bg-white answer-highlight">Bootstrap + Custom
+                                    CSS</p>
+                            </div>
+                            <div class="col-md-6 pe-md-3 px-2 px-md-2">
+                                <p class="border-radius py-2 py-md-5 bg-white answer-highlight">Magic</p>
                             </div>
                         </div>
 
                     </div>
 
+                    <div class="row justify-content-center">
+                        <div class="mt-5 col-6 px-0 border-radius bg-light" id="progress">
+                            <div id="bar" class="border-radius"></div>
+                        </div>
+                    </div>
+
                 </div>
-
-
 
             </div>
 
-            <footer class="bg-light text-center text-lg-start">
-                <div class="mb-4">
-                    <p>
-
-                    </p>
-                </div>
-            </footer>
-
-        <!-- </div> -->
         </div>
 
+        <!-- Footer -->
+
+        <footer class="bg-light text-center text-lg-start">
+            <div class="">
+                <p class="mb-0 p-2">
+                    Questions from Will Fry Open Trivia API
+                </p>
+            </div>
+        </footer>
+
     </div>
-    </div>
+
+
+    
 
     <!-- <div class="col-md-6 ps-md-0 px-0 px-md-2">
         <p class="border-radius py-2 py-md-5 bg-white">Bootstrap 5</p>
