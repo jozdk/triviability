@@ -35,6 +35,8 @@ body, html {
     /* background-color: aliceblue; */
 }
 
+
+
 /* #my-container {
     display: flex;
     flex: 1;
@@ -83,6 +85,29 @@ a:link, a:visited {
 }
 
 .border-radius {
-    border: 2px hidden black;
-    border-radius: 25px;
+    border: 1px hidden black;
+    border-radius: 10px;
 }
+
+/* #quiz-element {
+    min-height: 100%;
+} */
+
+
+/* #quiz-element {
+    width: 60%;
+    margin: 0 auto;
+}
+ */
+
+.answer-highlight:hover {
+    background-color: #03fcba62 !important;
+    cursor: pointer;
+}
+
+#bar {
+    height: 25px;
+    background-color: #03fcba62;
+    width: 0%;
+}
+
