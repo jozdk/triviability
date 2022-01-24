@@ -67,6 +67,7 @@ class UI {
         this.selectionElement = document.querySelector("#category-selection");
         this.startButton = document.querySelector("#start-button");
         this.mainElement = document.querySelector("#main");
+        this.quizElement = document.querySelector("#quiz-element");
 
         this.selectionElement.addEventListener("click", (event) => {
             if (event.target !== this.selectionElement && !event.target.classList.contains("col-sm-12")) {
@@ -109,26 +110,28 @@ class UI {
         this.startButton.addEventListener("click", () => {
             quiz.fetchQuestions();
             this.mainElement.style.display = "none";
-            this.render();
+            this.buildNode("div", {
+                id: "my-div"
+            })
         });
 
-        this.windowElement.addEventListener("load", () => {
-            this.progressBar.startTime = Date.now();
-            this.progressBar.tInterval = setInterval(() => {
-                this.progressBar.width += 0.835;
-                this.progressBar.elem.style.width = this.progressBar.width + "px";
-                this.progressBar.called++;
-                if (this.progressBar.called === 600) {
-                    clearInterval(this.progressBar.tInterval);
-                    console.log(Date.now() - this.progressBar.startTime)
-                }
-            }, 10);
-            // setTimeout(() => {
-            //     this.timerValues.elapsedTime = Date.now() - this.timerValues.startTime;
-            //     clearInterval(this.timerValues.tInterval);
-            //     console.log(this.timerValues.called, this.timerValues.elapsedTime)
-            // }, 10000)
-        })
+        // this.windowElement.addEventListener("load", () => {
+        //     this.progressBar.startTime = Date.now();
+        //     this.progressBar.tInterval = setInterval(() => {
+        //         this.progressBar.width += 0.835;
+        //         this.progressBar.elem.style.width = this.progressBar.width + "px";
+        //         this.progressBar.called++;
+        //         if (this.progressBar.called === 600) {
+        //             clearInterval(this.progressBar.tInterval);
+        //             console.log(this.progressBar.called, Date.now() - this.progressBar.startTime)
+        //         }
+        //     }, 10);
+        //     // setTimeout(() => {
+        //     //     this.timerValues.elapsedTime = Date.now() - this.timerValues.startTime;
+        //     //     clearInterval(this.timerValues.tInterval);
+        //     //     console.log(this.timerValues.called, this.timerValues.elapsedTime)
+        //     // }, 10000)
+        // })
 
     }
 
@@ -154,6 +157,19 @@ class UI {
 
     }
 
+    buildNode(tag, attributes) {
+        const element = document.createElement(tag);
+        Object.keys(attributes).forEach((attribute) => {
+            element.setAttribute(attribute, attributes[attribute]);
+        })
+    }
+
+}
+
+class TriviabilityNode {
+    constructor(tag, attributes) {
+        
+    }
 }
 
 
@@ -162,5 +178,5 @@ class UI {
 // Events?
 
 
-new UI;
+const ui = new UI;
 const quiz = new Quiz();
