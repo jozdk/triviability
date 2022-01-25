@@ -83,7 +83,7 @@ a:link, a:visited {
     filter: opacity(25%);
 }
 
-.border-radius {
+.rounded-lg {
     border: 1px hidden black;
     border-radius: 10px;
 }
@@ -118,5 +118,9 @@ a:link, a:visited {
     .bg-custom {
         background-color: #D2FF96;
     }
+}
+
+.bg-sport_and_leisure {
+    background-color: #D2FF96;
 }
 
