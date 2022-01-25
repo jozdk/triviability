@@ -4,8 +4,8 @@
 // Quiz Class: Represents a Quiz
 
 class Quiz {
-    constructor(gamestate) {
-        this._gamestate = gamestate;
+    constructor(quizstate) {
+        this._quizstate = quizstate;
         this._categories = [];
         this._questions = [];
     }
@@ -33,12 +33,17 @@ class Quiz {
     }
 
     async fetchQuestions() {
-        const url = `https://api.trivia.willfry.co.uk/questions?categories=${this._categories}&limit=9`;
-        const result = await fetch(url);
-        const questions = await result.json();
-        for (let question of questions) {
-            this._questions.push(question);
+        try {
+            const url = `https://api.trivia.willfry.co.uk/questions?categories=${this._categories}&limit=9`;
+            const result = await fetch(url);
+            const questions = await result.json();
+            for (let question of questions) {
+                this._questions.push(question);
+            }
+        } catch {
+            new Error("The request to Open Trivia API failed.")
         }
+        
     }
 }
 
@@ -110,9 +115,7 @@ class UI {
         this.startButton.addEventListener("click", () => {
             quiz.fetchQuestions();
             this.mainElement.style.display = "none";
-            this.buildNode("div", {
-                id: "my-div"
-            })
+            new QuizUI(quiz.categories[0]);
         });
 
         // this.windowElement.addEventListener("load", () => {
@@ -166,10 +169,77 @@ class UI {
 
 }
 
-class TriviabilityNode {
-    constructor(tag, attributes) {
-        
+
+class QuizUI {
+    constructor(category) {
+        this.mainElement = document.querySelector("#main");
+        this.boxComponent = buildComponent(this.buildNode("div", {id: "quiz-element", className: "container"}), this.buildNode("div", {className: "row justify-content-center"}), this.buildNode("div", {className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg"}));
+        this.statsComponent = buildComponent(this.buildNode("div", {className: "row mb-1 p-3"}), this.buildNode("div", {className: "col-12"}), this.buildNode("div", {className: `row rounded-lg bg-${category}`}), this.buildNode())
     }
+
+    buildNode(tag, properties) {
+        const element = document.createElement(tag);
+        Object.keys(properties).forEach((propertyName) => {
+            element[propertyName] = properties[propertyName];
+            // if (properties) {
+            //     Object.keys(properties).forEach((property) => {
+            //         element[property] = properties[property];
+            //     })
+            // }
+        })
+    }
+
+    buildComponent(containerElement, rowElement, colElement_s) {
+
+    }
+
+    append() {
+        //
+    }
+
+    render() {
+        this.mainElement.append()
+    }
+
+}
+
+
+
+
+class TriviabilityNode {
+    element;
+
+    constructor(tag, attributes, properties) {
+        this.element = document.createElement(tag);
+
+        if (attributes) {
+            this.setHTMLAttributes(attributes);
+        }
+
+        if (properties) {
+            this.setProperties(properties);
+        }
+
+    }
+
+
+    append(childorChildren) {
+        if (Array.isArray(childorChildren)) {
+            for (let childNode of childorChildren) {
+                this.element.appendChild(childNode.element);
+            }
+        } else {
+            this.element.appendChild(childorChildren.element);
+        }
+    }
+
+    setHTMLAttributes(attributes) {
+        Object.keys(attributes).forEach((attribute) => {
+            this.element.setAttribute(attribute, attributes[attribute]);
+        })
+    }
+
+    setProperties() 
 }
 
 
@@ -180,3 +250,4 @@ class TriviabilityNode {
 
 const ui = new UI;
 const quiz = new Quiz();
+const quizUI = new QuizUI();
