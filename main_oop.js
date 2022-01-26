@@ -115,7 +115,7 @@ class UI {
         this.startButton.addEventListener("click", () => {
             quiz.fetchQuestions();
             this.mainElement.style.display = "none";
-            new QuizUI(quiz.categories[0]);
+            
         });
 
         // this.windowElement.addEventListener("load", () => {
@@ -170,78 +170,107 @@ class UI {
 }
 
 
-class QuizUI {
-    constructor(category) {
-        this.mainElement = document.querySelector("#main");
-        this.boxComponent = buildComponent(this.buildNode("div", { id: "quiz-element", className: "container" }), this.buildNode("div", { className: "row justify-content-center" }), this.buildNode("div", { className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg" }));
-        this.statsComponent = buildComponent(this.buildNode("div", { className: "row mb-1 p-3" }), this.buildNode("div", { className: "col-12" }), this.buildNode("div", { className: `row rounded-lg bg-${category}` }), this.buildNode())
-    }
+// class QuizUI {
+//     constructor(category) {
+//         this.mainElement = document.querySelector("#main");
+//         this.boxComponent = buildComponent(this.buildNode("div", { id: "quiz-element", className: "container" }), this.buildNode("div", { className: "row justify-content-center" }), this.buildNode("div", { className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg" }));
+//         this.statsComponent = buildComponent(this.buildNode("div", { className: "row mb-1 p-3" }), this.buildNode("div", { className: "col-12" }), this.buildNode("div", { className: `row rounded-lg bg-${category}` }), this.buildNode())
+//     }
 
-    buildNode(tag, properties) {
-        const element = document.createElement(tag);
+//     buildNode(tag, properties) {
+//         const element = document.createElement(tag);
+//         Object.keys(properties).forEach((propertyName) => {
+//             element[propertyName] = properties[propertyName];
+//             // if (properties) {
+//             //     Object.keys(properties).forEach((property) => {
+//             //         element[property] = properties[property];
+//             //     })
+//             // }
+//         })
+//     }
+
+//     buildComponent(...elements) {
+
+//     }
+
+//     append() {
+//         //
+//     }
+
+//     render() {
+//         this.mainElement.append()
+//     }
+
+// }
+
+
+function buildNode(tag, properties) {
+    const element = document.createElement(tag);
+    if (properties) {
         Object.keys(properties).forEach((propertyName) => {
             element[propertyName] = properties[propertyName];
-            // if (properties) {
-            //     Object.keys(properties).forEach((property) => {
-            //         element[property] = properties[property];
-            //     })
-            // }
-        })
+        });
     }
 
-    buildComponent(...elements) {
-        
-    }
-
-    append() {
-        //
-    }
-
-    render() {
-        this.mainElement.append()
-    }
-
+    return element;
 }
 
 
-
-
-
-const tree = {
+const quizComponent = {
     root: {
-        element: this.buildNode("div", {id: "quiz-element", className: "container" }),
+        element: buildNode("div", { id: "quiz-element", className: "container" }),
         children: [
             {
-                element: this.buildNode("div", {className: "row justify-content-center" }),
+                element: buildNode("div", { className: "row justify-content-center" }),
                 children: [
                     {
-                        element: this.buildNode("div", {className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg", id:"box-component"}),
+                        element: buildNode("div", { className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg", id: "box-component" }),
                         children: [
                             {
-                                element: this.buildNode("div", {className: "row mb-1 p-3", id: "stats-component"}),
+                                element: buildNode("div", { className: "row mb-1 p-3", id: "stats-component" }),
                                 children: [
                                     {
-                                        element: this.buildNode("div", {className: "col"}),
+                                        element: buildNode("div", { className: "col" }),
                                         children: [
                                             {
-                                                element: this.buildNode("div", {className: "row rounded-lg p-2 bg-sport_and_leisure"}),
+                                                element: buildNode("div", { className: "row rounded-lg p-2 bg-sport_and_leisure" }),
                                                 children: [
                                                     {
-                                                        element: this.buildNode("div", {className: "col-3"}),
+                                                        element: buildNode("div", { className: "col-3" }),
                                                         children: [
                                                             {
-                                                                element: this.buildNode("p"),
+                                                                element: buildNode("p"),
                                                                 children: [
                                                                     {
-                                                                        element: document.createTextNode(category),
+                                                                        element: document.createTextNode("Science"),
                                                                         children: null
-                                                                    },
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        element: buildNode("div", { className: "col-3" }),
+                                                        children: [
+                                                            {
+                                                                element: buildNode("p"),
+                                                                children: [
                                                                     {
-                                                                        element: document.createTextNode(`${answered + 1}/9`),
+                                                                        element: document.createTextNode("1/10"),
                                                                         children: null
-                                                                    },
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        element: buildNode("div", { className: "col-3" }),
+                                                        children: [
+                                                            {
+                                                                element: buildNode("p"),
+                                                                children: [
                                                                     {
-                                                                        element: document.createTextNode(`${points} pts.`),
+                                                                        element: document.createTextNode("0 pts"),
                                                                         children: null
                                                                     }
                                                                 ]
@@ -255,16 +284,16 @@ const tree = {
                                 ]
                             },
                             {
-                                element: this.buildNode("div", {className: "row", id: "question-component"}),
+                                element: buildNode("div", { className: "row", id: "question-component" }),
                                 children: [
                                     {
-                                        element: this.buildNode("div", {className: "col text-center p-4 p-md-5"}),
+                                        element: buildNode("div", { className: "col text-center p-4 p-md-5" }),
                                         children: [
                                             {
-                                                element: this.buildNode("p", {className: "lead"}),
+                                                element: buildNode("p", { className: "lead" }),
                                                 children: [
                                                     {
-                                                        element: document.createTextNode(quiz.questions[answered].question),
+                                                        element: document.createTextNode("What does it take to make this quiz look good?"),
                                                         children: null
                                                     }
                                                 ]
@@ -274,16 +303,16 @@ const tree = {
                                 ]
                             },
                             {
-                                element: this.buildNode("div", {className: "row text-center lead px-md-2", id: "answers-component"}),
+                                element: buildNode("div", { className: "row text-center lead px-md-2", id: "answers-component" }),
                                 children: [
                                     {
-                                        element: this.buildNode("div", {className: "col-md-6 px-3 px-md-2"}),
+                                        element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
                                         children: [
                                             {
-                                                element: this.buildNode("p", {className: "rounded-lg py-2 py-md-5 bg-custom answer-highlight"}),
+                                                element: buildNode("p", { className: "rounded-lg py-2 py-md-5 bg-custom answer-highlight" }),
                                                 children: [
                                                     {
-                                                        element: document.createTextNode(quiz.questions[answered].multipleChoice[0]),
+                                                        element: document.createTextNode("Bootstrap"),
                                                         children: null
                                                     }
                                                 ]
@@ -291,13 +320,13 @@ const tree = {
                                         ]
                                     },
                                     {
-                                        element: this.buildNode("div", {className: "col-md-6 px-3 px-md-2"}),
+                                        element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
                                         children: [
                                             {
-                                                element: this.buildNode("p", {className: "rounded-lg py-2 py-md-5 bg-custom answer-highlight"}),
+                                                element: buildNode("p", { className: "rounded-lg py-2 py-md-5 bg-custom answer-highlight" }),
                                                 children: [
                                                     {
-                                                        element: document.createTextNode(quiz.questions[answered].multipleChoice[1]),
+                                                        element: document.createTextNode("No Bootstrap"),
                                                         children: null
                                                     }
                                                 ]
@@ -305,13 +334,13 @@ const tree = {
                                         ]
                                     },
                                     {
-                                        element: this.buildNode("div", {className: "col-md-6 px-3 px-md-2"}),
+                                        element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
                                         children: [
                                             {
-                                                element: this.buildNode("p", {className: "rounded-lg py-2 py-md-5 bg-custom answer-highlight"}),
+                                                element: buildNode("p", { className: "rounded-lg py-2 py-md-5 bg-custom answer-highlight" }),
                                                 children: [
                                                     {
-                                                        element: document.createTextNode(quiz.questions[answered].multipleChoice[2]),
+                                                        element: document.createTextNode("Bootstrap + Custom CSS"),
                                                         children: null
                                                     }
                                                 ]
@@ -319,13 +348,13 @@ const tree = {
                                         ]
                                     },
                                     {
-                                        element: this.buildNode("div", {className: "col-md-6 px-3 px-md-2"}),
+                                        element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
                                         children: [
                                             {
-                                                element: this.buildNode("p", {className: "rounded-lg py-2 py-md-5 bg-custom answer-highlight"}),
+                                                element: buildNode("p", { className: "rounded-lg py-2 py-md-5 bg-custom answer-highlight" }),
                                                 children: [
                                                     {
-                                                        element: document.createTextNode(quiz.questions[answered].multipleChoice[3]),
+                                                        element: document.createTextNode("Magic"),
                                                         children: null
                                                     }
                                                 ]
@@ -337,13 +366,13 @@ const tree = {
                         ]
                     },
                     {
-                        element: this.buildNode("div", {className: "row justify-content-center", id: "progress-component"}),
+                        element: buildNode("div", { className: "row justify-content-center", id: "progress-component" }),
                         children: [
                             {
-                                element: this.buildNode("div", {className: "mt-md-5 mt-4 col-6 px-0 rounded-lg bg-light"}),
+                                element: buildNode("div", { className: "mt-md-5 mt-4 col-6 px-0 rounded-lg bg-light" }),
                                 children: [
                                     {
-                                        element: this.buildNode("div", {className: "rounded-lg", id: "bar"}),
+                                        element: buildNode("div", { className: "rounded-lg", id: "bar" }),
                                         children: null
                                     }
                                 ]
@@ -356,80 +385,24 @@ const tree = {
     }
 }
 
-// Loop
-
-// buildDOM(tree) {
-//     const queue = [];
-//     const startNode = {node: tree.root, explored: true};
-//     queue.push(startNode);
-
-//     while (queue.length) {
-//         let currentNode = queue.pop();
-//         if (currentNode.children === null) {
-
-//         }
-//     }
-
-
-//     const currentNode = {};
-
-//     while (!currentNode.explored) {
-//         currentNode.node
-//     }
-
-// }
-
-// Recursion
-
-// let main = document.querySelector("#main")
-
-// buildDOM(tree, root) {
-
-//     if (queue.length === 0) {
-//         return;
-//     }
-
-//     const queue = [];
-//     queue.push(tree.root);
-//     // Mark startNode as explored????
-    
-//     let currentNode = queue.pop();
-
-//     if (currentNode.children) {
-//         currentNode.element.append(...currentNode.children);
-//     }
-
-
-//     if (currentNode.children === null) {
-
-//     } else {
-//         for (let child of currentNode.children) {
-//         queue.push(child);
-//         // Mark child as explored????
-//         }
-//     }
-    
-//     buildDOM()
-// }
-
 
 
 let component = {
     root: {
-        element: buildNode("div", {className: "container", id: "quiz-element"}),
+        element: buildNode("div", { className: "container", id: "quiz-element" }),
         children: [
             {
-                element: buildNode("div", {className: "row justify-content-center"}),
+                element: buildNode("div", { className: "row justify-content-center" }),
                 children: [
                     {
-                        element: buildNode("div", {className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg"}),
+                        element: buildNode("div", { className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg" }),
                         children: null
                     },
                     {
-                        element: buildNode("div", {className: "row justify-content-center"}),
+                        element: buildNode("div", { className: "row justify-content-center" }),
                         children: [
                             {
-                                element: buildNode("div", {className: "mt-md-5 mt-4 col-6 px-0 rounded-lg bg-light"}),
+                                element: buildNode("div", { className: "mt-md-5 mt-4 col-6 px-0 rounded-lg bg-light" }),
                                 children: null
                             }
                         ]
@@ -442,60 +415,46 @@ let component = {
 }
 
 
-function breadthFirstTraversal(startingNode, callback) {
-    const queue = [startingNode];
-
-    while (queue.length) {
-        const node = queue.shift();
-        callback(node);
-        for (let child of node.children) {
-            queue.push(child);
-        }
-        
-    }
-
-
-
-}
 
 
 
 
-class TriviabilityNode {
-    element;
 
-    constructor(tag, attributes, properties) {
-        this.element = document.createElement(tag);
+// class TriviabilityNode {
+//     element;
 
-        if (attributes) {
-            this.setHTMLAttributes(attributes);
-        }
+//     constructor(tag, attributes, properties) {
+//         this.element = document.createElement(tag);
 
-        if (properties) {
-            this.setProperties(properties);
-        }
+//         if (attributes) {
+//             this.setHTMLAttributes(attributes);
+//         }
 
-    }
+//         if (properties) {
+//             this.setProperties(properties);
+//         }
+
+//     }
 
 
-    append(childorChildren) {
-        if (Array.isArray(childorChildren)) {
-            for (let childNode of childorChildren) {
-                this.element.appendChild(childNode.element);
-            }
-        } else {
-            this.element.appendChild(childorChildren.element);
-        }
-    }
+//     append(childorChildren) {
+//         if (Array.isArray(childorChildren)) {
+//             for (let childNode of childorChildren) {
+//                 this.element.appendChild(childNode.element);
+//             }
+//         } else {
+//             this.element.appendChild(childorChildren.element);
+//         }
+//     }
 
-    setHTMLAttributes(attributes) {
-        Object.keys(attributes).forEach((attribute) => {
-            this.element.setAttribute(attribute, attributes[attribute]);
-        })
-    }
+//     setHTMLAttributes(attributes) {
+//         Object.keys(attributes).forEach((attribute) => {
+//             this.element.setAttribute(attribute, attributes[attribute]);
+//         })
+//     }
 
-    setProperties()
-}
+
+// }
 
 
 // Local Storage Class: Handles Local Storage
@@ -505,7 +464,7 @@ class TriviabilityNode {
 
 const ui = new UI;
 const quiz = new Quiz();
-const quizUI = new QuizUI();
+//const quizUI = new QuizUI();
 
 
 // class QuizUI {
@@ -554,3 +513,33 @@ const quizUI = new QuizUI();
 //     }
 
 // }
+
+
+// const mainTwo = document.querySelector("#main-2");
+
+
+function depthFirstTraversalTest(rootNode, indexOfStartingNode, startingNode) {
+    
+    rootNode.append(startingNode.element);
+
+    //console.log(startingNode.children)
+
+    if (startingNode.children) {
+        startingNode.children.forEach((child, i) => {
+            let nodeArray = Array.from(rootNode.children);
+            let newRootNode = nodeArray[indexOfStartingNode];
+            depthFirstTraversalTest(newRootNode, i, child);
+        })
+
+        // for (let i = 0; i < startingNode.children.length; i++) {
+        //     let nodeArray = Array.from(rootNode.childNodes);
+        //     let newRootNode = nodeArray[indexOfParentInNodeArray];
+        //     depthFirstTraversal(newRootNode, i, startingNode.children[i]);
+        // }
+
+    }
+
+}
+
+
+//depthFirstTraversalTest(ui.mainElement, 2, quizComponent.root);
