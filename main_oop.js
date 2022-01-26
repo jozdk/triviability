@@ -156,52 +156,7 @@ class UI {
         }
     }
 
-    render() {
-
-    }
-
-    buildNode(tag, attributes) {
-        const element = document.createElement(tag);
-        Object.keys(attributes).forEach((attribute) => {
-            element.setAttribute(attribute, attributes[attribute]);
-        })
-    }
-
 }
-
-
-// class QuizUI {
-//     constructor(category) {
-//         this.mainElement = document.querySelector("#main");
-//         this.boxComponent = buildComponent(this.buildNode("div", { id: "quiz-element", className: "container" }), this.buildNode("div", { className: "row justify-content-center" }), this.buildNode("div", { className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg" }));
-//         this.statsComponent = buildComponent(this.buildNode("div", { className: "row mb-1 p-3" }), this.buildNode("div", { className: "col-12" }), this.buildNode("div", { className: `row rounded-lg bg-${category}` }), this.buildNode())
-//     }
-
-//     buildNode(tag, properties) {
-//         const element = document.createElement(tag);
-//         Object.keys(properties).forEach((propertyName) => {
-//             element[propertyName] = properties[propertyName];
-//             // if (properties) {
-//             //     Object.keys(properties).forEach((property) => {
-//             //         element[property] = properties[property];
-//             //     })
-//             // }
-//         })
-//     }
-
-//     buildComponent(...elements) {
-
-//     }
-
-//     append() {
-//         //
-//     }
-
-//     render() {
-//         this.mainElement.append()
-//     }
-
-// }
 
 
 function buildNode(tag, properties) {
@@ -415,48 +370,6 @@ let component = {
 }
 
 
-
-
-
-
-
-// class TriviabilityNode {
-//     element;
-
-//     constructor(tag, attributes, properties) {
-//         this.element = document.createElement(tag);
-
-//         if (attributes) {
-//             this.setHTMLAttributes(attributes);
-//         }
-
-//         if (properties) {
-//             this.setProperties(properties);
-//         }
-
-//     }
-
-
-//     append(childorChildren) {
-//         if (Array.isArray(childorChildren)) {
-//             for (let childNode of childorChildren) {
-//                 this.element.appendChild(childNode.element);
-//             }
-//         } else {
-//             this.element.appendChild(childorChildren.element);
-//         }
-//     }
-
-//     setHTMLAttributes(attributes) {
-//         Object.keys(attributes).forEach((attribute) => {
-//             this.element.setAttribute(attribute, attributes[attribute]);
-//         })
-//     }
-
-
-// }
-
-
 // Local Storage Class: Handles Local Storage
 
 // Events?
@@ -464,58 +377,6 @@ let component = {
 
 const ui = new UI;
 const quiz = new Quiz();
-//const quizUI = new QuizUI();
-
-
-// class QuizUI {
-//     constructor(category) {
-//         this.mainElement = document.querySelector("#main");
-//         this.boxComponent = buildComponent(this.buildNode("div", { id: "quiz-element", className: "container" }), this.buildNode("div", { className: "row justify-content-center" }), this.buildNode("div", { className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg" }));
-//         this.statsComponent = buildComponent(this.buildNode("div", { className: "row mb-1 p-3" }), this.buildNode("div", { className: "col-12" }), this.buildNode("div", { className: `row rounded-lg bg-${category}` }), this.buildNode())
-//     }
-
-//     root(tag, properties, children) {
-//         const element = document.createElement(tag);
-//         Object.keys(properties).forEach((propertyName) => {
-//             element[propertyName] = properties[propertyName];
-//             // if (HTMLAttributes) {
-//             //     Object.keys(HTMLAttributes).forEach((attribute) => {
-//             //         element.setAttribute(attribute, HTMLAttributes.attribute)
-//             //     })
-//             // }
-//         })
-//         return {
-//             type: "root",
-//             element: element,
-//             children: this.childrensList(children)
-//         }
-//     }
-
-//     childrensList(children) {
-//         const childrensList = [];
-//         for (let i = 0; i < children.length; i++) {
-//             childrensList.push()
-//         }
-
-//         while 
-//     }
-
-//     buildComponent(elements, structure = {}) {
-
-//     }
-
-//     append() {
-//         //
-//     }
-
-//     render() {
-//         this.mainElement.append()
-//     }
-
-// }
-
-
-// const mainTwo = document.querySelector("#main-2");
 
 
 function depthFirstTraversalTest(rootNode, indexOfStartingNode, startingNode) {
@@ -542,4 +403,4 @@ function depthFirstTraversalTest(rootNode, indexOfStartingNode, startingNode) {
 }
 
 
-//depthFirstTraversalTest(ui.mainElement, 2, quizComponent.root);
+depthFirstTraversalTest(ui.mainElement, 2, quizComponent.root);
