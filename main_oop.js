@@ -43,7 +43,7 @@ class Quiz {
         } catch {
             new Error("The request to Open Trivia API failed.")
         }
-        
+
     }
 }
 
@@ -173,8 +173,8 @@ class UI {
 class QuizUI {
     constructor(category) {
         this.mainElement = document.querySelector("#main");
-        this.boxComponent = buildComponent(this.buildNode("div", {id: "quiz-element", className: "container"}), this.buildNode("div", {className: "row justify-content-center"}), this.buildNode("div", {className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg"}));
-        this.statsComponent = buildComponent(this.buildNode("div", {className: "row mb-1 p-3"}), this.buildNode("div", {className: "col-12"}), this.buildNode("div", {className: `row rounded-lg bg-${category}`}), this.buildNode())
+        this.boxComponent = buildComponent(this.buildNode("div", { id: "quiz-element", className: "container" }), this.buildNode("div", { className: "row justify-content-center" }), this.buildNode("div", { className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg" }));
+        this.statsComponent = buildComponent(this.buildNode("div", { className: "row mb-1 p-3" }), this.buildNode("div", { className: "col-12" }), this.buildNode("div", { className: `row rounded-lg bg-${category}` }), this.buildNode())
     }
 
     buildNode(tag, properties) {
@@ -189,8 +189,8 @@ class QuizUI {
         })
     }
 
-    buildComponent(containerElement, rowElement, colElement_s) {
-
+    buildComponent(...elements) {
+        
     }
 
     append() {
@@ -200,6 +200,261 @@ class QuizUI {
     render() {
         this.mainElement.append()
     }
+
+}
+
+
+
+
+
+const tree = {
+    root: {
+        element: this.buildNode("div", {id: "quiz-element", className: "container" }),
+        children: [
+            {
+                element: this.buildNode("div", {className: "row justify-content-center" }),
+                children: [
+                    {
+                        element: this.buildNode("div", {className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg", id:"box-component"}),
+                        children: [
+                            {
+                                element: this.buildNode("div", {className: "row mb-1 p-3", id: "stats-component"}),
+                                children: [
+                                    {
+                                        element: this.buildNode("div", {className: "col"}),
+                                        children: [
+                                            {
+                                                element: this.buildNode("div", {className: "row rounded-lg p-2 bg-sport_and_leisure"}),
+                                                children: [
+                                                    {
+                                                        element: this.buildNode("div", {className: "col-3"}),
+                                                        children: [
+                                                            {
+                                                                element: this.buildNode("p"),
+                                                                children: [
+                                                                    {
+                                                                        element: document.createTextNode(category),
+                                                                        children: null
+                                                                    },
+                                                                    {
+                                                                        element: document.createTextNode(`${answered + 1}/9`),
+                                                                        children: null
+                                                                    },
+                                                                    {
+                                                                        element: document.createTextNode(`${points} pts.`),
+                                                                        children: null
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                element: this.buildNode("div", {className: "row", id: "question-component"}),
+                                children: [
+                                    {
+                                        element: this.buildNode("div", {className: "col text-center p-4 p-md-5"}),
+                                        children: [
+                                            {
+                                                element: this.buildNode("p", {className: "lead"}),
+                                                children: [
+                                                    {
+                                                        element: document.createTextNode(quiz.questions[answered].question),
+                                                        children: null
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                element: this.buildNode("div", {className: "row text-center lead px-md-2", id: "answers-component"}),
+                                children: [
+                                    {
+                                        element: this.buildNode("div", {className: "col-md-6 px-3 px-md-2"}),
+                                        children: [
+                                            {
+                                                element: this.buildNode("p", {className: "rounded-lg py-2 py-md-5 bg-custom answer-highlight"}),
+                                                children: [
+                                                    {
+                                                        element: document.createTextNode(quiz.questions[answered].multipleChoice[0]),
+                                                        children: null
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        element: this.buildNode("div", {className: "col-md-6 px-3 px-md-2"}),
+                                        children: [
+                                            {
+                                                element: this.buildNode("p", {className: "rounded-lg py-2 py-md-5 bg-custom answer-highlight"}),
+                                                children: [
+                                                    {
+                                                        element: document.createTextNode(quiz.questions[answered].multipleChoice[1]),
+                                                        children: null
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        element: this.buildNode("div", {className: "col-md-6 px-3 px-md-2"}),
+                                        children: [
+                                            {
+                                                element: this.buildNode("p", {className: "rounded-lg py-2 py-md-5 bg-custom answer-highlight"}),
+                                                children: [
+                                                    {
+                                                        element: document.createTextNode(quiz.questions[answered].multipleChoice[2]),
+                                                        children: null
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        element: this.buildNode("div", {className: "col-md-6 px-3 px-md-2"}),
+                                        children: [
+                                            {
+                                                element: this.buildNode("p", {className: "rounded-lg py-2 py-md-5 bg-custom answer-highlight"}),
+                                                children: [
+                                                    {
+                                                        element: document.createTextNode(quiz.questions[answered].multipleChoice[3]),
+                                                        children: null
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        element: this.buildNode("div", {className: "row justify-content-center", id: "progress-component"}),
+                        children: [
+                            {
+                                element: this.buildNode("div", {className: "mt-md-5 mt-4 col-6 px-0 rounded-lg bg-light"}),
+                                children: [
+                                    {
+                                        element: this.buildNode("div", {className: "rounded-lg", id: "bar"}),
+                                        children: null
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+// Loop
+
+// buildDOM(tree) {
+//     const queue = [];
+//     const startNode = {node: tree.root, explored: true};
+//     queue.push(startNode);
+
+//     while (queue.length) {
+//         let currentNode = queue.pop();
+//         if (currentNode.children === null) {
+
+//         }
+//     }
+
+
+//     const currentNode = {};
+
+//     while (!currentNode.explored) {
+//         currentNode.node
+//     }
+
+// }
+
+// Recursion
+
+// let main = document.querySelector("#main")
+
+// buildDOM(tree, root) {
+
+//     if (queue.length === 0) {
+//         return;
+//     }
+
+//     const queue = [];
+//     queue.push(tree.root);
+//     // Mark startNode as explored????
+    
+//     let currentNode = queue.pop();
+
+//     if (currentNode.children) {
+//         currentNode.element.append(...currentNode.children);
+//     }
+
+
+//     if (currentNode.children === null) {
+
+//     } else {
+//         for (let child of currentNode.children) {
+//         queue.push(child);
+//         // Mark child as explored????
+//         }
+//     }
+    
+//     buildDOM()
+// }
+
+
+
+let component = {
+    root: {
+        element: buildNode("div", {className: "container", id: "quiz-element"}),
+        children: [
+            {
+                element: buildNode("div", {className: "row justify-content-center"}),
+                children: [
+                    {
+                        element: buildNode("div", {className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg"}),
+                        children: null
+                    },
+                    {
+                        element: buildNode("div", {className: "row justify-content-center"}),
+                        children: [
+                            {
+                                element: buildNode("div", {className: "mt-md-5 mt-4 col-6 px-0 rounded-lg bg-light"}),
+                                children: null
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+
+}
+
+
+function breadthFirstTraversal(startingNode, callback) {
+    const queue = [startingNode];
+
+    while (queue.length) {
+        const node = queue.shift();
+        callback(node);
+        for (let child of node.children) {
+            queue.push(child);
+        }
+        
+    }
+
+
 
 }
 
@@ -239,7 +494,7 @@ class TriviabilityNode {
         })
     }
 
-    setProperties() 
+    setProperties()
 }
 
 
@@ -251,3 +506,51 @@ class TriviabilityNode {
 const ui = new UI;
 const quiz = new Quiz();
 const quizUI = new QuizUI();
+
+
+// class QuizUI {
+//     constructor(category) {
+//         this.mainElement = document.querySelector("#main");
+//         this.boxComponent = buildComponent(this.buildNode("div", { id: "quiz-element", className: "container" }), this.buildNode("div", { className: "row justify-content-center" }), this.buildNode("div", { className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg" }));
+//         this.statsComponent = buildComponent(this.buildNode("div", { className: "row mb-1 p-3" }), this.buildNode("div", { className: "col-12" }), this.buildNode("div", { className: `row rounded-lg bg-${category}` }), this.buildNode())
+//     }
+
+//     root(tag, properties, children) {
+//         const element = document.createElement(tag);
+//         Object.keys(properties).forEach((propertyName) => {
+//             element[propertyName] = properties[propertyName];
+//             // if (HTMLAttributes) {
+//             //     Object.keys(HTMLAttributes).forEach((attribute) => {
+//             //         element.setAttribute(attribute, HTMLAttributes.attribute)
+//             //     })
+//             // }
+//         })
+//         return {
+//             type: "root",
+//             element: element,
+//             children: this.childrensList(children)
+//         }
+//     }
+
+//     childrensList(children) {
+//         const childrensList = [];
+//         for (let i = 0; i < children.length; i++) {
+//             childrensList.push()
+//         }
+
+//         while 
+//     }
+
+//     buildComponent(elements, structure = {}) {
+
+//     }
+
+//     append() {
+//         //
+//     }
+
+//     render() {
+//         this.mainElement.append()
+//     }
+
+// }
