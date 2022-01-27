@@ -1,13 +1,9 @@
-// new Settings;
+// Settings
 
-
-// Quiz Class: Represents a Quiz
-
-class Quiz {
-    constructor(quizstate) {
-        this._quizstate = quizstate;
+class Settings {
+    constructor() {
         this._categories = [];
-        this._questions = [];
+        this._quiz = {};
     }
 
     set categories(selected) {
@@ -22,26 +18,23 @@ class Quiz {
         return this._categories;
     }
 
-    set questions(data) {
-        for (let question of data) {
-            this._questions.push(question);
+    checkCategories() {
+        if (this._categories.length) {
+            return this._categories;
+        } else {
+            throw new Error("Please select one or more categories");
         }
-    }
-
-    get questions() {
-        return this._questions;
     }
 
     async fetchQuestions() {
         try {
-            const url = `https://api.trivia.willfry.co.uk/questions?categories=${this._categories}&limit=9`;
+            const categories = this.checkCategories();
+            const url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
             const result = await fetch(url);
             const questions = await result.json();
-            for (let question of questions) {
-                this._questions.push(question);
-            }
-        } catch {
-            new Error("The request to Open Trivia API failed.")
+            this._quiz = new Quiz(questions);        
+        } catch(error) {
+            // output error message
         }
 
     }
@@ -50,13 +43,68 @@ class Quiz {
 
 // Question Class: Represents a Question
 
-// Settings Class: Represents Settings
+class Question {
+    constructor(question) {
+        this.category = question.category
+        this.type = question.type
+        this.question = question.question
+        this.correctAnswer = question.correctAnswer
+        this.wrongAnswers = question.incorrectAnswers
+        this.result
+        this.makeMultipleChoice();
+    }
 
-// class Settings {
-//     constructor() {
+    makeMultipleChoice() {
+        const allWrongAnswers = this.wrongAnswers;
+        const randomWrongAnswers = [];
 
-//     }
-// }
+        while (randomWrongAnswers.length < 3) {
+            let random = Math.floor(Math.random() * allWrongAnswers.length);
+            randomWrongAnswers.push(allWrongAnswers[random]);
+            allWrongAnswers.splice(random, 1);
+        }
+
+        const choices = [this.correctAnswer, ...randomWrongAnswers]
+        this.multipleChoice = choices.sort(() => 0.5 - Math.random());
+    }
+
+    validate(answer) {
+        if (answer === this.correctAnswer) {
+            this.result = true;
+        } else {
+            this.result = false;
+        }
+    }
+
+}
+
+
+// Quiz
+
+class Quiz {
+    constructor(questions) {
+        this._questions = questions.map((question) => new Question(question));
+        this._gamestate = {
+            answered: 0,
+            points: 0
+        }
+
+    }
+
+    set gamestate(answered, points) {
+        this._gamestate.answered = answered;
+        this._gamestate.points = points;
+    }
+
+    get gamestate() {
+        return this._gamestate;
+    }
+
+    get questions() {
+        return this._questions;
+    }
+}
+
 
 // UI Class: Handles UI Tasks
 
@@ -211,7 +259,7 @@ const quizComponent = {
                                                                 element: buildNode("p"),
                                                                 children: [
                                                                     {
-                                                                        element: document.createTextNode("1/10"),
+                                                                        element: document.createTextNode("3/10"),
                                                                         children: null
                                                                     }
                                                                 ]
@@ -225,7 +273,7 @@ const quizComponent = {
                                                                 element: buildNode("p"),
                                                                 children: [
                                                                     {
-                                                                        element: document.createTextNode("0 pts"),
+                                                                        element: document.createTextNode("20 pts"),
                                                                         children: null
                                                                     }
                                                                 ]
@@ -376,14 +424,12 @@ let component = {
 
 
 const ui = new UI;
-const quiz = new Quiz();
+const settings = new Settings();
 
 
 function depthFirstTraversalTest(rootNode, indexOfStartingNode, startingNode) {
     
     rootNode.append(startingNode.element);
-
-    //console.log(startingNode.children)
 
     if (startingNode.children) {
         startingNode.children.forEach((child, i) => {
@@ -392,15 +438,48 @@ function depthFirstTraversalTest(rootNode, indexOfStartingNode, startingNode) {
             depthFirstTraversalTest(newRootNode, i, child);
         })
 
-        // for (let i = 0; i < startingNode.children.length; i++) {
-        //     let nodeArray = Array.from(rootNode.childNodes);
-        //     let newRootNode = nodeArray[indexOfParentInNodeArray];
-        //     depthFirstTraversal(newRootNode, i, startingNode.children[i]);
-        // }
-
     }
 
 }
 
 
 depthFirstTraversalTest(ui.mainElement, 2, quizComponent.root);
+
+
+class UIForQuiz {
+    constructor(category, questions, { answered, points }) {
+        this.mainElement = document.querySelector("#main")
+        this.quizBox = new QuizBoxComponent(category, questions, answered, points)
+        this.compileDOMTree(this.quizBox.abstractDOMTree);
+        this.progressBar = {
+            elem: document.querySelector("#bar"),
+            width: 0,
+            called: 0
+        }
+    }
+
+    updateComponent(component, category, questions, answered, points) {
+        switch (component) {
+            case "quizBox":
+                this.quizBox = new QuizBoxComponent(category, questions, answered, points);
+                break;
+            case "stats":
+                
+        }
+    }
+
+    compileDOMTree(startingNode, rootNode = this.mainElement, indexOfStartingNode = 2) {
+    
+        rootNode.append(startingNode.element);
+    
+        if (startingNode.children) {
+            startingNode.children.forEach((child, i) => {
+                let nodeArray = Array.from(rootNode.children);
+                let newRootNode = nodeArray[indexOfStartingNode];
+                this.compileDOMTree(child, newRootNode, i);
+            })
+        }
+    
+    }
+
+}
