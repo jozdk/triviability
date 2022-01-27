@@ -91,7 +91,7 @@ class Quiz {
 
     }
 
-    set gamestate(answered, points) {
+    set gamestate({ answered, points }) {
         this._gamestate.answered = answered;
         this._gamestate.points = points;
     }
