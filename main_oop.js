@@ -50,8 +50,8 @@ class Question {
         this.question = question.question
         this.correctAnswer = question.correctAnswer
         this.wrongAnswers = question.incorrectAnswers
+        this.multipleChoice = this.makeMultipleChoice()
         this.result
-        this.makeMultipleChoice();
     }
 
     makeMultipleChoice() {
@@ -65,7 +65,7 @@ class Question {
         }
 
         const choices = [this.correctAnswer, ...randomWrongAnswers]
-        this.multipleChoice = choices.sort(() => 0.5 - Math.random());
+        return choices.sort(() => 0.5 - Math.random());
     }
 
     validate(answer) {
@@ -88,6 +88,7 @@ class Quiz {
             answered: 0,
             points: 0
         }
+        this.ui = new UIForQuiz(this._questions[0].category, this._questions[0].question, this.gamestate);
 
     }
 
@@ -259,7 +260,7 @@ const quizComponent = {
                                                                 element: buildNode("p"),
                                                                 children: [
                                                                     {
-                                                                        element: document.createTextNode("3/10"),
+                                                                        element: document.createTextNode("1/10"),
                                                                         children: null
                                                                     }
                                                                 ]
@@ -273,7 +274,7 @@ const quizComponent = {
                                                                 element: buildNode("p"),
                                                                 children: [
                                                                     {
-                                                                        element: document.createTextNode("20 pts"),
+                                                                        element: document.createTextNode("0 pts"),
                                                                         children: null
                                                                     }
                                                                 ]
@@ -427,30 +428,43 @@ const ui = new UI;
 const settings = new Settings();
 
 
-function depthFirstTraversalTest(rootNode, indexOfStartingNode, startingNode) {
+// function depthFirstTraversalTest(rootNode, indexOfStartingNode, startingNode) {
+    
+//     rootNode.append(startingNode.element);
+
+//     if (startingNode.children) {
+//         startingNode.children.forEach((child, i) => {
+//             let nodeArray = Array.from(rootNode.children);
+//             let newRootNode = nodeArray[indexOfStartingNode];
+//             depthFirstTraversalTest(newRootNode, i, child);
+//         })
+
+//     }
+
+// }
+
+
+function depthFirstTraversalTest(rootNode, startingNode) {
     
     rootNode.append(startingNode.element);
 
     if (startingNode.children) {
-        startingNode.children.forEach((child, i) => {
-            let nodeArray = Array.from(rootNode.children);
-            let newRootNode = nodeArray[indexOfStartingNode];
-            depthFirstTraversalTest(newRootNode, i, child);
+        startingNode.children.forEach((child) => {
+            depthFirstTraversalTest(rootNode.lastElementChild, child);
         })
 
     }
 
 }
 
-
-depthFirstTraversalTest(ui.mainElement, 2, quizComponent.root);
+depthFirstTraversalTest(ui.mainElement, quizComponent.root);
 
 
 class UIForQuiz {
     constructor(category, questions, { answered, points }) {
         this.mainElement = document.querySelector("#main")
         this.quizBox = new QuizBoxComponent(category, questions, answered, points)
-        this.compileDOMTree(this.quizBox.abstractDOMTree);
+        this.compileDOMTree(this.mainElement, this.quizBox.abstractDOMTree);
         this.progressBar = {
             elem: document.querySelector("#bar"),
             width: 0,
@@ -468,16 +482,15 @@ class UIForQuiz {
         }
     }
 
-    compileDOMTree(startingNode, rootNode = this.mainElement, indexOfStartingNode = 2) {
+    compileDOMTree(rootNode, startingNode) {
     
         rootNode.append(startingNode.element);
     
         if (startingNode.children) {
-            startingNode.children.forEach((child, i) => {
-                let nodeArray = Array.from(rootNode.children);
-                let newRootNode = nodeArray[indexOfStartingNode];
-                this.compileDOMTree(child, newRootNode, i);
+            startingNode.children.forEach((child) => {
+                this.compileDOMTree(rootNode.lastElementChild, child);
             })
+    
         }
     
     }
