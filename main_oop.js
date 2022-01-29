@@ -32,9 +32,10 @@ class Settings {
             const url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
             const result = await fetch(url);
             const questions = await result.json();
-            this._quiz = new Quiz(questions);        
-        } catch(error) {
+            this._quiz = new Quiz(questions);
+        } catch (error) {
             // output error message
+            console.log(error.message)
         }
 
     }
@@ -45,13 +46,16 @@ class Settings {
 
 class Question {
     constructor(question) {
-        this.category = question.category
-        this.type = question.type
-        this.question = question.question
-        this.correctAnswer = question.correctAnswer
-        this.wrongAnswers = question.incorrectAnswers
-        this.multipleChoice = this.makeMultipleChoice()
-        this.result
+        this.category = {
+            title: question.category,
+            color: question.category.toLowerCase().replace(/\s/g, "-")
+        };
+        this.type = question.type;
+        this.question = question.question;
+        this.correctAnswer = question.correctAnswer;
+        this.wrongAnswers = question.incorrectAnswers;
+        this.multipleChoice = this.makeMultipleChoice();
+        this.result;
     }
 
     makeMultipleChoice() {
@@ -104,6 +108,10 @@ class Quiz {
     get questions() {
         return this._questions;
     }
+
+    validate(answer) {
+        this._questions[this._gamestate.answered].validate(answer);
+    }
 }
 
 
@@ -111,17 +119,10 @@ class Quiz {
 
 class UI {
     constructor() {
-        this.progressBar = {
-            width: 0,
-            elem: document.querySelector("#bar"),
-            called: 0
-        }
-
         this.windowElement = window;
+        this.selectionPage = document.querySelector("#selection-menu");
         this.selectionElement = document.querySelector("#category-selection");
         this.startButton = document.querySelector("#start-button");
-        this.mainElement = document.querySelector("#main");
-        this.quizElement = document.querySelector("#quiz-element");
 
         this.selectionElement.addEventListener("click", (event) => {
             if (event.target !== this.selectionElement && !event.target.classList.contains("col-sm-12")) {
@@ -162,9 +163,8 @@ class UI {
         });
 
         this.startButton.addEventListener("click", () => {
-            quiz.fetchQuestions();
-            this.mainElement.style.display = "none";
-            
+            settings.fetchQuestions();
+            this.selectionPage.style.display = "none";
         });
 
         // this.windowElement.addEventListener("load", () => {
@@ -220,64 +220,148 @@ function buildNode(tag, properties) {
 }
 
 
-const quizComponent = {
-    root: {
-        element: buildNode("div", { id: "quiz-element", className: "container" }),
-        children: [
-            {
-                element: buildNode("div", { className: "row justify-content-center" }),
+class quizComponentBox {
+    constructor( { category, question, multipleChoice }, { answered, points }, handler) {
+        this.abstractDOMTree = {
+            root: {
+                element: buildNode("div", { id: "quiz-element", className: "container" }),
                 children: [
                     {
-                        element: buildNode("div", { className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg", id: "box-component" }),
+                        element: buildNode("div", { className: "row justify-content-center" }),
                         children: [
                             {
-                                element: buildNode("div", { className: "row mb-1 p-3", id: "stats-component" }),
+                                element: buildNode("div", { className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg", id: "box-component" }),
                                 children: [
                                     {
-                                        element: buildNode("div", { className: "col" }),
+                                        element: buildNode("div", { className: "row mb-1 p-3", id: "stats-component" }),
                                         children: [
                                             {
-                                                element: buildNode("div", { className: "row rounded-lg p-2 bg-sport_and_leisure" }),
+                                                element: buildNode("div", { className: "col" }),
                                                 children: [
                                                     {
-                                                        element: buildNode("div", { className: "col-3" }),
+                                                        element: buildNode("div", { className: `row rounded-lg p-2 bg-${category.color}` }),
                                                         children: [
                                                             {
-                                                                element: buildNode("p"),
+                                                                element: buildNode("div", { className: "col-3" }),
                                                                 children: [
                                                                     {
-                                                                        element: document.createTextNode("Science"),
-                                                                        children: null
+                                                                        element: buildNode("p"),
+                                                                        children: [
+                                                                            {
+                                                                                element: document.createTextNode(category.title),
+                                                                                children: null
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                element: buildNode("div", { className: "col-3" }),
+                                                                children: [
+                                                                    {
+                                                                        element: buildNode("p"),
+                                                                        children: [
+                                                                            {
+                                                                                element: document.createTextNode(`${answered + 1}/9`),
+                                                                                children: null
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                element: buildNode("div", { className: "col-3" }),
+                                                                children: [
+                                                                    {
+                                                                        element: buildNode("p"),
+                                                                        children: [
+                                                                            {
+                                                                                element: document.createTextNode(`${points} pts`),
+                                                                                children: null
+                                                                            }
+                                                                        ]
                                                                     }
                                                                 ]
                                                             }
                                                         ]
-                                                    },
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        element: buildNode("div", { className: "row", id: "question-component" }),
+                                        children: [
+                                            {
+                                                element: buildNode("div", { className: "col text-center p-4 p-md-5" }),
+                                                children: [
                                                     {
-                                                        element: buildNode("div", { className: "col-3" }),
+                                                        element: buildNode("p", { className: "lead" }),
                                                         children: [
                                                             {
-                                                                element: buildNode("p"),
-                                                                children: [
-                                                                    {
-                                                                        element: document.createTextNode("1/10"),
-                                                                        children: null
-                                                                    }
-                                                                ]
+                                                                element: document.createTextNode(question),
+                                                                children: null
                                                             }
                                                         ]
-                                                    },
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        element: buildNode("div", { className: "row text-center lead px-md-2", id: "answers-component" }),
+                                        children: [
+                                            {
+                                                element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
+                                                children: [
                                                     {
-                                                        element: buildNode("div", { className: "col-3" }),
+                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom highlight-${category.color}`, onclick: handler }),
                                                         children: [
                                                             {
-                                                                element: buildNode("p"),
-                                                                children: [
-                                                                    {
-                                                                        element: document.createTextNode("0 pts"),
-                                                                        children: null
-                                                                    }
-                                                                ]
+                                                                element: document.createTextNode(multipleChoice[0]),
+                                                                children: null
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
+                                                children: [
+                                                    {
+                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom highlight-${category.color}`, onclick: handler }),
+                                                        children: [
+                                                            {
+                                                                element: document.createTextNode(multipleChoice[1]),
+                                                                children: null
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
+                                                children: [
+                                                    {
+                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom highlight-${category.color}`, onclick: handler }),
+                                                        children: [
+                                                            {
+                                                                element: document.createTextNode(multipleChoice[2]),
+                                                                children: null
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
+                                                children: [
+                                                    {
+                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom highlight-${category.color}`, onclick: handler }),
+                                                        children: [
+                                                            {
+                                                                element: document.createTextNode(multipleChoice[3]),
+                                                                children: null
                                                             }
                                                         ]
                                                     }
@@ -288,96 +372,16 @@ const quizComponent = {
                                 ]
                             },
                             {
-                                element: buildNode("div", { className: "row", id: "question-component" }),
+                                element: buildNode("div", { className: "row justify-content-center", id: "progress-component" }),
                                 children: [
                                     {
-                                        element: buildNode("div", { className: "col text-center p-4 p-md-5" }),
+                                        element: buildNode("div", { className: "mt-md-5 mt-4 col-6 px-0 rounded-lg bg-light" }),
                                         children: [
                                             {
-                                                element: buildNode("p", { className: "lead" }),
-                                                children: [
-                                                    {
-                                                        element: document.createTextNode("What does it take to make this quiz look good?"),
-                                                        children: null
-                                                    }
-                                                ]
+                                                element: buildNode("div", { className: "rounded-lg", id: "bar" }),
+                                                children: null
                                             }
                                         ]
-                                    }
-                                ]
-                            },
-                            {
-                                element: buildNode("div", { className: "row text-center lead px-md-2", id: "answers-component" }),
-                                children: [
-                                    {
-                                        element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
-                                        children: [
-                                            {
-                                                element: buildNode("p", { className: "rounded-lg py-2 py-md-5 bg-custom answer-highlight" }),
-                                                children: [
-                                                    {
-                                                        element: document.createTextNode("Bootstrap"),
-                                                        children: null
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
-                                        children: [
-                                            {
-                                                element: buildNode("p", { className: "rounded-lg py-2 py-md-5 bg-custom answer-highlight" }),
-                                                children: [
-                                                    {
-                                                        element: document.createTextNode("No Bootstrap"),
-                                                        children: null
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
-                                        children: [
-                                            {
-                                                element: buildNode("p", { className: "rounded-lg py-2 py-md-5 bg-custom answer-highlight" }),
-                                                children: [
-                                                    {
-                                                        element: document.createTextNode("Bootstrap + Custom CSS"),
-                                                        children: null
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
-                                        children: [
-                                            {
-                                                element: buildNode("p", { className: "rounded-lg py-2 py-md-5 bg-custom answer-highlight" }),
-                                                children: [
-                                                    {
-                                                        element: document.createTextNode("Magic"),
-                                                        children: null
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        element: buildNode("div", { className: "row justify-content-center", id: "progress-component" }),
-                        children: [
-                            {
-                                element: buildNode("div", { className: "mt-md-5 mt-4 col-6 px-0 rounded-lg bg-light" }),
-                                children: [
-                                    {
-                                        element: buildNode("div", { className: "rounded-lg", id: "bar" }),
-                                        children: null
                                     }
                                 ]
                             }
@@ -385,9 +389,10 @@ const quizComponent = {
                     }
                 ]
             }
-        ]
+        }
     }
 }
+
 
 
 
@@ -429,7 +434,7 @@ const settings = new Settings();
 
 
 // function depthFirstTraversalTest(rootNode, indexOfStartingNode, startingNode) {
-    
+
 //     rootNode.append(startingNode.element);
 
 //     if (startingNode.children) {
@@ -443,9 +448,10 @@ const settings = new Settings();
 
 // }
 
+const quizBox = new QuizBoxComponent()
 
 function depthFirstTraversalTest(rootNode, startingNode) {
-    
+
     rootNode.append(startingNode.element);
 
     if (startingNode.children) {
@@ -461,10 +467,10 @@ depthFirstTraversalTest(ui.mainElement, quizComponent.root);
 
 
 class UIForQuiz {
-    constructor(category, questions, { answered, points }) {
+    constructor(category, questions, gamestate) {
         this.mainElement = document.querySelector("#main")
-        this.quizBox = new QuizBoxComponent(category, questions, answered, points)
-        this.compileDOMTree(this.mainElement, this.quizBox.abstractDOMTree);
+        this.quizBox = new QuizBoxComponent(questions[0], gamestate, this.answerHandler);
+        this.compileDOMTree(this.mainElement, this.quizBox.abstractDOMTree.root);
         this.progressBar = {
             elem: document.querySelector("#bar"),
             width: 0,
@@ -472,27 +478,36 @@ class UIForQuiz {
         }
     }
 
-    updateComponent(component, category, questions, answered, points) {
+    updateComponent(component, question, gamestate) {
         switch (component) {
             case "quizBox":
-                this.quizBox = new QuizBoxComponent(category, questions, answered, points);
+                this.quizBox = new QuizBoxComponent(question, gamestate);
                 break;
             case "stats":
-                
+
         }
     }
 
     compileDOMTree(rootNode, startingNode) {
-    
+
         rootNode.append(startingNode.element);
-    
+
         if (startingNode.children) {
             startingNode.children.forEach((child) => {
                 this.compileDOMTree(rootNode.lastElementChild, child);
             })
-    
+
         }
-    
+
+    }
+
+    answerHandler(event) {
+        settings._quiz.validate(event.target.textContent);
+
+        // Or I could add a givenAnswer property to the question object, write a setter function that executes the validate function inside the question object
+        // Or I could write a setter function for the quiz that takes the given answer as an argument and advances the gamestate.
+
+        // settings._quiz = event.target.textContent;
     }
 
 }
