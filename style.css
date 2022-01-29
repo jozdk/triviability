@@ -120,7 +120,40 @@ a:link, a:visited {
     }
 }
 
-.bg-sport_and_leisure {
+.bg-science, .highlight-science:hover {
+    background-color: #03FCBA;
+}
+
+.bg-history, .highlight-history:hover {
+    background-color: #FFF75C;
+}
+
+.bg-geography, .highlight-geography:hover {
+    background-color: #D47AE8;
+}
+
+.bg-movies, .highlight-film-and-tv:hover {
+    background-color: #EA3452;
+}
+
+.bg-literature, .highlight-art-and-literature:hover {
+    background-color: #71FEFA;
+}
+
+.bg-music, .highlight-music:hover {
+    background-color: #FFA552;
+}
+
+.bg-sport_and_leisure, .highlight-sport-and-leisure:hover {
     background-color: #D2FF96;
 }
+
+.bg-general_knowledge, .highlight-general-knowledge:hover {
+    background-color: #C4AF9A;
+}
+
+.bg-society_and_culture, .highlight-society-and-culture:hover {
+    background-color: #FF579F;
+}
+
 
