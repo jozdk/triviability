@@ -3,7 +3,6 @@
 class Settings {
     constructor() {
         this._categories = [];
-        this._quiz = {};
     }
 
     set categories(selected) {
@@ -32,7 +31,7 @@ class Settings {
             const url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
             const result = await fetch(url);
             const questions = await result.json();
-            this._quiz = new Quiz(questions);
+            quiz.questions = questions;
         } catch (error) {
             // output error message
             console.log(error.message)
@@ -87,7 +86,8 @@ class Question {
 
 class Quiz {
     constructor(questions) {
-        this._questions = questions.map((question) => new Question(question));
+        // this._questions = questions.map((question) => new Question(question));
+        this._questions = [];
         this._gamestate = {
             answered: 0,
             points: 0
@@ -105,6 +105,10 @@ class Quiz {
         return this._gamestate;
     }
 
+    set questions(questions) {
+        this_questions = questions.map((question) => new Question(question));
+    }
+
     get questions() {
         return this._questions;
     }
@@ -117,7 +121,7 @@ class Quiz {
 
 // UI Class: Handles UI Tasks
 
-class UI {
+class UIForSettings {
     constructor() {
         this.windowElement = window;
         this.selectionPage = document.querySelector("#selection-menu");
@@ -167,23 +171,6 @@ class UI {
             this.selectionPage.style.display = "none";
         });
 
-        // this.windowElement.addEventListener("load", () => {
-        //     this.progressBar.startTime = Date.now();
-        //     this.progressBar.tInterval = setInterval(() => {
-        //         this.progressBar.width += 0.835;
-        //         this.progressBar.elem.style.width = this.progressBar.width + "px";
-        //         this.progressBar.called++;
-        //         if (this.progressBar.called === 600) {
-        //             clearInterval(this.progressBar.tInterval);
-        //             console.log(this.progressBar.called, Date.now() - this.progressBar.startTime)
-        //         }
-        //     }, 10);
-        //     // setTimeout(() => {
-        //     //     this.timerValues.elapsedTime = Date.now() - this.timerValues.startTime;
-        //     //     clearInterval(this.timerValues.tInterval);
-        //     //     console.log(this.timerValues.called, this.timerValues.elapsedTime)
-        //     // }, 10000)
-        // })
 
     }
 
@@ -221,7 +208,7 @@ function buildNode(tag, properties) {
 
 
 class quizComponentBox {
-    constructor( { category, question, multipleChoice }, { answered, points }, handler) {
+    constructor({ category, question, multipleChoice }, { answered, points }, handler) {
         this.abstractDOMTree = {
             root: {
                 element: buildNode("div", { id: "quiz-element", className: "container" }),
@@ -429,8 +416,9 @@ let component = {
 // Events?
 
 
-const ui = new UI;
+const ui = new UIForSettings;
 const settings = new Settings();
+const quiz = new Quiz();
 
 
 // function depthFirstTraversalTest(rootNode, indexOfStartingNode, startingNode) {
@@ -474,7 +462,6 @@ class UIForQuiz {
         this.progressBar = {
             elem: document.querySelector("#bar"),
             width: 0,
-            called: 0
         }
     }
 
@@ -508,6 +495,21 @@ class UIForQuiz {
         // Or I could write a setter function for the quiz that takes the given answer as an argument and advances the gamestate.
 
         // settings._quiz = event.target.textContent;
+    }
+
+    timeProgress() {
+        this.progressBar.startTime = Date.now();
+        this.progressBar.timeInterval = setInterval(() => {
+            // const time = Date.now();
+            this.progressBar.width += 0.835;
+            this.progressBar.elem.style.width = this.progressBar.width + "px";
+        }, 10);
+
+        setTimeout(() => {
+            this.progressBar.elapsedTime = Date.now() - this.progressBar.startTime;
+            clearInterval(this.progressBar.timeInterval);
+            console.log()
+        }, 10000)
     }
 
 }
