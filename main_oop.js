@@ -51,14 +51,17 @@ class Question {
         };
         this.type = question.type;
         this.question = question.question;
-        this.correctAnswer = question.correctAnswer;
+        this.correctAnswer = {
+            title: question.correctAnswer,
+            index: -1
+        }
         this.wrongAnswers = question.incorrectAnswers;
         this.multipleChoice = this.makeMultipleChoice();
         this.result;
     }
 
     makeMultipleChoice() {
-        const allWrongAnswers = this.wrongAnswers;
+        const allWrongAnswers = [...this.wrongAnswers];
         const randomWrongAnswers = [];
 
         while (randomWrongAnswers.length < 3) {
@@ -67,8 +70,9 @@ class Question {
             allWrongAnswers.splice(random, 1);
         }
 
-        const choices = [this.correctAnswer, ...randomWrongAnswers]
-        return choices.sort(() => 0.5 - Math.random());
+        const choices = [this.correctAnswer, ...randomWrongAnswers].sort(() => 0.5 - Math.random());
+        this.correctAnswer.index = choices.indexOf(this.correctAnswer.title);
+        return choices;
     }
 
     validate(answer) {
@@ -81,6 +85,82 @@ class Question {
 
 }
 
+class UIForQuiz {
+    constructor(question, gamestate) {
+        this.mainElement = document.querySelector("#main")
+        this.quizBox = new QuizBoxComponent(question, gamestate, this.answerHandler);
+        this.stats;
+        this.answers;
+        
+        this.progressBar = {
+            elem: document.querySelector("#bar"),
+            width: 0,
+        }
+
+        this.compileDOMTree(this.mainElement, this.quizBox.abstractDOMTree.root);
+    }
+
+    updateComponent(component, question, gamestate) {
+        switch (component) {
+            case "quizBox":
+                this.quizBox = new QuizBoxComponent(question, gamestate, this.answerHandler);
+                this.compileDOMTree(this.mainElement, this.quizBox.abstractDOMTree.root)
+                break;
+            case "stats":
+                this.stats = new StatsComponent(question, gamestate);
+                this.compileDOMTree(document.querySelector("#stats-component"), this.stats.abstractDOMTree.root);
+                break;
+            case "answers":
+                this.answers = new AnswersComponent(question, null);
+                this.compileDOMTree(document.querySelector("#box-component"), this.answers.abstractDOMTree.root);
+                //document.querySelector("#answers-component").children[question.correctAnswer.index].firstElementChild.classList.add("correct");
+                break;
+        }
+    }
+
+    compileDOMTree(rootNode, startingNode) {
+
+        rootNode.append(startingNode.element);
+
+        if (startingNode.children) {
+            startingNode.children.forEach((child) => {
+                this.compileDOMTree(rootNode.lastElementChild, child);
+            })
+
+        }
+
+    }
+
+    answerHandler(event) {
+        
+        const gamestateUpdate = quiz.validate(event.target.textContent);
+
+        if (gamestateUpdate.result === true) {
+            this.updateComponent("stats", )
+        } 
+
+        // Or I could add a givenAnswer property to the question object, write a setter function that executes the validate function inside the question object
+        // Or I could write a setter function for the quiz that takes the given answer as an argument and advances the gamestate.
+
+        // settings._quiz = event.target.textContent;
+    }
+
+    timeProgress() {
+        this.progressBar.startTime = Date.now();
+        this.progressBar.timeInterval = setInterval(() => {
+            // const time = Date.now();
+            this.progressBar.width += 0.835;
+            this.progressBar.elem.style.width = this.progressBar.width + "px";
+        }, 10);
+
+        setTimeout(() => {
+            this.progressBar.elapsedTime = Date.now() - this.progressBar.startTime;
+            clearInterval(this.progressBar.timeInterval);
+            console.log()
+        }, 10000)
+    }
+
+}
 
 // Quiz
 
@@ -92,7 +172,8 @@ class Quiz {
             answered: 0,
             points: 0
         }
-        this.ui = new UIForQuiz(this._questions[0].category, this._questions[0].question, this.gamestate);
+        //this.ui = new UIForQuiz(this._questions[0].category, this._questions[0].question, this.gamestate);
+        this.ui = {};
 
     }
 
@@ -106,7 +187,8 @@ class Quiz {
     }
 
     set questions(questions) {
-        this_questions = questions.map((question) => new Question(question));
+        this._questions = questions.map((question) => new Question(question));
+        this.ui = new UIForQuiz(this._questions[0], this._gamestate, this.ui.answerHandler);
     }
 
     get questions() {
@@ -115,6 +197,10 @@ class Quiz {
 
     validate(answer) {
         this._questions[this._gamestate.answered].validate(answer);
+        if (this._questions[this._gamestate.answered].result === true) {
+            this._gamestate.points += 10;
+        }
+        this._gamestate.answered++;
     }
 }
 
@@ -143,7 +229,7 @@ class UIForSettings {
                     case "Geography":
                         this.toggleSelection(targetElement, "geography");
                         break;
-                    case "Movies":
+                    case "Film & TV":
                         this.toggleSelection(targetElement, "movies");
                         break;
                     case "Art & Literature":
@@ -175,17 +261,17 @@ class UIForSettings {
     }
 
     toggleSelection(element, category) {
-        if (element.classList.contains("highlight")) {
+        if (element.classList.contains("category-highlight")) {
             element.classList.add("selected");
-            element.classList.remove("highlight");
-            quiz.categories = {
+            element.classList.remove("category-highlight");
+            settings.categories = {
                 category: category,
                 request: "add"
             };
         } else if (element.classList.contains("selected")) {
             element.classList.remove("selected");
-            element.classList.add("highlight");
-            quiz.categories = {
+            element.classList.add("category-highlight");
+            settings.categories = {
                 category: category,
                 request: "remove"
             }
@@ -207,7 +293,7 @@ function buildNode(tag, properties) {
 }
 
 
-class quizComponentBox {
+class QuizBoxComponent {
     constructor({ category, question, multipleChoice }, { answered, points }, handler) {
         this.abstractDOMTree = {
             root: {
@@ -226,13 +312,13 @@ class quizComponentBox {
                                                 element: buildNode("div", { className: "col" }),
                                                 children: [
                                                     {
-                                                        element: buildNode("div", { className: `row rounded-lg p-2 bg-${category.color}` }),
+                                                        element: buildNode("div", { className: `row align-items-center rounded-lg p-2 bg-${category.color}` }),
                                                         children: [
                                                             {
                                                                 element: buildNode("div", { className: "col-3" }),
                                                                 children: [
                                                                     {
-                                                                        element: buildNode("p"),
+                                                                        element: buildNode("p", { className: "my-2" }),
                                                                         children: [
                                                                             {
                                                                                 element: document.createTextNode(category.title),
@@ -246,7 +332,7 @@ class quizComponentBox {
                                                                 element: buildNode("div", { className: "col-3" }),
                                                                 children: [
                                                                     {
-                                                                        element: buildNode("p"),
+                                                                        element: buildNode("p", { className: "my-2" }),
                                                                         children: [
                                                                             {
                                                                                 element: document.createTextNode(`${answered + 1}/9`),
@@ -260,7 +346,7 @@ class quizComponentBox {
                                                                 element: buildNode("div", { className: "col-3" }),
                                                                 children: [
                                                                     {
-                                                                        element: buildNode("p"),
+                                                                        element: buildNode("p", { className: "my-2" }),
                                                                         children: [
                                                                             {
                                                                                 element: document.createTextNode(`${points} pts`),
@@ -302,7 +388,7 @@ class quizComponentBox {
                                                 element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
                                                 children: [
                                                     {
-                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom highlight-${category.color}`, onclick: handler }),
+                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom answer-highlight-${category.color}`, onclick: handler }),
                                                         children: [
                                                             {
                                                                 element: document.createTextNode(multipleChoice[0]),
@@ -316,7 +402,7 @@ class quizComponentBox {
                                                 element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
                                                 children: [
                                                     {
-                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom highlight-${category.color}`, onclick: handler }),
+                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom answer-highlight-${category.color}`, onclick: handler }),
                                                         children: [
                                                             {
                                                                 element: document.createTextNode(multipleChoice[1]),
@@ -330,7 +416,7 @@ class quizComponentBox {
                                                 element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
                                                 children: [
                                                     {
-                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom highlight-${category.color}`, onclick: handler }),
+                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom answer-highlight-${category.color}`, onclick: handler }),
                                                         children: [
                                                             {
                                                                 element: document.createTextNode(multipleChoice[2]),
@@ -344,7 +430,7 @@ class quizComponentBox {
                                                 element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
                                                 children: [
                                                     {
-                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom highlight-${category.color}`, onclick: handler }),
+                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom answer-highlight-${category.color}`, onclick: handler }),
                                                         children: [
                                                             {
                                                                 element: document.createTextNode(multipleChoice[3]),
@@ -377,6 +463,134 @@ class quizComponentBox {
                 ]
             }
         }
+    }
+}
+
+class StatsComponent {
+    constructor({ category }, { answered, points }) {
+        this.abstractDOMTree = {
+            root: {
+                element: buildNode("div", { className: "col" }),
+                children: [
+                    {
+                        element: buildNode("div", { className: `row align-items-center rounded-lg p-2 bg-${category.color}` }),
+                        children: [
+                            {
+                                element: buildNode("div", { className: "col-3" }),
+                                children: [
+                                    {
+                                        element: buildNode("p", { className: "my-2" }),
+                                        children: [
+                                            {
+                                                element: document.createTextNode(category.title),
+                                                children: null
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                element: buildNode("div", { className: "col-3" }),
+                                children: [
+                                    {
+                                        element: buildNode("p", { className: "my-2" }),
+                                        children: [
+                                            {
+                                                element: document.createTextNode(`${answered + 1}/9`),
+                                                children: null
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                element: buildNode("div", { className: "col-3" }),
+                                children: [
+                                    {
+                                        element: buildNode("p", { className: "my-2" }),
+                                        children: [
+                                            {
+                                                element: document.createTextNode(`${points} pts`),
+                                                children: null
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+}
+
+class AnswersComponent {
+    constructor({ category, multipleChoice, correctAnswer }, handler) {
+        this.abstractDOMTree = {
+            root: {
+                element: buildNode("div", { className: "row text-center lead px-md-2", id: "answers-component" }),
+                children: [
+                    {
+                        element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
+                        children: [
+                            {
+                                element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom answer-highlight-${category.color}`, onclick: handler }),
+                                children: [
+                                    {
+                                        element: document.createTextNode(multipleChoice[0]),
+                                        children: null
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
+                        children: [
+                            {
+                                element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom answer-highlight-${category.color}`, onclick: handler }),
+                                children: [
+                                    {
+                                        element: document.createTextNode(multipleChoice[1]),
+                                        children: null
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
+                        children: [
+                            {
+                                element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom answer-highlight-${category.color}`, onclick: handler }),
+                                children: [
+                                    {
+                                        element: document.createTextNode(multipleChoice[2]),
+                                        children: null
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
+                        children: [
+                            {
+                                element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom answer-highlight-${category.color}`, onclick: handler }),
+                                children: [
+                                    {
+                                        element: document.createTextNode(multipleChoice[3]),
+                                        children: null
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+        this.abstractDOMTree.root.children[correctAnswer.index].children[0].element.classList.add("correct");
     }
 }
 
@@ -419,6 +633,7 @@ let component = {
 const ui = new UIForSettings;
 const settings = new Settings();
 const quiz = new Quiz();
+//const quizBox = new QuizBoxComponent()
 
 
 // function depthFirstTraversalTest(rootNode, indexOfStartingNode, startingNode) {
@@ -436,7 +651,7 @@ const quiz = new Quiz();
 
 // }
 
-const quizBox = new QuizBoxComponent()
+
 
 function depthFirstTraversalTest(rootNode, startingNode) {
 
@@ -451,65 +666,11 @@ function depthFirstTraversalTest(rootNode, startingNode) {
 
 }
 
-depthFirstTraversalTest(ui.mainElement, quizComponent.root);
+//depthFirstTraversalTest(ui.mainElement, quizComponent.root);
 
 
-class UIForQuiz {
-    constructor(category, questions, gamestate) {
-        this.mainElement = document.querySelector("#main")
-        this.quizBox = new QuizBoxComponent(questions[0], gamestate, this.answerHandler);
-        this.compileDOMTree(this.mainElement, this.quizBox.abstractDOMTree.root);
-        this.progressBar = {
-            elem: document.querySelector("#bar"),
-            width: 0,
-        }
-    }
 
-    updateComponent(component, question, gamestate) {
-        switch (component) {
-            case "quizBox":
-                this.quizBox = new QuizBoxComponent(question, gamestate);
-                break;
-            case "stats":
+const testQuestions = [{"category":"Geography","correctAnswer":"Africa","id":6696,"incorrectAnswers":["South America","Oceania","Europe","Asia","North America"],"question":"Togo is located on which continent?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Sudan","id":6549,"incorrectAnswers":["South Sudan","Egypt","Republic of the Congo","Equatorial Guinea","Gabon","Benin","Democratic Republic of the Congo","Eritrea","Uganda","Togo","São Tomé and Príncipe","Rwanda","Tunisia","Malta"],"question":"Which of these countries borders Chad?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Asia","id":22872,"incorrectAnswers":["Europe","Africa","North America","South America"],"question":"Which is the Earth's largest continent?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"South America","id":6683,"incorrectAnswers":["Oceania","Europe","Asia","Africa","North America"],"question":"Suriname is located on which continent?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Spain","id":5713,"incorrectAnswers":["Portugal","Andorra","Mali","Tunisia","France","Monaco","Senegal","Burkina Faso","Switzerland","The Gambia","Malta","Ireland","Italy","Belgium","Luxembourg","Liechtenstein","Niger"],"question":"Morocco shares a land border with which of these countries?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Tripoli","id":19272,"incorrectAnswers":["Benghazi","Tunis","Alexandria"],"question":"What is the capital of Libya?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Europe","id":6685,"incorrectAnswers":["South America","Oceania","Asia","Africa","North America"],"question":"Andorra is located on which continent?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"East Timor","id":5609,"incorrectAnswers":["Solomon Islands","Vanuatu","Palau","Brunei","Nauru","Federated States of Micronesia","Fiji","Philippines","Malaysia","Singapore","Tuvalu","Kiribati","Marshall Islands","Cambodia","Vietnam","Thailand"],"question":"Which of these countries borders Australia?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Austria","id":19550,"incorrectAnswers":["Croatia","San Marino","Bosnia and Herzegovina","Romania","Poland"],"question":"Which country borders Italy, Switzerland, Germany, Czech Republic, Hungary, Slovenia, and Liechtenstein?","type":"Multiple Choice"}];
 
-        }
-    }
 
-    compileDOMTree(rootNode, startingNode) {
-
-        rootNode.append(startingNode.element);
-
-        if (startingNode.children) {
-            startingNode.children.forEach((child) => {
-                this.compileDOMTree(rootNode.lastElementChild, child);
-            })
-
-        }
-
-    }
-
-    answerHandler(event) {
-        settings._quiz.validate(event.target.textContent);
-
-        // Or I could add a givenAnswer property to the question object, write a setter function that executes the validate function inside the question object
-        // Or I could write a setter function for the quiz that takes the given answer as an argument and advances the gamestate.
-
-        // settings._quiz = event.target.textContent;
-    }
-
-    timeProgress() {
-        this.progressBar.startTime = Date.now();
-        this.progressBar.timeInterval = setInterval(() => {
-            // const time = Date.now();
-            this.progressBar.width += 0.835;
-            this.progressBar.elem.style.width = this.progressBar.width + "px";
-        }, 10);
-
-        setTimeout(() => {
-            this.progressBar.elapsedTime = Date.now() - this.progressBar.startTime;
-            clearInterval(this.progressBar.timeInterval);
-            console.log()
-        }, 10000)
-    }
-
-}
+//quiz.questions = testQuestions;
