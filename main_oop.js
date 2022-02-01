@@ -57,6 +57,7 @@ class Question {
         }
         this.wrongAnswers = question.incorrectAnswers;
         this.multipleChoice = this.makeMultipleChoice();
+        this.userAnswer;
         this.result;
     }
 
@@ -70,17 +71,15 @@ class Question {
             allWrongAnswers.splice(random, 1);
         }
 
-        const choices = [this.correctAnswer, ...randomWrongAnswers].sort(() => 0.5 - Math.random());
+        const choices = [this.correctAnswer.title, ...randomWrongAnswers].sort(() => 0.5 - Math.random());
         this.correctAnswer.index = choices.indexOf(this.correctAnswer.title);
         return choices;
     }
 
     validate(answer) {
-        if (answer === this.correctAnswer) {
-            this.result = true;
-        } else {
-            this.result = false;
-        }
+        this.userAnswer = answer;
+        this.result = answer === this.correctAnswer.title ? true : false;
+        return this.result;
     }
 
 }
@@ -107,7 +106,7 @@ class UIForQuiz {
                 this.compileDOMTree(this.mainElement, this.quizBox.abstractDOMTree.root)
                 break;
             case "stats":
-                this.stats = new StatsComponent(question, gamestate);
+                this.stats = new StatsComponent(question, gamestate.points);
                 this.compileDOMTree(document.querySelector("#stats-component"), this.stats.abstractDOMTree.root);
                 break;
             case "answers":
@@ -116,6 +115,17 @@ class UIForQuiz {
                 //document.querySelector("#answers-component").children[question.correctAnswer.index].firstElementChild.classList.add("correct");
                 break;
         }
+    }
+
+    updateStats(category, gamestate) {
+        this.stats = new StatsComponent(category, gamestate);
+        this.compileDOMTree(document.querySelector("#stats-component"), this.stats.abstractDOMTree.root);
+    }
+
+    updateAnswers(userAnswer, correctAnswer) {
+        // this.answers = new AnswersComponent(question, null);
+        // this.compileDOMTree(document.querySelector("#box-component"), this.answers.abstractDOMTree.root);
+        document.querySelector("#answers-component")
     }
 
     compileDOMTree(rootNode, startingNode) {
@@ -133,11 +143,16 @@ class UIForQuiz {
 
     answerHandler(event) {
         
-        const gamestateUpdate = quiz.validate(event.target.textContent);
+        const userAnswer = event.target.textContent;
+        const { result, points, correctAnswer } = quiz.validate(userAnswer);
 
-        if (gamestateUpdate.result === true) {
-            this.updateComponent("stats", )
-        } 
+        this.updateStats(points);
+
+        if (result === true) {
+            event.target.classList.add("correct");
+        } else {
+            updateAnswers(userAnswer, correctAnswer);
+        }
 
         // Or I could add a givenAnswer property to the question object, write a setter function that executes the validate function inside the question object
         // Or I could write a setter function for the quiz that takes the given answer as an argument and advances the gamestate.
@@ -196,11 +211,25 @@ class Quiz {
     }
 
     validate(answer) {
-        this._questions[this._gamestate.answered].validate(answer);
-        if (this._questions[this._gamestate.answered].result === true) {
+        //this._questions[this._gamestate.answered].userAnswer = answer;
+        let currentQuestion = this._questions[this._gamestate.answered];
+        
+        if (currentQuestion.validate(answer) === true) {
             this._gamestate.points += 10;
         }
+        
+        // this.ui.updateComponent("stats", currentQuestion, this._gamestate);
+        // this.ui.updateComponent("answers", currentQuestion);
+
         this._gamestate.answered++;
+
+        return {
+            result: currentQuestion.result,
+            points: this._gamestate.points,
+            correctAnswer: currentQuestion.correctAnswer.index
+        }
+
+        //setTimeout(DisplayNextButton, 3000);
     }
 }
 
@@ -467,7 +496,7 @@ class QuizBoxComponent {
 }
 
 class StatsComponent {
-    constructor({ category }, { answered, points }) {
+    constructor(category, { answered, points }) {
         this.abstractDOMTree = {
             root: {
                 element: buildNode("div", { className: "col" }),
@@ -526,7 +555,7 @@ class StatsComponent {
 }
 
 class AnswersComponent {
-    constructor({ category, multipleChoice, correctAnswer }, handler) {
+    constructor({ category, multipleChoice, correctAnswer, userAnswer }, handler) {
         this.abstractDOMTree = {
             root: {
                 element: buildNode("div", { className: "row text-center lead px-md-2", id: "answers-component" }),
@@ -673,4 +702,4 @@ function depthFirstTraversalTest(rootNode, startingNode) {
 const testQuestions = [{"category":"Geography","correctAnswer":"Africa","id":6696,"incorrectAnswers":["South America","Oceania","Europe","Asia","North America"],"question":"Togo is located on which continent?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Sudan","id":6549,"incorrectAnswers":["South Sudan","Egypt","Republic of the Congo","Equatorial Guinea","Gabon","Benin","Democratic Republic of the Congo","Eritrea","Uganda","Togo","São Tomé and Príncipe","Rwanda","Tunisia","Malta"],"question":"Which of these countries borders Chad?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Asia","id":22872,"incorrectAnswers":["Europe","Africa","North America","South America"],"question":"Which is the Earth's largest continent?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"South America","id":6683,"incorrectAnswers":["Oceania","Europe","Asia","Africa","North America"],"question":"Suriname is located on which continent?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Spain","id":5713,"incorrectAnswers":["Portugal","Andorra","Mali","Tunisia","France","Monaco","Senegal","Burkina Faso","Switzerland","The Gambia","Malta","Ireland","Italy","Belgium","Luxembourg","Liechtenstein","Niger"],"question":"Morocco shares a land border with which of these countries?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Tripoli","id":19272,"incorrectAnswers":["Benghazi","Tunis","Alexandria"],"question":"What is the capital of Libya?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Europe","id":6685,"incorrectAnswers":["South America","Oceania","Asia","Africa","North America"],"question":"Andorra is located on which continent?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"East Timor","id":5609,"incorrectAnswers":["Solomon Islands","Vanuatu","Palau","Brunei","Nauru","Federated States of Micronesia","Fiji","Philippines","Malaysia","Singapore","Tuvalu","Kiribati","Marshall Islands","Cambodia","Vietnam","Thailand"],"question":"Which of these countries borders Australia?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Austria","id":19550,"incorrectAnswers":["Croatia","San Marino","Bosnia and Herzegovina","Romania","Poland"],"question":"Which country borders Italy, Switzerland, Germany, Czech Republic, Hungary, Slovenia, and Liechtenstein?","type":"Multiple Choice"}];
 
 
-//quiz.questions = testQuestions;
+quiz.questions = testQuestions;

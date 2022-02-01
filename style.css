@@ -163,3 +163,11 @@ a:link, a:visited {
 .correct {
     background-color: green;
 }
+
+.incorrect {
+    background-color: red;
+}
+
+.solution {
+    border: 5px solid green;
+}
