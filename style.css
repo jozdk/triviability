@@ -165,9 +165,88 @@ a:link, a:visited {
 }
 
 .incorrect {
-    background-color: red;
+    background-color: darkred;
 }
 
 .solution {
     border: 5px solid green;
 }
+
+
+.radial-timer {
+    width: 80px;
+    height: 80px;
+    background-color: #fff;
+    position: relative;
+    border-radius: 100%;
+}
+
+
+.second-half {
+    width: 40px;
+    height: 80px;
+    background-color: #D2FF96;
+    position: absolute;
+    right: 0;
+    /* animation-name: mymove;
+    animation-duration: 15s; */
+    transform-origin: center left;
+    /* z-index: auto; */
+    border-radius: 0 80px 80px 0;
+}
+
+.seconds {
+    z-index: auto;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+.first-half {
+    width: 40px;
+    height: 80px;
+    background-color: #D2FF96;
+    position: absolute;
+    /* z-index: auto; */
+    border-radius: 80px 0 0 80px;
+    transform-origin: center right;
+}
+
+.half-mask {
+    width: 40px;
+    height: 80px;
+    background-color: #fff;
+    position: absolute;
+    right: 0;
+    border-radius: 0 80px 80px 0;
+}
+
+/* @keyframes mymove {
+    
+    0% {
+        transform: rotate(0);
+        transform-origin: center left;
+    }
+    100% {
+        transform-origin: center left;
+        transform: rotate(180deg);
+    }   
+  } */
+
+  .little-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 100%;
+      background-color: #fff;
+  }
+
+  .text-correct {
+      color: #D2FF96;
+      color: #FFF75C;
+      color: green;
+  }
+
+  .text-wrong {
+      color: darkred;
+  }
+
