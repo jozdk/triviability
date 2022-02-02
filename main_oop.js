@@ -90,7 +90,7 @@ class UIForQuiz {
         this.quizBox = new QuizBoxComponent(question, gamestate, this.answerHandler);
         this.stats;
         this.answers;
-        
+
         this.progressBar = {
             elem: document.querySelector("#bar"),
             width: 0,
@@ -142,7 +142,7 @@ class UIForQuiz {
     }
 
     answerHandler(event) {
-        
+
         const userAnswer = event.target.textContent;
         const { result, points, correctAnswer } = quiz.validate(userAnswer);
 
@@ -213,11 +213,11 @@ class Quiz {
     validate(answer) {
         //this._questions[this._gamestate.answered].userAnswer = answer;
         let currentQuestion = this._questions[this._gamestate.answered];
-        
+
         if (currentQuestion.validate(answer) === true) {
             this._gamestate.points += 10;
         }
-        
+
         // this.ui.updateComponent("stats", currentQuestion, this._gamestate);
         // this.ui.updateComponent("answers", currentQuestion);
 
@@ -699,7 +699,47 @@ function depthFirstTraversalTest(rootNode, startingNode) {
 
 
 
-const testQuestions = [{"category":"Geography","correctAnswer":"Africa","id":6696,"incorrectAnswers":["South America","Oceania","Europe","Asia","North America"],"question":"Togo is located on which continent?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Sudan","id":6549,"incorrectAnswers":["South Sudan","Egypt","Republic of the Congo","Equatorial Guinea","Gabon","Benin","Democratic Republic of the Congo","Eritrea","Uganda","Togo","São Tomé and Príncipe","Rwanda","Tunisia","Malta"],"question":"Which of these countries borders Chad?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Asia","id":22872,"incorrectAnswers":["Europe","Africa","North America","South America"],"question":"Which is the Earth's largest continent?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"South America","id":6683,"incorrectAnswers":["Oceania","Europe","Asia","Africa","North America"],"question":"Suriname is located on which continent?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Spain","id":5713,"incorrectAnswers":["Portugal","Andorra","Mali","Tunisia","France","Monaco","Senegal","Burkina Faso","Switzerland","The Gambia","Malta","Ireland","Italy","Belgium","Luxembourg","Liechtenstein","Niger"],"question":"Morocco shares a land border with which of these countries?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Tripoli","id":19272,"incorrectAnswers":["Benghazi","Tunis","Alexandria"],"question":"What is the capital of Libya?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Europe","id":6685,"incorrectAnswers":["South America","Oceania","Asia","Africa","North America"],"question":"Andorra is located on which continent?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"East Timor","id":5609,"incorrectAnswers":["Solomon Islands","Vanuatu","Palau","Brunei","Nauru","Federated States of Micronesia","Fiji","Philippines","Malaysia","Singapore","Tuvalu","Kiribati","Marshall Islands","Cambodia","Vietnam","Thailand"],"question":"Which of these countries borders Australia?","type":"Multiple Choice"},{"category":"Geography","correctAnswer":"Austria","id":19550,"incorrectAnswers":["Croatia","San Marino","Bosnia and Herzegovina","Romania","Poland"],"question":"Which country borders Italy, Switzerland, Germany, Czech Republic, Hungary, Slovenia, and Liechtenstein?","type":"Multiple Choice"}];
+const testQuestions = [{ "category": "Geography", "correctAnswer": "Africa", "id": 6696, "incorrectAnswers": ["South America", "Oceania", "Europe", "Asia", "North America"], "question": "Togo is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Sudan", "id": 6549, "incorrectAnswers": ["South Sudan", "Egypt", "Republic of the Congo", "Equatorial Guinea", "Gabon", "Benin", "Democratic Republic of the Congo", "Eritrea", "Uganda", "Togo", "São Tomé and Príncipe", "Rwanda", "Tunisia", "Malta"], "question": "Which of these countries borders Chad?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Asia", "id": 22872, "incorrectAnswers": ["Europe", "Africa", "North America", "South America"], "question": "Which is the Earth's largest continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "South America", "id": 6683, "incorrectAnswers": ["Oceania", "Europe", "Asia", "Africa", "North America"], "question": "Suriname is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Spain", "id": 5713, "incorrectAnswers": ["Portugal", "Andorra", "Mali", "Tunisia", "France", "Monaco", "Senegal", "Burkina Faso", "Switzerland", "The Gambia", "Malta", "Ireland", "Italy", "Belgium", "Luxembourg", "Liechtenstein", "Niger"], "question": "Morocco shares a land border with which of these countries?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Tripoli", "id": 19272, "incorrectAnswers": ["Benghazi", "Tunis", "Alexandria"], "question": "What is the capital of Libya?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Europe", "id": 6685, "incorrectAnswers": ["South America", "Oceania", "Asia", "Africa", "North America"], "question": "Andorra is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "East Timor", "id": 5609, "incorrectAnswers": ["Solomon Islands", "Vanuatu", "Palau", "Brunei", "Nauru", "Federated States of Micronesia", "Fiji", "Philippines", "Malaysia", "Singapore", "Tuvalu", "Kiribati", "Marshall Islands", "Cambodia", "Vietnam", "Thailand"], "question": "Which of these countries borders Australia?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Austria", "id": 19550, "incorrectAnswers": ["Croatia", "San Marino", "Bosnia and Herzegovina", "Romania", "Poland"], "question": "Which country borders Italy, Switzerland, Germany, Czech Republic, Hungary, Slovenia, and Liechtenstein?", "type": "Multiple Choice" }];
 
 
-quiz.questions = testQuestions;
+//quiz.questions = testQuestions;
+
+const secondHalf = document.querySelector(".second-half");
+const firstHalf = document.querySelector(".first-half");
+const seconds = document.querySelector("#seconds");
+
+let start;
+let timeInterval;
+
+
+function rotate() {
+    start = Date.now();
+    let degree = 0;
+    //secondHalf.style.transform = `rotate(${degree}deg)`
+    let object = secondHalf;
+    timeInterval = setInterval(function () {
+        time = Date.now() - start;
+
+        let elapsed = Math.floor(time / 1000);
+
+        seconds.innerHTML--;
+            
+        object.style.transform = `rotate(${degree += 30}deg)`;
+
+        if (elapsed === 6) {
+            //clearInterval(timeInterval)
+            secondHalf.style.display = "none";
+            object = firstHalf;
+            degree = 0;
+        }       
+
+        if (elapsed === 12) {
+            clearInterval(timeInterval);
+        }
+
+    }, 1000);
+
+    
+}
+
+//rotate();
