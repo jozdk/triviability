@@ -177,15 +177,9 @@
                     <div id="stats-component" class="col-md-2 d-none d-md-flex bg-light rounded-lg me-2 mt-5 flex-column">
 
                         <div class="row mb-1 p-3">
-                            <div class="col">
-                                <div class="row align-items-center rounded-lg p-2 bg-sport_and_leisure">
-                                    <!-- <div class="col"> -->
-                                        <p class="px-0 my-2 text-center">QUESTION 1 of 9</p>
-                                    <!-- </div> -->
-                                </div>
-
+                            <div class="col rounded-lg p-2 bg-sport_and_leisure">
+                                <p class="px-0 my-2 text-center">QUESTION 1 of 9</p>
                             </div>
-
                         </div>
 
                         <div id="timer-component" class="row py-3">
@@ -246,45 +240,42 @@
 
                         </div> -->
 
-                        <div id="score-component" class="row mb-1 py-3 px-xxl-5 px-lg-3 text-center">
-                            <h5>Score</h5>
-                            <h3>0</h3>
-                            <div class="col-4 px-xxl-0">
+                        <div id="score-component" class="row mb-1 py-3 px-xxl-5 px-lg-4 px-md-1 text-center">
+
+                            <div class="col-12">
+                                <h5>Score</h5>
+                            </div>
+                            <div class="col-12">
+                                <h3 class="py-3">0</h3>
+                            </div>
+
+                            <div class="col-4 px-0">
                                 <i class="bi bi-check-circle-fill fs-3 text-correct"></i>
                             </div>
-                            <div class="col-4 px-xxl-0">
+                            <div class="col-4 px-0">
                                 <i class="bi bi-x-circle-fill fs-3 text-wrong"></i>
                             </div>
-                            <div class="col-4 px-xxl-0">
+                            <div class="col-4 px-0">
                                 <i class="bi bi-check-circle-fill fs-3 text-correct"></i>
                             </div>
-                            <div class="col-4 px-xxl-0">
+                            <div class="col-4 px-0">
                                 <i class="bi bi-circle-fill fs-3 text-white"></i>
                             </div>
-                            <div class="col-4 px-xxl-0">
+                            <div class="col-4 px-0">
                                 <i class="bi bi-circle-fill fs-3 text-white"></i>
                             </div>
-                            <div class="col-4 px-xxl-0">
+                            <div class="col-4 px-0">
                                 <i class="bi bi-circle-fill fs-3 text-white"></i>
                             </div>
-                            <div class="col-4 px-xxl-0">
+                            <div class="col-4 px-0">
                                 <i class="bi bi-circle-fill fs-3 text-white"></i>
                             </div>
-                            <div class="col-4 px-xxl-0">
+                            <div class="col-4 px-0">
                                 <i class="bi bi-circle-fill fs-3 text-white"></i>
                             </div>
-                            <div class="col-4 px-xxl-0">
+                            <div class="col-4 px-0">
                                 <i class="bi bi-circle-fill fs-3 text-white"></i>
                             </div>
-
-                            <!-- <div class="col">
-                                <div class="row h-100 p-lg-2 px-xl-4 text-center justify-content-center">
-                                    
-
-
-                                </div>
-                            </div> -->
-
 
                         </div>
 
@@ -340,24 +331,26 @@
 
                     <!-- TEST -->
 
-                    <div id="box-component-TEST" class="col-11 col-md-9 col-xxl-7 mt-5">
+                    <div id="quizbox-component" class="col-11 col-md-9 col-xxl-7 mt-5">
 
-                        <div id="BOX-1" class="row">
+                        <div id="question-component" class="row">
                             <div class="col bg-light rounded-lg">
 
                                 <div class="row mb-1 p-3">
-                                    <div class="col">
-                                        <div class="row align-items-center rounded-lg p-2 bg-sport_and_leisure">
+                                    <div class="col-12 rounded-lg p-2 bg-sport_and_leisure">
+                                        <div class="row px-2">
                                             <div class="col-6 text-start">
                                                 <p class="my-2">Science</p>
                                             </div>
-                                            <div class="col-6 text-end">
-                                                <i class="bi bi-hourglass-top fs-4 mx-1"></i>
-                                                <i class="bi bi-arrow-left-right fs-4 mx-1"></i>
-                                                <strong class="border border-dark p-1 mx-2 me-0">50:50</strong>
+                                            <div class="col-2 text-end">
+                                                <i class="bi bi-hourglass-top fs-4"></i>
                                             </div>
-                                           
-                                            
+                                            <div class="col-2 text-end">
+                                                <i class="bi bi-arrow-left-right fs-4"></i>
+                                            </div>
+                                            <div class="col-2 d-flex align-items-center justify-content-end">                                                       
+                                                <strong class="border border-dark p-1">50:50</strong>                                                                                                     
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -373,46 +366,28 @@
                             </div>
                         </div>
 
-                        <div id="BOX-2" class="row">
+                        <div id="answers-component" class="row">
                             <div class="col bg-light rounded-lg mt-2">
 
                                 <div id="answers-component" class="row text-center lead px-md-2 py-3 gy-3">
                                     <div class="col-md-6 px-3 px-md-2">
-                                        <p class="rounded-lg py-2 py-md-5 bg-custom answer-highlight my-0">Bootstrap</p>
+                                        <p class="rounded-lg py-2 py-md-5 bg-custom answer-highlight my-0 border">Bootstrap</p>
                                     </div>
                                     <div class="col-md-6 px-3 px-md-2">
-                                        <p class="rounded-lg py-2 py-md-5 bg-custom answer-highlight my-0">No Bootstrap</p>
+                                        <p class="rounded-lg py-2 py-md-5 bg-custom answer-highlight my-0 border">No Bootstrap</p>
                                     </div>
                                     <div class="col-md-6 px-3 px-md-2">
-                                        <p class="rounded-lg py-2 py-md-5 bg-custom answer-highlight my-0">Bootstrap + Custom
+                                        <p class="rounded-lg py-2 py-md-5 bg-custom answer-highlight my-0 border">Bootstrap + Custom
                                             CSS</p>
                                     </div>
                                     <div class="col-md-6 px-3 px-md-2">
-                                        <p class="rounded-lg py-2 py-md-5 bg-custom answer-highlight my-0">Magic</p>
+                                        <p class="rounded-lg py-2 py-md-5 bg-custom answer-highlight my-0 border">Magic</p>
                                     </div>
                                 </div>
                                 
                             </div>
                         </div>
-
-                        <!-- <div class="row mb-1 p-3 rounded-lg bg-sport_and_leisure">                           
-                                
-                            <div class="col-3">
-                                <p>Science</p>
-                            </div>
-                            <div class="col-3">
-                                <p>1/10</p>
-                            </div>
-                            <div class="col-3">
-                                <p>0 pts</p>
-                            </div>                                
-
-                        </div> -->
-
                         
-
-                        
-
                     </div>
 
                     <!-- <div id="progress" class="row justify-content-center">
@@ -438,27 +413,6 @@
         </footer>
 
     </div>
-
-
-
-
-    <!-- <div class="col-md-6 ps-md-0 px-0 px-md-2">
-        <p class="rounded-lg py-2 py-md-5 bg-white">Bootstrap 5</p>
-    </div>
-    <div class="col-md-6 pe-md-0 px-0 px-md-2">
-        <p class="rounded-lg py-2 py-md-5 bg-white">No Bootstrap</p>
-    </div>
-    <div class="col-md-6 ps-md-0 px-0 px-md-2">
-        <p class="rounded-lg py-2 py-md-5 bg-white">Bootstrap + CSS</p>
-    </div>
-    <div class="col-md-6 pe-md-0 px-0 px-md-2">
-        <p class="rounded-lg py-2 py-md-5 bg-white">Magic</p>
-    </div> -->
-
-    <!-- <button id="get-quiz">Get Quiz</button>
-    <button id="start-quiz">Let's Go!</button>
-    <div id="quiz-question"></div>
-    <div id="quiz-answers"></div> -->
 
     <script src="main_oop.js"></script>
     <!-- <script src="main.js"></script> -->
