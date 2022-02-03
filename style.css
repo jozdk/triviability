@@ -67,7 +67,7 @@ a:link, a:visited {
     text-decoration: none;
 } */
 
-.category:hover {
+.cursor:hover {
     cursor: pointer;
 }
 
@@ -246,5 +246,9 @@ a:link, a:visited {
 
   .text-wrong {
       color: darkred;
+  }
+
+  .joker-highlight:hover {
+    background-color: rgba(255, 255, 255, 0.418);
   }
 

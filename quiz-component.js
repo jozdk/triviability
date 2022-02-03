@@ -245,7 +245,7 @@ const quizComponent = {
                                                                         element: buildNode("div", {className: "col-2 text-end"}),
                                                                         children: [
                                                                             {
-                                                                                element: buildNode("i", {className: "bi bi-hourglass-top fs-4"}),
+                                                                                element: buildNode("i", {className: "bi bi-hourglass-top fs-4 p-1 cursor joker-highlight"}),
                                                                                 children: null
                                                                             }
                                                                         ]
@@ -254,7 +254,7 @@ const quizComponent = {
                                                                         element: buildNode("div", {className: "col-2 text-end"}),
                                                                         children: [
                                                                             {
-                                                                                element: buildNode("i", {className: "bi bi-arrow-left-right fs-4"}),
+                                                                                element: buildNode("i", {className: "bi bi-arrow-left-right fs-4 p-1 cursor joker-highlight"}),
                                                                                 children: null
                                                                             }
                                                                         ]
@@ -263,7 +263,7 @@ const quizComponent = {
                                                                         element: buildNode("div", {className: "col-2 d-flex align-items-center justify-content-end"}),
                                                                         children: [
                                                                             {
-                                                                                element: buildNode("strong", {className: "border border-dark p-1"}),
+                                                                                element: buildNode("strong", {className: "border border-dark p-1 cursor joker-highlight"}),
                                                                                 children: [
                                                                                     {
                                                                                         element: document.createTextNode("50:50"),
