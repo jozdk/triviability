@@ -128,7 +128,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon(board[0])}-fill text-${board[0]}`}),
                                                 children: null
                                             }
                                         ]
@@ -137,7 +137,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon(board[1])}-fill text-${board[1]}`}),
                                                 children: null
                                             }
                                         ]
@@ -146,7 +146,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon(board[2])}-fill text-${board[2]}`}),
                                                 children: null
                                             }
                                         ]
@@ -155,7 +155,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon(board[3])}-fill text-${board[3]}`}),
                                                 children: null
                                             }
                                         ]
@@ -164,7 +164,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon(board[4])}-fill text-${board[4]}`}),
                                                 children: null
                                             }
                                         ]
@@ -173,7 +173,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon(board[5])}-fill text-${board[5]}`}),
                                                 children: null
                                             }
                                         ]
@@ -182,7 +182,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon(board[6])}-fill text-${board[6]}`}),
                                                 children: null
                                             }
                                         ]
@@ -191,7 +191,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon(board[7])}-fill text-${board[7]}`}),
                                                 children: null
                                             }
                                         ]
@@ -200,7 +200,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon(board[8])}-fill text-${board[8]}`}),
                                                 children: null
                                             }
                                         ]
