@@ -185,7 +185,7 @@ a:link, a:visited {
 .second-half {
     width: 40px;
     height: 80px;
-    background-color: #D2FF96;
+    /* background-color: #D2FF96; */
     position: absolute;
     right: 0;
     /* animation-name: mymove;
@@ -205,7 +205,7 @@ a:link, a:visited {
 .first-half {
     width: 40px;
     height: 80px;
-    background-color: #D2FF96;
+    /* background-color: #D2FF96; */
     position: absolute;
     /* z-index: auto; */
     border-radius: 80px 0 0 80px;
@@ -246,6 +246,10 @@ a:link, a:visited {
 
   .text-wrong {
       color: darkred;
+  }
+
+  .text-blank {
+      color: #fff;
   }
 
   .joker-highlight:hover {
