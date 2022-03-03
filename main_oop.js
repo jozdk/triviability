@@ -322,63 +322,290 @@ function buildNode(tag, properties) {
 }
 
 
-class QuizBoxComponent {
-    constructor({ category, question, multipleChoice }, { answered, points }, handler) {
+
+class QuizComponent {
+    constructor({ category, question, multipleChoice, answered, points, board, handler }) {
         this.abstractDOMTree = {
             root: {
-                element: buildNode("div", { id: "quiz-element", className: "container" }),
+                element: buildNode("div", { id: "quiz-element", className: "container-xl" }),
                 children: [
                     {
                         element: buildNode("div", { className: "row justify-content-center" }),
                         children: [
                             {
-                                element: buildNode("div", { className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg", id: "box-component" }),
+                                element: buildNode("div", { id: "stats-component", className: "col-md-2 d-none d-md-flex bg-light rounded-lg me-2 mt-5 flex-column" }),
                                 children: [
                                     {
-                                        element: buildNode("div", { className: "row mb-1 p-3", id: "stats-component" }),
+                                        element: buildNode("div", { className: "row mb-1 p-3" }),
                                         children: [
                                             {
-                                                element: buildNode("div", { className: "col" }),
+                                                element: buildNode("div", { className: `col rounded-lg p-2 bg-${category.color}` }),
                                                 children: [
                                                     {
-                                                        element: buildNode("div", { className: `row align-items-center rounded-lg p-2 bg-${category.color}` }),
+                                                        element: buildNode("p", { className: "px-0 my-2 text-center" }),
                                                         children: [
                                                             {
-                                                                element: buildNode("div", { className: "col-3" }),
+                                                                element: document.createTextNode(`QUESTION ${answered + 1} of 9`),
+                                                                children: null
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        element: buildNode("div", { id: "timer-component", className: "row py-3" }),
+                                        children: [
+                                            {
+                                                element: buildNode("div", { className: "col text-center d-flex flex-column align-items-center" }),
+                                                children: [
+                                                    {
+                                                        element: buildNode("h5", { className: "mb-3" }),
+                                                        children: [
+                                                            {
+                                                                element: document.createTextNode("Timer"),
+                                                                children: null
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        element: buildNode("div", { id: "timer-container" }),
+                                                        children: [
+                                                            {
+                                                                element: buildNode("div", { className: "radial-timer" }),
                                                                 children: [
                                                                     {
-                                                                        element: buildNode("p", { className: "my-2" }),
+                                                                        element: buildNode("div", { className: `first-half bg-${category.color}` }),
+                                                                        children: null
+                                                                    },
+                                                                    {
+                                                                        element: buildNode("div", { className: "half-mask" }),
+                                                                        children: null
+                                                                    },
+                                                                    {
+                                                                        element: buildNode("div", { className: `second-half bg-${category.color}` }),
+                                                                        children: null
+                                                                    },
+                                                                    {
+                                                                        element: buildNode("div", { className: "seconds d-flex align-items-center justify-content-center lead" }),
                                                                         children: [
                                                                             {
-                                                                                element: document.createTextNode(category.title),
-                                                                                children: null
+                                                                                element: buildNode("h4", { id: "seconds" }),
+                                                                                children: [
+                                                                                    {
+                                                                                        element: document.createTextNode("12"),
+                                                                                        children: null
+                                                                                    }
+                                                                                ]
                                                                             }
                                                                         ]
                                                                     }
                                                                 ]
-                                                            },
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        element: buildNode("div", { id: "score-component", className: "row mb-1 py-3 px-xxl-5 px-lg-4 px-md-1 text-center" }),
+                                        children: [
+                                            {
+                                                element: buildNode("div", { className: "col-12" }),
+                                                children: [
+                                                    {
+                                                        element: buildNode("h5"),
+                                                        children: [
                                                             {
-                                                                element: buildNode("div", { className: "col-3" }),
+                                                                element: document.createTextNode("Score"),
+                                                                children: null
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                element: buildNode("div", { className: "col-12" }),
+                                                children: [
+                                                    {
+                                                        element: buildNode("h3", { className: "py-3" }),
+                                                        children: [
+                                                            {
+                                                                element: document.createTextNode(points),
+                                                                children: null
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                element: buildNode("div", { className: "col-4 px-0" }),
+                                                children: [
+                                                    {
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[0])}-fill text-${board[0]}` }),
+                                                        children: null
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                element: buildNode("div", { className: "col-4 px-0" }),
+                                                children: [
+                                                    {
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[1])}-fill text-${board[1]}` }),
+                                                        children: null
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                element: buildNode("div", { className: "col-4 px-0" }),
+                                                children: [
+                                                    {
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[2])}-fill text-${board[2]}` }),
+                                                        children: null
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                element: buildNode("div", { className: "col-4 px-0" }),
+                                                children: [
+                                                    {
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[3])}-fill text-${board[3]}` }),
+                                                        children: null
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                element: buildNode("div", { className: "col-4 px-0" }),
+                                                children: [
+                                                    {
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[4])}-fill text-${board[4]}` }),
+                                                        children: null
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                element: buildNode("div", { className: "col-4 px-0" }),
+                                                children: [
+                                                    {
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[5])}-fill text-${board[5]}` }),
+                                                        children: null
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                element: buildNode("div", { className: "col-4 px-0" }),
+                                                children: [
+                                                    {
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[6])}-fill text-${board[6]}` }),
+                                                        children: null
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                element: buildNode("div", { className: "col-4 px-0" }),
+                                                children: [
+                                                    {
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[7])}-fill text-${board[7]}` }),
+                                                        children: null
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                element: buildNode("div", { className: "col-4 px-0" }),
+                                                children: [
+                                                    {
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[8])}-fill text-${board[8]}` }),
+                                                        children: null
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-9 col-xxl-7 mt-5" }),
+                                children: [
+                                    {
+                                        element: buildNode("div", { id: "question-component", className: "row" }),
+                                        children: [
+                                            {
+                                                element: buildNode("div", { className: "col bg-light rounded-lg" }),
+                                                children: [
+                                                    {
+                                                        element: buildNode("div", { id: "question-header-component", className: "row mb-1 p-3" }),
+                                                        children: [
+                                                            {
+                                                                element: buildNode("div", { className: `col-12 rounded-lg p-2 bg-${category.color}` }),
                                                                 children: [
                                                                     {
-                                                                        element: buildNode("p", { className: "my-2" }),
+                                                                        element: buildNode("div", { className: "row px-2" }),
                                                                         children: [
                                                                             {
-                                                                                element: document.createTextNode(`${answered + 1}/9`),
-                                                                                children: null
+                                                                                element: buildNode("div", { className: "col-6 text-start" }),
+                                                                                children: [
+                                                                                    {
+                                                                                        element: buildNode("p", { className: "my-2" }),
+                                                                                        children: [
+                                                                                            {
+                                                                                                element: document.createTextNode(category.title),
+                                                                                                children: null
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            {
+                                                                                element: buildNode("div", { className: "col-2 text-end" }),
+                                                                                children: [
+                                                                                    {
+                                                                                        element: buildNode("i", { className: "bi bi-hourglass-top fs-4 p-1 cursor joker-highlight" }),
+                                                                                        children: null
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            {
+                                                                                element: buildNode("div", { className: "col-2 text-end" }),
+                                                                                children: [
+                                                                                    {
+                                                                                        element: buildNode("i", { className: "bi bi-arrow-left-right fs-4 p-1 cursor joker-highlight" }),
+                                                                                        children: null
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            {
+                                                                                element: buildNode("div", { className: "col-2 d-flex align-items-center justify-content-end" }),
+                                                                                children: [
+                                                                                    {
+                                                                                        element: buildNode("strong", { className: "border border-dark p-1 cursor joker-highlight" }),
+                                                                                        children: [
+                                                                                            {
+                                                                                                element: document.createTextNode("50:50"),
+                                                                                                children: null
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                ]
                                                                             }
                                                                         ]
                                                                     }
                                                                 ]
-                                                            },
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        element: buildNode("div", { id: "question-question-component", className: "row" }),
+                                                        children: [
                                                             {
-                                                                element: buildNode("div", { className: "col-3" }),
+                                                                element: buildNode("div", { className: "col text-center p-4 p-md-5" }),
                                                                 children: [
                                                                     {
-                                                                        element: buildNode("p", { className: "my-2" }),
+                                                                        element: buildNode("p", { className: "lead" }),
                                                                         children: [
                                                                             {
-                                                                                element: document.createTextNode(`${points} pts`),
+                                                                                element: document.createTextNode(question),
                                                                                 children: null
                                                                             }
                                                                         ]
@@ -392,96 +619,73 @@ class QuizBoxComponent {
                                         ]
                                     },
                                     {
-                                        element: buildNode("div", { className: "row", id: "question-component" }),
+                                        element: buildNode("div", { id: "answers-component", className: "row" }),
                                         children: [
                                             {
-                                                element: buildNode("div", { className: "col text-center p-4 p-md-5" }),
+                                                element: buildNode("div", { className: "col bg-light rounded-lg mt-2" }),
                                                 children: [
                                                     {
-                                                        element: buildNode("p", { className: "lead" }),
+                                                        element: buildNode("div", { className: "row text-center lead px-md-2 py-3 gy-3" }),
                                                         children: [
                                                             {
-                                                                element: document.createTextNode(question),
-                                                                children: null
+                                                                element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
+                                                                children: [
+                                                                    {
+                                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 my-0 bg-custom border answer-highlight-${category.color}`, onclick: handler }),
+                                                                        children: [
+                                                                            {
+                                                                                element: document.createTextNode(multipleChoice[0]),
+                                                                                children: null
+                                                                            }
+                                                                        ]
+                                                                    }                                                                   
+                                                                ]
+                                                            },
+                                                            {
+                                                                element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
+                                                                children: [
+                                                                    {
+                                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 my-0 bg-custom border answer-highlight-${category.color}`, onclick: handler }),
+                                                                        children: [
+                                                                            {
+                                                                                element: document.createTextNode(multipleChoice[1]),
+                                                                                children: null
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
+                                                                children: [
+                                                                    {
+                                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 my-0 bg-custom border answer-highlight-${category.color}`, onclick: handler }),
+                                                                        children: [
+                                                                            {
+                                                                                element: document.createTextNode(multipleChoice[2]),
+                                                                                children: null
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
+                                                                children: [
+                                                                    {
+                                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 my-0 bg-custom border answer-highlight-${category.color}`, onclick: handler }),
+                                                                        children: [
+                                                                            {
+                                                                                element: document.createTextNode(multipleChoice[3]),
+                                                                                children: null
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
                                                             }
                                                         ]
                                                     }
                                                 ]
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        element: buildNode("div", { className: "row text-center lead px-md-2", id: "answers-component" }),
-                                        children: [
-                                            {
-                                                element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom answer-highlight-${category.color}`, onclick: handler }),
-                                                        children: [
-                                                            {
-                                                                element: document.createTextNode(multipleChoice[0]),
-                                                                children: null
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom answer-highlight-${category.color}`, onclick: handler }),
-                                                        children: [
-                                                            {
-                                                                element: document.createTextNode(multipleChoice[1]),
-                                                                children: null
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom answer-highlight-${category.color}`, onclick: handler }),
-                                                        children: [
-                                                            {
-                                                                element: document.createTextNode(multipleChoice[2]),
-                                                                children: null
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom answer-highlight-${category.color}`, onclick: handler }),
-                                                        children: [
-                                                            {
-                                                                element: document.createTextNode(multipleChoice[3]),
-                                                                children: null
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                element: buildNode("div", { className: "row justify-content-center", id: "progress-component" }),
-                                children: [
-                                    {
-                                        element: buildNode("div", { className: "mt-md-5 mt-4 col-6 px-0 rounded-lg bg-light" }),
-                                        children: [
-                                            {
-                                                element: buildNode("div", { className: "rounded-lg", id: "bar" }),
-                                                children: null
                                             }
                                         ]
                                     }
@@ -495,163 +699,6 @@ class QuizBoxComponent {
     }
 }
 
-class StatsComponent {
-    constructor(category, { answered, points }) {
-        this.abstractDOMTree = {
-            root: {
-                element: buildNode("div", { className: "col" }),
-                children: [
-                    {
-                        element: buildNode("div", { className: `row align-items-center rounded-lg p-2 bg-${category.color}` }),
-                        children: [
-                            {
-                                element: buildNode("div", { className: "col-3" }),
-                                children: [
-                                    {
-                                        element: buildNode("p", { className: "my-2" }),
-                                        children: [
-                                            {
-                                                element: document.createTextNode(category.title),
-                                                children: null
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                element: buildNode("div", { className: "col-3" }),
-                                children: [
-                                    {
-                                        element: buildNode("p", { className: "my-2" }),
-                                        children: [
-                                            {
-                                                element: document.createTextNode(`${answered + 1}/9`),
-                                                children: null
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                element: buildNode("div", { className: "col-3" }),
-                                children: [
-                                    {
-                                        element: buildNode("p", { className: "my-2" }),
-                                        children: [
-                                            {
-                                                element: document.createTextNode(`${points} pts`),
-                                                children: null
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
-        }
-    }
-}
-
-class AnswersComponent {
-    constructor({ category, multipleChoice, correctAnswer, userAnswer }, handler) {
-        this.abstractDOMTree = {
-            root: {
-                element: buildNode("div", { className: "row text-center lead px-md-2", id: "answers-component" }),
-                children: [
-                    {
-                        element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
-                        children: [
-                            {
-                                element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom answer-highlight-${category.color}`, onclick: handler }),
-                                children: [
-                                    {
-                                        element: document.createTextNode(multipleChoice[0]),
-                                        children: null
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
-                        children: [
-                            {
-                                element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom answer-highlight-${category.color}`, onclick: handler }),
-                                children: [
-                                    {
-                                        element: document.createTextNode(multipleChoice[1]),
-                                        children: null
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
-                        children: [
-                            {
-                                element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom answer-highlight-${category.color}`, onclick: handler }),
-                                children: [
-                                    {
-                                        element: document.createTextNode(multipleChoice[2]),
-                                        children: null
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
-                        children: [
-                            {
-                                element: buildNode("p", { className: `rounded-lg py-2 py-md-5 bg-custom answer-highlight-${category.color}`, onclick: handler }),
-                                children: [
-                                    {
-                                        element: document.createTextNode(multipleChoice[3]),
-                                        children: null
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
-        }
-        this.abstractDOMTree.root.children[correctAnswer.index].children[0].element.classList.add("correct");
-    }
-}
-
-
-
-
-let component = {
-    root: {
-        element: buildNode("div", { className: "container", id: "quiz-element" }),
-        children: [
-            {
-                element: buildNode("div", { className: "row justify-content-center" }),
-                children: [
-                    {
-                        element: buildNode("div", { className: "col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg" }),
-                        children: null
-                    },
-                    {
-                        element: buildNode("div", { className: "row justify-content-center" }),
-                        children: [
-                            {
-                                element: buildNode("div", { className: "mt-md-5 mt-4 col-6 px-0 rounded-lg bg-light" }),
-                                children: null
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    }
-
-}
 
 
 // Local Storage Class: Handles Local Storage
@@ -695,7 +742,53 @@ function depthFirstTraversalTest(rootNode, startingNode) {
 
 }
 
-//depthFirstTraversalTest(ui.mainElement, quizComponent.root);
+//depthFirstTraversalTest(document.querySelector("#main"), quizComponent.root);
+depthFirstTraversalTest(document.querySelector("#main"), new QuizComponent({
+    category: {
+        title: "Geography",
+        color: "geography"
+    },
+    question: "Togo is located on which continent?",
+    multipleChoice: ["South America", "Europe", "Asia", "Africa"],
+    answered: 0,
+    points: 0,
+    board: {
+        0: "correct",
+        1: "wrong",
+        2: "blank",
+        3: "blank",
+        4: "blank",
+        5: "blank",
+        6: "blank",
+        7: "blank",
+        8: "blank"
+    },
+    handler: function(event) {
+
+        const userAnswer = event.target.textContent;
+
+        if (userAnswer === "Africa") {
+            event.target.classList.add("correct");
+        } else {
+            // updateAnswers(userAnswer, correctAnswer);
+            // For now let's just do
+            event.target.classList(add("incorrect"));
+        }
+
+    }
+}).abstractDOMTree.root);
+
+
+function resultIcon(value) {
+    switch(value) {
+        case "blank":
+            return "circle";
+        case "correct":
+            return "check-circle";
+        case "wrong":
+            return "x-circle";
+    }
+}
 
 
 
@@ -723,7 +816,7 @@ function rotate() {
         let elapsed = Math.floor(time / 1000);
 
         seconds.innerHTML--;
-            
+
         object.style.transform = `rotate(${degree += 30}deg)`;
 
         if (elapsed === 6) {
@@ -731,7 +824,7 @@ function rotate() {
             secondHalf.style.display = "none";
             object = firstHalf;
             degree = 0;
-        }       
+        }
 
         if (elapsed === 12) {
             clearInterval(timeInterval);
@@ -739,7 +832,7 @@ function rotate() {
 
     }, 1000);
 
-    
+
 }
 
 //rotate();
