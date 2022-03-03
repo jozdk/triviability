@@ -54,7 +54,7 @@ class Question {
         this.correctAnswer = {
             title: question.correctAnswer,
             index: -1
-        }
+        };
         this.wrongAnswers = question.incorrectAnswers;
         this.multipleChoice = this.makeMultipleChoice();
         this.userAnswer;
@@ -86,8 +86,16 @@ class Question {
 
 class UIForQuiz {
     constructor(question, gamestate) {
-        this.mainElement = document.querySelector("#main")
-        this.quizBox = new QuizBoxComponent(question, gamestate, this.answerHandler);
+        this.mainElement = document.querySelector("#main");
+        this.quizBox = new QuizComponent({
+            category: question.category,
+            question: question.question,
+            multipleChoice: question.multipleChoice,
+            answered: gamestate.answered,
+            points: gamestate.points,
+            board: gamestate.board,
+            handler: this.answerHandler
+        });
         this.stats;
         this.answers;
 
@@ -185,7 +193,18 @@ class Quiz {
         this._questions = [];
         this._gamestate = {
             answered: 0,
-            points: 0
+            points: 0,
+            board: {
+                0: "blank",
+                1: "blank",
+                2: "blank",
+                3: "blank",
+                4: "blank",
+                5: "blank",
+                6: "blank",
+                7: "blank",
+                8: "blank"
+            }
         }
         //this.ui = new UIForQuiz(this._questions[0].category, this._questions[0].question, this.gamestate);
         this.ui = {};
@@ -195,6 +214,7 @@ class Quiz {
     set gamestate({ answered, points }) {
         this._gamestate.answered = answered;
         this._gamestate.points = points;
+        // board
     }
 
     get gamestate() {
@@ -203,7 +223,7 @@ class Quiz {
 
     set questions(questions) {
         this._questions = questions.map((question) => new Question(question));
-        this.ui = new UIForQuiz(this._questions[0], this._gamestate, this.ui.answerHandler);
+        this.ui = new UIForQuiz(this._questions[0], this._gamestate);
     }
 
     get questions() {
@@ -282,7 +302,8 @@ class UIForSettings {
         });
 
         this.startButton.addEventListener("click", () => {
-            settings.fetchQuestions();
+            //settings.fetchQuestions();
+            quiz.questions = testQuestions;
             this.selectionPage.style.display = "none";
         });
 
@@ -743,40 +764,44 @@ function depthFirstTraversalTest(rootNode, startingNode) {
 }
 
 //depthFirstTraversalTest(document.querySelector("#main"), quizComponent.root);
-depthFirstTraversalTest(document.querySelector("#main"), new QuizComponent({
-    category: {
-        title: "Geography",
-        color: "geography"
-    },
-    question: "Togo is located on which continent?",
-    multipleChoice: ["South America", "Europe", "Asia", "Africa"],
-    answered: 0,
-    points: 0,
-    board: {
-        0: "correct",
-        1: "wrong",
-        2: "blank",
-        3: "blank",
-        4: "blank",
-        5: "blank",
-        6: "blank",
-        7: "blank",
-        8: "blank"
-    },
-    handler: function(event) {
 
-        const userAnswer = event.target.textContent;
+// Render test
 
-        if (userAnswer === "Africa") {
-            event.target.classList.add("correct");
-        } else {
-            // updateAnswers(userAnswer, correctAnswer);
-            // For now let's just do
-            event.target.classList(add("incorrect"));
-        }
+// depthFirstTraversalTest(document.querySelector("#main"), new QuizComponent({
+//     category: {
+//         title: "Geography",
+//         color: "geography"
+//     },
+//     question: "Togo is located on which continent?",
+//     multipleChoice: ["South America", "Europe", "Asia", "Africa"],
+//     answered: 2,
+//     points: 0,
+//     board: {
+//         0: "correct",
+//         1: "wrong",
+//         2: "blank",
+//         3: "blank",
+//         4: "blank",
+//         5: "blank",
+//         6: "blank",
+//         7: "blank",
+//         8: "blank"
+//     },
+//     handler: function(event) {
 
-    }
-}).abstractDOMTree.root);
+//         const userAnswer = event.target.textContent;
+
+//         if (userAnswer === "Africa") {
+//             event.target.classList.add("correct");
+//             event.target.classList.remove("answer-highlight-geography");
+//         } else {
+//             // updateAnswers(userAnswer, correctAnswer);
+//             // For now let's just do
+//             event.target.classList.add("incorrect");
+//         }
+
+//     }
+// }).abstractDOMTree.root);
 
 
 function resultIcon(value) {
