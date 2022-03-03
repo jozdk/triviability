@@ -60,7 +60,7 @@ const quizComponent = {
                                                         element: buildNode("div", {className: "radial-timer"}),
                                                         children: [
                                                             {
-                                                                element: buildNode("div", {className: "first-half"}),
+                                                                element: buildNode("div", {className: `first-half bg-${category.color}`}),
                                                                 children: null
                                                             },
                                                             {
@@ -68,7 +68,7 @@ const quizComponent = {
                                                                 children: null
                                                             },
                                                             {
-                                                                element: buildNode("div", {className: "second-half"}),
+                                                                element: buildNode("div", {className: `second-half bg-${category.color}`}),
                                                                 children: null
                                                             },
                                                             {
@@ -128,7 +128,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon} text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
                                                 children: null
                                             }
                                         ]
@@ -137,7 +137,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon} text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
                                                 children: null
                                             }
                                         ]
@@ -146,7 +146,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon} text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
                                                 children: null
                                             }
                                         ]
@@ -155,7 +155,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon} text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
                                                 children: null
                                             }
                                         ]
@@ -164,7 +164,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon} text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
                                                 children: null
                                             }
                                         ]
@@ -173,7 +173,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon} text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
                                                 children: null
                                             }
                                         ]
@@ -182,7 +182,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon} text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
                                                 children: null
                                             }
                                         ]
@@ -191,7 +191,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon} text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
                                                 children: null
                                             }
                                         ]
@@ -200,7 +200,7 @@ const quizComponent = {
                                         element: buildNode("div", {className: "col-4 px-0"}),
                                         children: [
                                             {
-                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon} text-${resultColor}`}),
+                                                element: buildNode("i", {className: `fs-3 bi bi-${resultIcon}-fill text-${resultColor}`}),
                                                 children: null
                                             }
                                         ]
@@ -278,21 +278,21 @@ const quizComponent = {
                                                         ]
                                                     }
                                                 ]
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        element: buildNode("div", {id: "question-question-component", className: "row"}),
-                                        children: [
+                                            },
                                             {
-                                                element: buildNode("div", {className: "col text-center p-4 p-md-5"}),
+                                                element: buildNode("div", {id: "question-question-component", className: "row"}),
                                                 children: [
                                                     {
-                                                        element: buildNode("p", {className: "lead"}),
+                                                        element: buildNode("div", {className: "col text-center p-4 p-md-5"}),
                                                         children: [
                                                             {
-                                                                element: document.createTextNode(question),
-                                                                children: null
+                                                                element: buildNode("p", {className: "lead"}),
+                                                                children: [
+                                                                    {
+                                                                        element: document.createTextNode(question),
+                                                                        children: null
+                                                                    }
+                                                                ]
                                                             }
                                                         ]
                                                     }
@@ -322,7 +322,12 @@ const quizComponent = {
                                                                         children: null
                                                                     }
                                                                 ]
-                                                            },
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        element: buildNode("div", {className: "col-md-6 px-3 px-md-2"}),
+                                                        children: [
                                                             {
                                                                 element: buildNode("p", {className: `rounded-lg py-2 py-md-5 my-0 bg-custom border answer-highlight-${category.color}`, onclick: handler}),
                                                                 children: [
@@ -331,7 +336,12 @@ const quizComponent = {
                                                                         children: null
                                                                     }
                                                                 ]
-                                                            },
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        element: buildNode("div", {className: "col-md-6 px-3 px-md-2"}),
+                                                        children: [
                                                             {
                                                                 element: buildNode("p", {className: `rounded-lg py-2 py-md-5 my-0 bg-custom border answer-highlight-${category.color}`, onclick: handler}),
                                                                 children: [
@@ -340,7 +350,12 @@ const quizComponent = {
                                                                         children: null
                                                                     }
                                                                 ]
-                                                            },
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        element: buildNode("div", {className: "col-md-6 px-3 px-md-2"}),
+                                                        children: [
                                                             {
                                                                 element: buildNode("p", {className: `rounded-lg py-2 py-md-5 my-0 bg-custom border answer-highlight-${category.color}`, onclick: handler}),
                                                                 children: [
