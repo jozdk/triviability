@@ -168,6 +168,10 @@ a:link, a:visited {
     background-color: darkred;
 }
 
+.blank {
+    background-color: #fff;
+}
+
 .solution {
     border: 5px solid green;
 }
@@ -240,15 +244,15 @@ a:link, a:visited {
       background-color: #fff;
   }
 
-  .text-correct {
+  .board-correct {
       color: green;
   }
 
-  .text-wrong {
+  .board-wrong {
       color: darkred;
   }
 
-  .text-blank {
+  .board-undefined {
       color: #fff;
   }
 

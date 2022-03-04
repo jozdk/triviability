@@ -3,6 +3,7 @@
 class Settings {
     constructor() {
         this._categories = [];
+        this.ui = new UIForSettings();
     }
 
     set categories(selected) {
@@ -78,7 +79,7 @@ class Question {
 
     validate(answer) {
         this.userAnswer = answer;
-        this.result = answer === this.correctAnswer.title ? true : false;
+        this.result = answer === this.correctAnswer.title ? "correct" : "wrong";
         return this.result;
     }
 
@@ -87,7 +88,7 @@ class Question {
 class UIForQuiz {
     constructor(question, gamestate) {
         this.mainElement = document.querySelector("#main");
-        this.quizBox = new QuizComponent({
+        this.quizElement = new QuizComponent({
             category: question.category,
             question: question.question,
             multipleChoice: question.multipleChoice,
@@ -96,22 +97,15 @@ class UIForQuiz {
             board: gamestate.board,
             handler: this.answerHandler
         });
-        this.stats;
-        this.answers;
 
-        this.progressBar = {
-            elem: document.querySelector("#bar"),
-            width: 0,
-        }
-
-        this.compileDOMTree(this.mainElement, this.quizBox.abstractDOMTree.root);
+        this.compileDOMTree(this.mainElement, this.quizElement.abstractDOMTree.root);
     }
 
     updateComponent(component, question, gamestate) {
         switch (component) {
             case "quizBox":
-                this.quizBox = new QuizBoxComponent(question, gamestate, this.answerHandler);
-                this.compileDOMTree(this.mainElement, this.quizBox.abstractDOMTree.root)
+                this.quizElement = new QuizComponent(question, gamestate, this.answerHandler);
+                this.compileDOMTree(this.mainElement, this.quizElement.abstractDOMTree.root)
                 break;
             case "stats":
                 this.stats = new StatsComponent(question, gamestate.points);
@@ -194,37 +188,33 @@ class Quiz {
         this._gamestate = {
             answered: 0,
             points: 0,
-            board: {
-                0: "blank",
-                1: "blank",
-                2: "blank",
-                3: "blank",
-                4: "blank",
-                5: "blank",
-                6: "blank",
-                7: "blank",
-                8: "blank"
-            }
-        }
-        //this.ui = new UIForQuiz(this._questions[0].category, this._questions[0].question, this.gamestate);
+            board: {}
+        };
         this.ui = {};
-
     }
 
-    set gamestate({ answered, points }) {
+    init(questions) {
+        this._questions = questions.map((question) => new Question(question));
+        this._questions.forEach((question, index) => {
+            this._gamestate.board[index] = question.result;
+        });
+        this.ui = new UIForQuiz(this._questions[0], this._gamestate);
+    }
+
+    set gamestate({ answered, points, board }) {
         this._gamestate.answered = answered;
         this._gamestate.points = points;
-        // board
+        // set board
     }
 
     get gamestate() {
         return this._gamestate;
     }
 
-    set questions(questions) {
-        this._questions = questions.map((question) => new Question(question));
-        this.ui = new UIForQuiz(this._questions[0], this._gamestate);
-    }
+    // set questions(questions) {
+    //     this._questions = questions.map((question) => new Question(question));
+    //     this.ui = new UIForQuiz(this._questions[0], this._gamestate);
+    // }
 
     get questions() {
         return this._questions;
@@ -258,7 +248,6 @@ class Quiz {
 
 class UIForSettings {
     constructor() {
-        this.windowElement = window;
         this.selectionPage = document.querySelector("#selection-menu");
         this.selectionElement = document.querySelector("#category-selection");
         this.startButton = document.querySelector("#start-button");
@@ -303,7 +292,7 @@ class UIForSettings {
 
         this.startButton.addEventListener("click", () => {
             //settings.fetchQuestions();
-            quiz.questions = testQuestions;
+            quiz.init(testQuestions);
             this.selectionPage.style.display = "none";
         });
 
@@ -465,7 +454,7 @@ class QuizComponent {
                                                 element: buildNode("div", { className: "col-4 px-0" }),
                                                 children: [
                                                     {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[0])}-fill text-${board[0]}` }),
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[0])}-fill board-${board[0]}` }),
                                                         children: null
                                                     }
                                                 ]
@@ -474,7 +463,7 @@ class QuizComponent {
                                                 element: buildNode("div", { className: "col-4 px-0" }),
                                                 children: [
                                                     {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[1])}-fill text-${board[1]}` }),
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[1])}-fill board-${board[1]}` }),
                                                         children: null
                                                     }
                                                 ]
@@ -483,7 +472,7 @@ class QuizComponent {
                                                 element: buildNode("div", { className: "col-4 px-0" }),
                                                 children: [
                                                     {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[2])}-fill text-${board[2]}` }),
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[2])}-fill board-${board[2]}` }),
                                                         children: null
                                                     }
                                                 ]
@@ -492,7 +481,7 @@ class QuizComponent {
                                                 element: buildNode("div", { className: "col-4 px-0" }),
                                                 children: [
                                                     {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[3])}-fill text-${board[3]}` }),
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[3])}-fill board-${board[3]}` }),
                                                         children: null
                                                     }
                                                 ]
@@ -501,7 +490,7 @@ class QuizComponent {
                                                 element: buildNode("div", { className: "col-4 px-0" }),
                                                 children: [
                                                     {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[4])}-fill text-${board[4]}` }),
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[4])}-fill board-${board[4]}` }),
                                                         children: null
                                                     }
                                                 ]
@@ -510,7 +499,7 @@ class QuizComponent {
                                                 element: buildNode("div", { className: "col-4 px-0" }),
                                                 children: [
                                                     {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[5])}-fill text-${board[5]}` }),
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[5])}-fill board-${board[5]}` }),
                                                         children: null
                                                     }
                                                 ]
@@ -519,7 +508,7 @@ class QuizComponent {
                                                 element: buildNode("div", { className: "col-4 px-0" }),
                                                 children: [
                                                     {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[6])}-fill text-${board[6]}` }),
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[6])}-fill board-${board[6]}` }),
                                                         children: null
                                                     }
                                                 ]
@@ -528,7 +517,7 @@ class QuizComponent {
                                                 element: buildNode("div", { className: "col-4 px-0" }),
                                                 children: [
                                                     {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[7])}-fill text-${board[7]}` }),
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[7])}-fill board-${board[7]}` }),
                                                         children: null
                                                     }
                                                 ]
@@ -537,7 +526,7 @@ class QuizComponent {
                                                 element: buildNode("div", { className: "col-4 px-0" }),
                                                 children: [
                                                     {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[8])}-fill text-${board[8]}` }),
+                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[8])}-fill board-${board[8]}` }),
                                                         children: null
                                                     }
                                                 ]
@@ -727,7 +716,7 @@ class QuizComponent {
 // Events?
 
 
-const ui = new UIForSettings;
+// const ui = new UIForSettings;
 const settings = new Settings();
 const quiz = new Quiz();
 //const quizBox = new QuizBoxComponent()
@@ -806,7 +795,7 @@ function depthFirstTraversalTest(rootNode, startingNode) {
 
 function resultIcon(value) {
     switch(value) {
-        case "blank":
+        case undefined:
             return "circle";
         case "correct":
             return "check-circle";
