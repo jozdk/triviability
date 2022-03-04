@@ -59,7 +59,7 @@ class Question {
         this.wrongAnswers = question.incorrectAnswers;
         this.multipleChoice = this.makeMultipleChoice();
         this.userAnswer;
-        this.result;
+        this.result = "unanswered";
     }
 
     makeMultipleChoice() {
@@ -188,7 +188,7 @@ class Quiz {
         this._gamestate = {
             answered: 0,
             points: 0,
-            board: {}
+            board: []
         };
         this.ui = {};
     }
@@ -345,25 +345,26 @@ class QuizComponent {
                             {
                                 element: buildNode("div", { id: "stats-component", className: "col-md-2 d-none d-md-flex bg-light rounded-lg me-2 mt-5 flex-column" }),
                                 children: [
-                                    {
-                                        element: buildNode("div", { className: "row mb-1 p-3" }),
-                                        children: [
-                                            {
-                                                element: buildNode("div", { className: `col rounded-lg p-2 bg-${category.color}` }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("p", { className: "px-0 my-2 text-center" }),
-                                                        children: [
-                                                            {
-                                                                element: document.createTextNode(`QUESTION ${answered + 1} of 9`),
-                                                                children: null
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    // {
+                                    //     element: buildNode("div", { className: "row mb-1 p-3" }),
+                                    //     children: [
+                                    //         {
+                                    //             element: buildNode("div", { className: `col rounded-lg p-2 bg-${category.color}` }),
+                                    //             children: [
+                                    //                 {
+                                    //                     element: buildNode("p", { className: "px-0 my-2 text-center" }),
+                                    //                     children: [
+                                    //                         {
+                                    //                             element: document.createTextNode(`QUESTION ${answered + 1} of 9`),
+                                    //                             children: null
+                                    //                         }
+                                    //                     ]
+                                    //                 }
+                                    //             ]
+                                    //         }
+                                    //     ]
+                                    // },
+                                    new StatsHeader({ category, answered }),
                                     {
                                         element: buildNode("div", { id: "timer-component", className: "row py-3" }),
                                         children: [
@@ -709,7 +710,27 @@ class QuizComponent {
     }
 }
 
-
+class StatsHeader {
+    constructor({ category, answered }) {
+        this.element = buildNode("div", { className: "row mb-1 p-3" });
+        this.children = [
+            {
+                element: buildNode("div", { className: `col rounded-lg p-2 bg-${category.color}` }),
+                children: [
+                    {
+                        element: buildNode("p", { className: "px-0 my-2 text-center" }),
+                        children: [
+                            {
+                                element: document.createTextNode(`QUESTION ${answered + 1} of 9`),
+                                children: null
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
 
 // Local Storage Class: Handles Local Storage
 
@@ -795,7 +816,7 @@ function depthFirstTraversalTest(rootNode, startingNode) {
 
 function resultIcon(value) {
     switch(value) {
-        case undefined:
+        case "unanswered":
             return "circle";
         case "correct":
             return "check-circle";

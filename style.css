@@ -252,7 +252,7 @@ a:link, a:visited {
       color: darkred;
   }
 
-  .board-undefined {
+  .board-unanswered {
       color: #fff;
   }
 
