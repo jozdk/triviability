@@ -1,3 +1,5 @@
+// Original and whole QuizComponent
+
 class QuizComponent {
     constructor({ category, question, multipleChoice, answered, points, board, handler }) {
         this.abstractDOMTree = {

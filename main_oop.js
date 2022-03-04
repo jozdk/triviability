@@ -345,195 +345,9 @@ class QuizComponent {
                             {
                                 element: buildNode("div", { id: "stats-component", className: "col-md-2 d-none d-md-flex bg-light rounded-lg me-2 mt-5 flex-column" }),
                                 children: [
-                                    // {
-                                    //     element: buildNode("div", { className: "row mb-1 p-3" }),
-                                    //     children: [
-                                    //         {
-                                    //             element: buildNode("div", { className: `col rounded-lg p-2 bg-${category.color}` }),
-                                    //             children: [
-                                    //                 {
-                                    //                     element: buildNode("p", { className: "px-0 my-2 text-center" }),
-                                    //                     children: [
-                                    //                         {
-                                    //                             element: document.createTextNode(`QUESTION ${answered + 1} of 9`),
-                                    //                             children: null
-                                    //                         }
-                                    //                     ]
-                                    //                 }
-                                    //             ]
-                                    //         }
-                                    //     ]
-                                    // },
                                     new StatsHeader({ category, answered }),
-                                    {
-                                        element: buildNode("div", { id: "timer-component", className: "row py-3" }),
-                                        children: [
-                                            {
-                                                element: buildNode("div", { className: "col text-center d-flex flex-column align-items-center" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("h5", { className: "mb-3" }),
-                                                        children: [
-                                                            {
-                                                                element: document.createTextNode("Timer"),
-                                                                children: null
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        element: buildNode("div", { id: "timer-container" }),
-                                                        children: [
-                                                            {
-                                                                element: buildNode("div", { className: "radial-timer" }),
-                                                                children: [
-                                                                    {
-                                                                        element: buildNode("div", { className: `first-half bg-${category.color}` }),
-                                                                        children: null
-                                                                    },
-                                                                    {
-                                                                        element: buildNode("div", { className: "half-mask" }),
-                                                                        children: null
-                                                                    },
-                                                                    {
-                                                                        element: buildNode("div", { className: `second-half bg-${category.color}` }),
-                                                                        children: null
-                                                                    },
-                                                                    {
-                                                                        element: buildNode("div", { className: "seconds d-flex align-items-center justify-content-center lead" }),
-                                                                        children: [
-                                                                            {
-                                                                                element: buildNode("h4", { id: "seconds" }),
-                                                                                children: [
-                                                                                    {
-                                                                                        element: document.createTextNode("12"),
-                                                                                        children: null
-                                                                                    }
-                                                                                ]
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                ]
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        element: buildNode("div", { id: "score-component", className: "row mb-1 py-3 px-xxl-5 px-lg-4 px-md-1 text-center" }),
-                                        children: [
-                                            {
-                                                element: buildNode("div", { className: "col-12" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("h5"),
-                                                        children: [
-                                                            {
-                                                                element: document.createTextNode("Score"),
-                                                                children: null
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                element: buildNode("div", { className: "col-12" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("h3", { className: "py-3" }),
-                                                        children: [
-                                                            {
-                                                                element: document.createTextNode(points),
-                                                                children: null
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                element: buildNode("div", { className: "col-4 px-0" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[0])}-fill board-${board[0]}` }),
-                                                        children: null
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                element: buildNode("div", { className: "col-4 px-0" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[1])}-fill board-${board[1]}` }),
-                                                        children: null
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                element: buildNode("div", { className: "col-4 px-0" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[2])}-fill board-${board[2]}` }),
-                                                        children: null
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                element: buildNode("div", { className: "col-4 px-0" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[3])}-fill board-${board[3]}` }),
-                                                        children: null
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                element: buildNode("div", { className: "col-4 px-0" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[4])}-fill board-${board[4]}` }),
-                                                        children: null
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                element: buildNode("div", { className: "col-4 px-0" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[5])}-fill board-${board[5]}` }),
-                                                        children: null
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                element: buildNode("div", { className: "col-4 px-0" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[6])}-fill board-${board[6]}` }),
-                                                        children: null
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                element: buildNode("div", { className: "col-4 px-0" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[7])}-fill board-${board[7]}` }),
-                                                        children: null
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                element: buildNode("div", { className: "col-4 px-0" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(board[8])}-fill board-${board[8]}` }),
-                                                        children: null
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
+                                    new Timer({ category }),
+                                    new Score({ points: 0, board: ["unanswered", "unanswered", "unanswered", "unanswered", "unanswered", "unanswered", "unanswered", "unanswered", "unanswered"] })
                                 ]
                             },
                             {
@@ -732,6 +546,118 @@ class StatsHeader {
     }
 }
 
+class Timer {
+    constructor({ category }) {
+        this.element = buildNode("div", { id: "timer-component", className: "row py-3" });
+        this.children = [
+            {
+                element: buildNode("div", { className: "col text-center d-flex flex-column align-items-center" }),
+                children: [
+                    {
+                        element: buildNode("h5", { className: "mb-3" }),
+                        children: [
+                            {
+                                element: document.createTextNode("Timer"),
+                                children: null
+                            }
+                        ]
+                    },
+                    {
+                        element: buildNode("div", { id: "timer-container" }),
+                        children: [
+                            {
+                                element: buildNode("div", { className: "radial-timer" }),
+                                children: [
+                                    {
+                                        element: buildNode("div", { className: `first-half bg-${category.color}` }),
+                                        children: null
+                                    },
+                                    {
+                                        element: buildNode("div", { className: "half-mask" }),
+                                        children: null
+                                    },
+                                    {
+                                        element: buildNode("div", { className: `second-half bg-${category.color}` }),
+                                        children: null
+                                    },
+                                    {
+                                        element: buildNode("div", { className: "seconds d-flex align-items-center justify-content-center lead" }),
+                                        children: [
+                                            {
+                                                element: buildNode("h4", { id: "seconds" }),
+                                                children: [
+                                                    {
+                                                        element: document.createTextNode("12"),
+                                                        children: null
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+class Score {
+    constructor({ points, board }) {
+
+        const boardFields = board.map(field => {
+           return new BoardField({ field: field });
+        });
+
+        this.element = buildNode("div", { id: "score-component", className: "row mb-1 py-3 px-xxl-5 px-lg-4 px-md-1 text-center" });
+        this.children = [
+            {
+                element: buildNode("div", { className: "col-12" }),
+                children: [
+                    {
+                        element: buildNode("h5"),
+                        children: [
+                            {
+                                element: document.createTextNode("Score"),
+                                children: null
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                element: buildNode("div", { className: "col-12" }),
+                children: [
+                    {
+                        element: buildNode("h3", { className: "py-3" }),
+                        children: [
+                            {
+                                element: document.createTextNode(points),
+                                children: null
+                            }
+                        ]
+                    }
+                ]
+            },
+            ...boardFields
+        ]
+    }
+}
+
+class BoardField {
+    constructor({ field }) {
+        this.element = buildNode("div", { className: "col-4 px-0" });
+        this.children = [
+            {
+                element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(field)}-fill board-${field}` }),
+                children: null
+            }
+        ]
+    }
+}
+
 // Local Storage Class: Handles Local Storage
 
 // Events?
@@ -777,41 +703,41 @@ function depthFirstTraversalTest(rootNode, startingNode) {
 
 // Render test
 
-// depthFirstTraversalTest(document.querySelector("#main"), new QuizComponent({
-//     category: {
-//         title: "Geography",
-//         color: "geography"
-//     },
-//     question: "Togo is located on which continent?",
-//     multipleChoice: ["South America", "Europe", "Asia", "Africa"],
-//     answered: 2,
-//     points: 0,
-//     board: {
-//         0: "correct",
-//         1: "wrong",
-//         2: "blank",
-//         3: "blank",
-//         4: "blank",
-//         5: "blank",
-//         6: "blank",
-//         7: "blank",
-//         8: "blank"
-//     },
-//     handler: function(event) {
+depthFirstTraversalTest(document.querySelector("#main"), new QuizComponent({
+    category: {
+        title: "Geography",
+        color: "geography"
+    },
+    question: "Togo is located on which continent?",
+    multipleChoice: ["South America", "Europe", "Asia", "Africa"],
+    answered: 0,
+    points: 0,
+    board: {
+        0: "unanswered",
+        1: "unanswered",
+        2: "unanswered",
+        3: "unanswered",
+        4: "unanswered",
+        5: "unanswered",
+        6: "unanswered",
+        7: "unanswered",
+        8: "unanswered"
+    },
+    handler: function(event) {
 
-//         const userAnswer = event.target.textContent;
+        const userAnswer = event.target.textContent;
 
-//         if (userAnswer === "Africa") {
-//             event.target.classList.add("correct");
-//             event.target.classList.remove("answer-highlight-geography");
-//         } else {
-//             // updateAnswers(userAnswer, correctAnswer);
-//             // For now let's just do
-//             event.target.classList.add("incorrect");
-//         }
+        if (userAnswer === "Africa") {
+            event.target.classList.add("correct");
+            event.target.classList.remove("answer-highlight-geography");
+        } else {
+            // updateAnswers(userAnswer, correctAnswer);
+            // For now let's just do
+            event.target.classList.add("incorrect");
+        }
 
-//     }
-// }).abstractDOMTree.root);
+    }
+}).abstractDOMTree.root);
 
 
 function resultIcon(value) {
