@@ -354,77 +354,7 @@ class QuizComponent {
                                 element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-9 col-xxl-7 mt-5" }),
                                 children: [
                                     new QuestionComponent({category, question}),
-                                    {
-                                        element: buildNode("div", { id: "answers-component", className: "row" }),
-                                        children: [
-                                            {
-                                                element: buildNode("div", { className: "col bg-light rounded-lg mt-2" }),
-                                                children: [
-                                                    {
-                                                        element: buildNode("div", { className: "row text-center lead px-md-2 py-3 gy-3" }),
-                                                        children: [
-                                                            {
-                                                                element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
-                                                                children: [
-                                                                    {
-                                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 my-0 bg-custom border answer-highlight-${category.color}`, onclick: handler }),
-                                                                        children: [
-                                                                            {
-                                                                                element: document.createTextNode(multipleChoice[0]),
-                                                                                children: null
-                                                                            }
-                                                                        ]
-                                                                    }                                                                   
-                                                                ]
-                                                            },
-                                                            {
-                                                                element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
-                                                                children: [
-                                                                    {
-                                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 my-0 bg-custom border answer-highlight-${category.color}`, onclick: handler }),
-                                                                        children: [
-                                                                            {
-                                                                                element: document.createTextNode(multipleChoice[1]),
-                                                                                children: null
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                ]
-                                                            },
-                                                            {
-                                                                element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
-                                                                children: [
-                                                                    {
-                                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 my-0 bg-custom border answer-highlight-${category.color}`, onclick: handler }),
-                                                                        children: [
-                                                                            {
-                                                                                element: document.createTextNode(multipleChoice[2]),
-                                                                                children: null
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                ]
-                                                            },
-                                                            {
-                                                                element: buildNode("div", { className: "col-md-6 px-3 px-md-2" }),
-                                                                children: [
-                                                                    {
-                                                                        element: buildNode("p", { className: `rounded-lg py-2 py-md-5 my-0 bg-custom border answer-highlight-${category.color}`, onclick: handler }),
-                                                                        children: [
-                                                                            {
-                                                                                element: document.createTextNode(multipleChoice[3]),
-                                                                                children: null
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                ]
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
+                                    new Answers({category, multipleChoice, handler})
                                 ]
                             }
                         ]
@@ -663,6 +593,47 @@ class QuestionText {
                                 children: null
                             }
                         ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+class Answers {
+    constructor({ category, multipleChoice, handler }) {
+
+        const answers = multipleChoice.map((answer) => {
+            return new Answer({answer, category, handler});
+        })
+
+        this.element = buildNode("div", { id: "answers-component", className: "row" });
+        this.children = [
+            {
+                element: buildNode("div", { className: "col bg-light rounded-lg mt-2" }),
+                children: [
+                    {
+                        element: buildNode("div", { className: "row text-center lead px-md-2 py-3 gy-3" }),
+                        children: [
+                            ...answers
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+class Answer {
+    constructor({ answer, category, handler }) {
+        this.element = buildNode("div", { className: "col-md-6 px-3 px-md-2" });
+        this.children = [
+            {
+                element: buildNode("p", { className: `rounded-lg py-2 py-md-5 my-0 bg-custom border answer-highlight-${category.color}`, onclick: handler }),
+                children: [
+                    {
+                        element: document.createTextNode(answer),
+                        children: null
                     }
                 ]
             }
