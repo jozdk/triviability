@@ -233,6 +233,8 @@ class Quiz {
 
         this._gamestate.answered++;
 
+        // Update state
+
         return {
             result: currentQuestion.result,
             points: this._gamestate.points,
@@ -686,7 +688,7 @@ function depthFirstTraversalTest(rootNode, startingNode) {
 
 // Render test
 
-depthFirstTraversalTest(document.querySelector("#main"), new QuizComponent({
+const quizComp = new QuizComponent({
     category: {
         title: "Geography",
         color: "geography"
@@ -710,7 +712,9 @@ depthFirstTraversalTest(document.querySelector("#main"), new QuizComponent({
         }
 
     }
-}).abstractDOMTree.root);
+});
+
+depthFirstTraversalTest(document.querySelector("#main"), quizComp.abstractDOMTree.root);
 
 
 function resultIcon(value) {
