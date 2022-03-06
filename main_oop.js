@@ -77,43 +77,50 @@ class Question {
         return choices;
     }
 
-    validate(answer) {
-        this.userAnswer = answer;
-        this.result = answer === this.correctAnswer.title ? "correct" : "wrong";
-        return this.result;
-    }
+    // validate(answer) {
+    //     this.userAnswer = answer;
+    //     this.result = answer === this.correctAnswer.title ? "correct" : "wrong";
+    //     return this.result;
+    // }
 
 }
 
 class UIForQuiz {
     constructor(question, gamestate) {
         this.mainElement = document.querySelector("#main");
-        this.quizElement = new QuizComponent({
-            category: question.category,
-            question: question.question,
-            multipleChoice: question.multipleChoice,
-            answered: gamestate.answered,
-            points: gamestate.points,
-            board: gamestate.board,
+        this._quizElement = new QuizComponent({
+            // category: question.category,
+            question: question,
+            gamestate: gamestate,
+            // multipleChoice: question.multipleChoice,
+            // answered: gamestate.answered,
+            // points: gamestate.points,
+            // board: gamestate.board,
             handler: this.answerHandler
         });
 
-        this.compileDOMTree(this.mainElement, this.quizElement.abstractDOMTree.root);
+        this.render(this.mainElement, this._quizElement.root);
+    }
+
+    set quizElement(quizComp) {
+        this._quizElement = quizComp;
+        this.mainElement.innerHTML = "";
+        this.render(this.mainElement, this._quizElement.root);
     }
 
     updateComponent(component, question, gamestate) {
         switch (component) {
             case "quizBox":
-                this.quizElement = new QuizComponent(question, gamestate, this.answerHandler);
-                this.compileDOMTree(this.mainElement, this.quizElement.abstractDOMTree.root)
+                this._quizElement = new QuizComponent(question, gamestate, this.answerHandler);
+                this.render(this.mainElement, this._quizElement.abstractDOMTree.root)
                 break;
             case "stats":
                 this.stats = new StatsComponent(question, gamestate.points);
-                this.compileDOMTree(document.querySelector("#stats-component"), this.stats.abstractDOMTree.root);
+                this.render(document.querySelector("#stats-component"), this.stats.abstractDOMTree.root);
                 break;
             case "answers":
                 this.answers = new AnswersComponent(question, null);
-                this.compileDOMTree(document.querySelector("#box-component"), this.answers.abstractDOMTree.root);
+                this.render(document.querySelector("#box-component"), this.answers.abstractDOMTree.root);
                 //document.querySelector("#answers-component").children[question.correctAnswer.index].firstElementChild.classList.add("correct");
                 break;
         }
@@ -121,7 +128,7 @@ class UIForQuiz {
 
     updateStats(category, gamestate) {
         this.stats = new StatsComponent(category, gamestate);
-        this.compileDOMTree(document.querySelector("#stats-component"), this.stats.abstractDOMTree.root);
+        this.render(document.querySelector("#stats-component"), this.stats.abstractDOMTree.root);
     }
 
     updateAnswers(userAnswer, correctAnswer) {
@@ -130,13 +137,13 @@ class UIForQuiz {
         document.querySelector("#answers-component")
     }
 
-    compileDOMTree(rootNode, startingNode) {
+    render(rootNode, startingNode) {
 
         rootNode.append(startingNode.element);
 
         if (startingNode.children) {
             startingNode.children.forEach((child) => {
-                this.compileDOMTree(rootNode.lastElementChild, child);
+                this.render(rootNode.lastElementChild, child);
             })
 
         }
@@ -145,16 +152,20 @@ class UIForQuiz {
 
     answerHandler(event) {
 
+        console.log("answer event is being handled")
+
         const userAnswer = event.target.textContent;
-        const { result, points, correctAnswer } = quiz.validate(userAnswer);
+        // const { result, points, correctAnswer } = quiz.validate(userAnswer);
 
-        this.updateStats(points);
+        quiz.validate(userAnswer)
 
-        if (result === true) {
-            event.target.classList.add("correct");
-        } else {
-            updateAnswers(userAnswer, correctAnswer);
-        }
+        //this.updateStats(points);
+
+        // if (result === true) {
+        //     event.target.classList.add("correct");
+        // } else {
+        //     updateAnswers(userAnswer, correctAnswer);
+        // }
 
         // Or I could add a givenAnswer property to the question object, write a setter function that executes the validate function inside the question object
         // Or I could write a setter function for the quiz that takes the given answer as an argument and advances the gamestate.
@@ -162,27 +173,27 @@ class UIForQuiz {
         // settings._quiz = event.target.textContent;
     }
 
-    timeProgress() {
-        this.progressBar.startTime = Date.now();
-        this.progressBar.timeInterval = setInterval(() => {
-            // const time = Date.now();
-            this.progressBar.width += 0.835;
-            this.progressBar.elem.style.width = this.progressBar.width + "px";
-        }, 10);
+    // timeProgress() {
+    //     this.progressBar.startTime = Date.now();
+    //     this.progressBar.timeInterval = setInterval(() => {
+    //         // const time = Date.now();
+    //         this.progressBar.width += 0.835;
+    //         this.progressBar.elem.style.width = this.progressBar.width + "px";
+    //     }, 10);
 
-        setTimeout(() => {
-            this.progressBar.elapsedTime = Date.now() - this.progressBar.startTime;
-            clearInterval(this.progressBar.timeInterval);
-            console.log()
-        }, 10000)
-    }
+    //     setTimeout(() => {
+    //         this.progressBar.elapsedTime = Date.now() - this.progressBar.startTime;
+    //         clearInterval(this.progressBar.timeInterval);
+    //         console.log()
+    //     }, 10000)
+    // }
 
 }
 
 // Quiz
 
 class Quiz {
-    constructor(questions) {
+    constructor() {
         // this._questions = questions.map((question) => new Question(question));
         this._questions = [];
         this._gamestate = {
@@ -221,25 +232,26 @@ class Quiz {
     }
 
     validate(answer) {
-        //this._questions[this._gamestate.answered].userAnswer = answer;
-        let currentQuestion = this._questions[this._gamestate.answered];
-
-        if (currentQuestion.validate(answer) === true) {
-            this._gamestate.points += 10;
-        }
+        console.log("answer is being validated")
+        // Update quiz
+        this._questions[this._gamestate.answered].userAnswer = answer;
+        this._questions[this._gamestate.answered].result = answer === this._questions[this._gamestate.answered].correctAnswer.title ? "correct" : "wrong";
+        this._gamestate.points += this._questions[this._gamestate.answered].result === "correct" ? 10 : 0;
+        this._gamestate.board[this._gamestate.answered] = this._questions[this._gamestate.answered].result;
 
         // this.ui.updateComponent("stats", currentQuestion, this._gamestate);
         // this.ui.updateComponent("answers", currentQuestion);
 
+        // Update UI
+        this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, handler: null });
+
         this._gamestate.answered++;
 
-        // Update state
-
-        return {
-            result: currentQuestion.result,
-            points: this._gamestate.points,
-            correctAnswer: currentQuestion.correctAnswer.index
-        }
+        // return {
+        //     result: currentQuestion.result,
+        //     points: this._gamestate.points,
+        //     correctAnswer: currentQuestion.correctAnswer.index
+        // }
 
         //setTimeout(DisplayNextButton, 3000);
     }
@@ -336,33 +348,32 @@ function buildNode(tag, properties) {
 
 
 class QuizComponent {
-    constructor({ category, question, multipleChoice, answered, points, board, handler }) {
-        this.abstractDOMTree = {
-            root: {
-                element: buildNode("div", { id: "quiz-element", className: "container-xl" }),
-                children: [
-                    {
-                        element: buildNode("div", { className: "row justify-content-center" }),
-                        children: [
-                            {
-                                element: buildNode("div", { id: "stats-component", className: "col-md-2 d-none d-md-flex bg-light rounded-lg me-2 mt-5 flex-column" }),
-                                children: [
-                                    new StatsHeader({ category, answered }),
-                                    new Timer({ category }),
-                                    new Score({ points: points, board: board })
-                                ]
-                            },
-                            {
-                                element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-9 col-xxl-7 mt-5" }),
-                                children: [
-                                    new QuestionComponent({category, question}),
-                                    new Answers({category, multipleChoice, handler})
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
+    constructor({ question, gamestate, handler }) {
+        this.root = {
+            element: buildNode("div", { id: "quiz-element", className: "container-xl" }),
+            children: [
+                {
+                    element: buildNode("div", { className: "row justify-content-center" }),
+                    children: [
+                        {
+                            element: buildNode("div", { id: "stats-component", className: "col-md-2 d-none d-md-flex bg-light rounded-lg me-2 mt-5 flex-column" }),
+                            children: [
+                                new StatsHeader({ category: question.category, answered: gamestate.answered }),
+                                new Timer({ category: question.category }),
+                                new Score({ points: gamestate.points, board: gamestate.board })
+                            ]
+                        },
+                        {
+                            element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-9 col-xxl-7 mt-5" }),
+                            children: [
+                                new QuestionComponent({ category: question.category, question: question.question }),
+                                new Answers({ question, handler })
+                            ]
+                        }
+                    ]
+                }
+            ]
+
         }
     }
 }
@@ -451,7 +462,7 @@ class Score {
     constructor({ points, board }) {
 
         const boardFields = board.map(field => {
-           return new BoardField({ field: field });
+            return new BoardField({ field });
         });
 
         this.element = buildNode("div", { id: "score-component", className: "row mb-1 py-3 px-xxl-5 px-lg-4 px-md-1 text-center" });
@@ -508,8 +519,8 @@ class QuestionComponent {
             {
                 element: buildNode("div", { className: "col bg-light rounded-lg" }),
                 children: [
-                    new QuestionHeader({category}),
-                    new QuestionText({question})
+                    new QuestionHeader({ category }),
+                    new QuestionText({ question })
                 ]
             }
         ]
@@ -603,11 +614,53 @@ class QuestionText {
 }
 
 class Answers {
-    constructor({ category, multipleChoice, handler }) {
+    constructor({ question, handler }) {
 
-        const answers = multipleChoice.map((answer) => {
-            return new Answer({answer, category, handler});
+        // let answers;
+
+        // if (question.result === "correct") {
+        //     answers = question.multipleChoice.map((answer) => {
+        //         if (answer === question.correctAnswer.title && answer === question.userAnswer) {
+        //             return new Answer({ answer: answer, result: "correct", category: { color: undefined }, handler: handler });
+        //         } else {
+        //             return new Answer({ answer: answer, result: "white", category: question.category, handler: handler });
+        //         }
+        //     });
+        // } else if (question.result === "wrong") {
+        //     if (answer === question.correctAnswer.title && answer === question.userAnswer) {
+        //         return new Answer({ answer: answer, result: "correct", category: { color: undefined }, handler: handler });
+            
+        // }
+
+        const answers = question.multipleChoice.map((answer) => {
+
+            if (question.result === "correct" && answer === question.correctAnswer.title) {
+                return new Answer({ answer: answer, result: "correct", category: { color: undefined }, handler: handler });
+            } 
+            
+            if (question.result === "wrong" && answer === question.userAnswer) {
+                return new Answer({ answer: answer, result: "wrong",  category: { color: undefined }, handler: handler});
+            }
+
+            if (question.result === "wrong" && answer === question.correctAnswer.title) {
+                return new Answer({ answer: answer, result: "actually-correct", category: { color: undefined }, handler: handler });
+            }
+            
+            return new Answer({ answer: answer, result: "white", category: question.category, handler: handler });     
+
         })
+
+        // const answers = [];
+
+        // for (let i = 0; i < question.multipleChoice.length; i++) {
+        //     if ()
+
+        //     answers.push(new Answer({
+        //         answer: question.multipleChoice[i],
+        //         result: question.result,
+        //         category: question.category,
+        //         handler }));
+        // }
 
         this.element = buildNode("div", { id: "answers-component", className: "row" });
         this.children = [
@@ -627,11 +680,11 @@ class Answers {
 }
 
 class Answer {
-    constructor({ answer, category, handler }) {
+    constructor({ answer, result, category, handler }) {
         this.element = buildNode("div", { className: "col-md-6 px-3 px-md-2" });
         this.children = [
             {
-                element: buildNode("p", { className: `rounded-lg py-2 py-md-5 my-0 bg-custom border answer-highlight-${category.color}`, onclick: handler }),
+                element: buildNode("p", { className: `rounded-lg py-2 py-md-5 my-0 bg-answer-${result} border answer-highlight-${category.color}`, onclick: handler }),
                 children: [
                     {
                         element: document.createTextNode(answer),
@@ -688,37 +741,35 @@ function depthFirstTraversalTest(rootNode, startingNode) {
 
 // Render test
 
-const quizComp = new QuizComponent({
-    category: {
-        title: "Geography",
-        color: "geography"
-    },
-    question: "Togo is located on which continent?",
-    multipleChoice: ["South America", "Europe", "Asia", "Africa"],
-    answered: 0,
-    points: 0,
-    board: ["unanswered", "unanswered", "unanswered", "unanswered", "unanswered", "unanswered", "unanswered", "unanswered", "unanswered"],
-    handler: function(event) {
+// depthFirstTraversalTest(document.querySelector("#main"), new QuizComponent({
+//     category: {
+//         title: "Geography",
+//         color: "geography"
+//     },
+//     question: "Togo is located on which continent?",
+//     multipleChoice: ["South America", "Europe", "Asia", "Africa"],
+//     answered: 0,
+//     points: 0,
+//     board: ["unanswered", "unanswered", "unanswered", "unanswered", "unanswered", "unanswered", "unanswered", "unanswered", "unanswered"],
+//     handler: function (event) {
 
-        const userAnswer = event.target.textContent;
+//         const userAnswer = event.target.textContent;
 
-        if (userAnswer === "Africa") {
-            event.target.classList.add("correct");
-            event.target.classList.remove("answer-highlight-geography");
-        } else {
-            // updateAnswers(userAnswer, correctAnswer);
-            // For now let's just do
-            event.target.classList.add("incorrect");
-        }
+//         if (userAnswer === "Africa") {
+//             event.target.classList.add("correct");
+//             event.target.classList.remove("answer-highlight-geography");
+//         } else {
+//             // updateAnswers(userAnswer, correctAnswer);
+//             // For now let's just do
+//             event.target.classList.add("incorrect");
+//         }
 
-    }
-});
-
-depthFirstTraversalTest(document.querySelector("#main"), quizComp.abstractDOMTree.root);
+//     }
+// }).root);
 
 
 function resultIcon(value) {
-    switch(value) {
+    switch (value) {
         case "unanswered":
             return "circle";
         case "correct":
@@ -733,7 +784,7 @@ function resultIcon(value) {
 const testQuestions = [{ "category": "Geography", "correctAnswer": "Africa", "id": 6696, "incorrectAnswers": ["South America", "Oceania", "Europe", "Asia", "North America"], "question": "Togo is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Sudan", "id": 6549, "incorrectAnswers": ["South Sudan", "Egypt", "Republic of the Congo", "Equatorial Guinea", "Gabon", "Benin", "Democratic Republic of the Congo", "Eritrea", "Uganda", "Togo", "São Tomé and Príncipe", "Rwanda", "Tunisia", "Malta"], "question": "Which of these countries borders Chad?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Asia", "id": 22872, "incorrectAnswers": ["Europe", "Africa", "North America", "South America"], "question": "Which is the Earth's largest continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "South America", "id": 6683, "incorrectAnswers": ["Oceania", "Europe", "Asia", "Africa", "North America"], "question": "Suriname is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Spain", "id": 5713, "incorrectAnswers": ["Portugal", "Andorra", "Mali", "Tunisia", "France", "Monaco", "Senegal", "Burkina Faso", "Switzerland", "The Gambia", "Malta", "Ireland", "Italy", "Belgium", "Luxembourg", "Liechtenstein", "Niger"], "question": "Morocco shares a land border with which of these countries?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Tripoli", "id": 19272, "incorrectAnswers": ["Benghazi", "Tunis", "Alexandria"], "question": "What is the capital of Libya?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Europe", "id": 6685, "incorrectAnswers": ["South America", "Oceania", "Asia", "Africa", "North America"], "question": "Andorra is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "East Timor", "id": 5609, "incorrectAnswers": ["Solomon Islands", "Vanuatu", "Palau", "Brunei", "Nauru", "Federated States of Micronesia", "Fiji", "Philippines", "Malaysia", "Singapore", "Tuvalu", "Kiribati", "Marshall Islands", "Cambodia", "Vietnam", "Thailand"], "question": "Which of these countries borders Australia?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Austria", "id": 19550, "incorrectAnswers": ["Croatia", "San Marino", "Bosnia and Herzegovina", "Romania", "Poland"], "question": "Which country borders Italy, Switzerland, Germany, Czech Republic, Hungary, Slovenia, and Liechtenstein?", "type": "Multiple Choice" }];
 
 
-//quiz.questions = testQuestions;
+quiz.init(testQuestions);
 
 const secondHalf = document.querySelector(".second-half");
 const firstHalf = document.querySelector(".first-half");

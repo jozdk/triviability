@@ -110,19 +110,7 @@ a:link, a:visited {
     width: 0%;
 }
 
-.bg-custom {
-    background-color: white;
-}
 
-.bg-custom:hover {
-    cursor: pointer;
-}
-
-@media (max-width: 768px) {
-    .bg-custom {
-        background-color: #D2FF96;
-    }
-}
 
 .bg-science, .answer-highlight-science:hover {
     background-color: #03FCBA;
@@ -160,17 +148,36 @@ a:link, a:visited {
     background-color: #FF579F;
 }
 
-.correct {
+.bg-answer-white {
+    background-color: white;
+}
+
+.bg-answer-white:hover {
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .bg-custom {
+        background-color: #D2FF96;
+    }
+}
+
+.bg-answer-correct {
     background-color: green;
 }
 
-.incorrect {
+.bg-answer-wrong {
     background-color: darkred;
 }
 
-.blank {
-    background-color: #fff;
+.bg-answer-actually-correct {
+    /* border: 5px solid green !important; */
+    box-shadow: inset 0px 0px 0px 5px green;
 }
+
+/* .blank {
+    background-color: #fff;
+} */
 
 .solution {
     border: 5px solid green;
