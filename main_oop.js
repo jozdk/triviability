@@ -247,6 +247,10 @@ class Quiz {
 
         this._gamestate.answered++;
 
+        setTimeout(() => {
+
+        }, 3000)
+
         // return {
         //     result: currentQuestion.result,
         //     points: this._gamestate.points,
@@ -371,7 +375,8 @@ class QuizComponent {
                             ]
                         }
                     ]
-                }
+                },
+                ... question.result !== "unanswered" ? [new NextButton()] : []
             ]
 
         }
@@ -689,6 +694,38 @@ class Answer {
                     {
                         element: document.createTextNode(answer),
                         children: null
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+class NextButton {
+    constructor() {
+        this.element = buildNode("div", { className: "row justify-content-center" }),
+        this.children = [
+            {
+                element: buildNode("div", { className: "col-11 col-xxl-9 mt-3" }),
+                children: [
+                    {
+                        element: buildNode("div", { className: "row justify-content-center justify-content-md-end" }),
+                        children: [
+                            {
+                                element: buildNode("div", { className: "col-5 col-lg-2 px-0 d-flex justify-content-md-end justify-content-center" }),
+                                children: [
+                                    {
+                                        element: buildNode("button", { className: "btn btn-outline-dark px-4" }),
+                                        children: [
+                                            {
+                                                element: document.createTextNode("Next Question"),
+                                                children: null
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             }
