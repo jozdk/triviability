@@ -22,7 +22,7 @@ class Settings {
         if (this._categories.length) {
             return this._categories;
         } else {
-            throw new Error("Please select one or more categories");
+            throw new Error("no categories selected");
         }
     }
 
@@ -32,10 +32,9 @@ class Settings {
             const url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
             const result = await fetch(url);
             const questions = await result.json();
-            quiz.questions = questions;
+            quiz.init(questions);
         } catch (error) {
-            // output error message
-            console.log(error.message)
+           console.log(error.message);
         }
 
     }
@@ -48,7 +47,7 @@ class Question {
     constructor(question) {
         this.category = {
             title: question.category,
-            color: question.category.toLowerCase().replace(/\s/g, "-")
+            color: question.category.toLowerCase().replace(/\s/g, "_")
         };
         this.type = question.type;
         this.question = question.question;
@@ -313,9 +312,11 @@ class UIForSettings {
         });
 
         this.startButton.addEventListener("click", () => {
-            //settings.fetchQuestions();
-            quiz.init(testQuestions);
+            if (settings.categories.length) {
+                settings.fetchQuestions();
+            //quiz.init(testQuestions);
             this.selectionPage.style.display = "none";
+            }            
         });
 
 
@@ -699,7 +700,7 @@ class Answer {
         this.element = buildNode("div", { className: "col-md-6 px-3 px-md-2" });
         this.children = [
             {
-                element: buildNode("p", { className: `rounded-lg py-2 py-md-5 my-0 bg-answer-${result} border answer-highlight-${category.color}`, onclick: handler }),
+                element: buildNode("p", { className: `rounded-lg p-2 py-md-5 my-0 bg-answer-${result} border answer-highlight-${category.color}`, onclick: handler }),
                 children: [
                     {
                         element: document.createTextNode(answer),
@@ -836,7 +837,7 @@ function resultIcon(value) {
 const testQuestions = [{ "category": "Geography", "correctAnswer": "Africa", "id": 6696, "incorrectAnswers": ["South America", "Oceania", "Europe", "Asia", "North America"], "question": "Togo is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Sudan", "id": 6549, "incorrectAnswers": ["South Sudan", "Egypt", "Republic of the Congo", "Equatorial Guinea", "Gabon", "Benin", "Democratic Republic of the Congo", "Eritrea", "Uganda", "Togo", "São Tomé and Príncipe", "Rwanda", "Tunisia", "Malta"], "question": "Which of these countries borders Chad?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Asia", "id": 22872, "incorrectAnswers": ["Europe", "Africa", "North America", "South America"], "question": "Which is the Earth's largest continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "South America", "id": 6683, "incorrectAnswers": ["Oceania", "Europe", "Asia", "Africa", "North America"], "question": "Suriname is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Spain", "id": 5713, "incorrectAnswers": ["Portugal", "Andorra", "Mali", "Tunisia", "France", "Monaco", "Senegal", "Burkina Faso", "Switzerland", "The Gambia", "Malta", "Ireland", "Italy", "Belgium", "Luxembourg", "Liechtenstein", "Niger"], "question": "Morocco shares a land border with which of these countries?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Tripoli", "id": 19272, "incorrectAnswers": ["Benghazi", "Tunis", "Alexandria"], "question": "What is the capital of Libya?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Europe", "id": 6685, "incorrectAnswers": ["South America", "Oceania", "Asia", "Africa", "North America"], "question": "Andorra is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "East Timor", "id": 5609, "incorrectAnswers": ["Solomon Islands", "Vanuatu", "Palau", "Brunei", "Nauru", "Federated States of Micronesia", "Fiji", "Philippines", "Malaysia", "Singapore", "Tuvalu", "Kiribati", "Marshall Islands", "Cambodia", "Vietnam", "Thailand"], "question": "Which of these countries borders Australia?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Austria", "id": 19550, "incorrectAnswers": ["Croatia", "San Marino", "Bosnia and Herzegovina", "Romania", "Poland"], "question": "Which country borders Italy, Switzerland, Germany, Czech Republic, Hungary, Slovenia, and Liechtenstein?", "type": "Multiple Choice" }];
 
 
-quiz.init(testQuestions);
+//quiz.init(testQuestions);
 
 const secondHalf = document.querySelector(".second-half");
 const firstHalf = document.querySelector(".first-half");
