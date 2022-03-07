@@ -193,7 +193,7 @@ a:link, a:visited {
 }
 
 
-.second-half {
+.second-half-js {
     width: 40px;
     height: 80px;
     /* background-color: #D2FF96; */
@@ -213,7 +213,7 @@ a:link, a:visited {
     width: 100%;
 }
 
-.first-half {
+.first-half-js {
     width: 40px;
     height: 80px;
     /* background-color: #D2FF96; */

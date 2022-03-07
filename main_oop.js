@@ -34,7 +34,7 @@ class Settings {
             const questions = await result.json();
             quiz.init(questions);
         } catch (error) {
-           console.log(error.message);
+            console.log(error.message);
         }
 
     }
@@ -139,6 +139,10 @@ class UIForQuiz {
     render(rootNode, startingNode) {
 
         rootNode.append(startingNode.element);
+
+        if (startingNode.componentDidMount) {
+            startingNode.componentDidMount();
+        }
 
         if (startingNode.children) {
             startingNode.children.forEach((child) => {
@@ -314,9 +318,9 @@ class UIForSettings {
         this.startButton.addEventListener("click", () => {
             if (settings.categories.length) {
                 settings.fetchQuestions();
-            //quiz.init(testQuestions);
-            this.selectionPage.style.display = "none";
-            }            
+                //quiz.init(testQuestions);
+                this.selectionPage.style.display = "none";
+            }
         });
 
 
@@ -381,7 +385,7 @@ class QuizComponent {
                         }
                     ]
                 },
-                ... question.result !== "unanswered" ? [new NextButton()] : []
+                ...question.result !== "unanswered" ? [new NextButton()] : []
             ]
 
         }
@@ -433,7 +437,7 @@ class Timer {
                                 element: buildNode("div", { className: "radial-timer" }),
                                 children: [
                                     {
-                                        element: buildNode("div", { className: `first-half bg-${category.color}` }),
+                                        element: buildNode("div", { className: `first-half-js bg-${category.color}` }),
                                         children: null
                                     },
                                     {
@@ -441,14 +445,14 @@ class Timer {
                                         children: null
                                     },
                                     {
-                                        element: buildNode("div", { className: `second-half bg-${category.color}` }),
+                                        element: buildNode("div", { className: `second-half-js bg-${category.color}` }),
                                         children: null
                                     },
                                     {
                                         element: buildNode("div", { className: "seconds d-flex align-items-center justify-content-center lead" }),
                                         children: [
                                             {
-                                                element: buildNode("h4", { id: "seconds" }),
+                                                element: buildNode("h4", { id: "seconds-js" }),
                                                 children: [
                                                     {
                                                         element: document.createTextNode("12"),
@@ -464,7 +468,64 @@ class Timer {
                     }
                 ]
             }
-        ]
+        ];
+        this.state = {
+            secondHalf: this.children[0].children[1].children[0].children[2].element,
+            firstHalf: this.children[0].children[1].children[0].children[0].element,
+            seconds: this.children[0].children[1].children[0].children[3].children[0].element
+            // start: undefined,
+            // timeInterval: undefined,
+            // time: undefined,
+            // degree: undefined,
+            // elapsed: undefined,
+            // object: undefined,
+        }
+    }
+    componentDidMount() {
+        console.log("timer mounted");
+        // this.state.secondHalf = document.querySelector(".second-half-js");
+        // this.state.firstHalf = document.querySelector(".first-half-js");
+        // this.state.seconds = document.querySelector("#seconds-js");
+
+        // let start;
+        // let timeInterval;
+        // let time;
+
+        
+        this.state.start = Date.now();
+        this.state.degree = 0;
+        //secondHalf.style.transform = `rotate(${degree}deg)`
+        this.state.object = this.state.secondHalf;
+        this.state.timeInterval = setInterval(function() {
+            try {
+                    this.state.time = Date.now() - this.state.start;
+
+                this.state.elapsed = Math.floor(this.state.time / 1000);
+
+                this.state.seconds.textContent--;
+
+                this.state.object.style.transform = `rotate(${this.state.degree += 30}deg)`;
+
+                if (this.state.elapsed === 6) {
+                    //clearInterval(timeInterval)
+                    this.state.secondHalf.style.display = "none";
+                    this.state.object = this.state.firstHalf;
+                    this.state.degree = 0;
+                }
+
+                if (this.state.elapsed === 12) {
+                    clearInterval(this.state.timeInterval);
+                }
+            } catch (err) {
+
+            }
+            
+
+        }.bind(this), 1000);
+
+        
+
+        
     }
 }
 
@@ -639,7 +700,7 @@ class Answers {
         // } else if (question.result === "wrong") {
         //     if (answer === question.correctAnswer.title && answer === question.userAnswer) {
         //         return new Answer({ answer: answer, result: "correct", category: { color: undefined }, handler: handler });
-            
+
         // }
 
         // const answers = [];
@@ -660,10 +721,10 @@ class Answers {
 
             if (question.result === "correct" && answer === question.correctAnswer.title) {
                 return new Answer({ answer: answer, result: "correct", category: { color: undefined }, handler: handler });
-            } 
-            
+            }
+
             if (question.result === "wrong" && answer === question.userAnswer) {
-                return new Answer({ answer: answer, result: "wrong",  category: { color: undefined }, handler: handler});
+                return new Answer({ answer: answer, result: "wrong", category: { color: undefined }, handler: handler });
             }
 
             if (question.result === "wrong" && answer === question.correctAnswer.title) {
@@ -673,8 +734,8 @@ class Answers {
             if (question.result !== "unanswered") {
                 return new Answer({ answer, result: "white", category: { color: undefined }, handler: handler })
             }
-            
-            return new Answer({ answer: answer, result: "white", category: question.category, handler: handler });     
+
+            return new Answer({ answer: answer, result: "white", category: question.category, handler: handler });
 
         })
 
@@ -720,32 +781,32 @@ class NextButton {
         }
 
         this.element = buildNode("div", { className: "row justify-content-center" }),
-        this.children = [
-            {
-                element: buildNode("div", { className: "col-11 col-xxl-9 mt-3" }),
-                children: [
-                    {
-                        element: buildNode("div", { className: "row justify-content-center justify-content-md-end" }),
-                        children: [
-                            {
-                                element: buildNode("div", { className: "col-5 col-lg-2 px-0 d-flex justify-content-md-end justify-content-center" }),
-                                children: [
-                                    {
-                                        element: buildNode("button", { className: "btn btn-outline-dark px-4", onclick: handler }),
-                                        children: [
-                                            {
-                                                element: document.createTextNode("Next Question"),
-                                                children: null
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
+            this.children = [
+                {
+                    element: buildNode("div", { className: "col-11 col-xxl-9 mt-3" }),
+                    children: [
+                        {
+                            element: buildNode("div", { className: "row justify-content-center justify-content-md-end" }),
+                            children: [
+                                {
+                                    element: buildNode("div", { className: "col-5 col-lg-2 px-0 d-flex justify-content-md-end justify-content-center" }),
+                                    children: [
+                                        {
+                                            element: buildNode("button", { className: "btn btn-outline-dark px-4", onclick: handler }),
+                                            children: [
+                                                {
+                                                    element: document.createTextNode("Next Question"),
+                                                    children: null
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
     }
 }
 
@@ -837,11 +898,11 @@ function resultIcon(value) {
 const testQuestions = [{ "category": "Geography", "correctAnswer": "Africa", "id": 6696, "incorrectAnswers": ["South America", "Oceania", "Europe", "Asia", "North America"], "question": "Togo is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Sudan", "id": 6549, "incorrectAnswers": ["South Sudan", "Egypt", "Republic of the Congo", "Equatorial Guinea", "Gabon", "Benin", "Democratic Republic of the Congo", "Eritrea", "Uganda", "Togo", "São Tomé and Príncipe", "Rwanda", "Tunisia", "Malta"], "question": "Which of these countries borders Chad?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Asia", "id": 22872, "incorrectAnswers": ["Europe", "Africa", "North America", "South America"], "question": "Which is the Earth's largest continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "South America", "id": 6683, "incorrectAnswers": ["Oceania", "Europe", "Asia", "Africa", "North America"], "question": "Suriname is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Spain", "id": 5713, "incorrectAnswers": ["Portugal", "Andorra", "Mali", "Tunisia", "France", "Monaco", "Senegal", "Burkina Faso", "Switzerland", "The Gambia", "Malta", "Ireland", "Italy", "Belgium", "Luxembourg", "Liechtenstein", "Niger"], "question": "Morocco shares a land border with which of these countries?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Tripoli", "id": 19272, "incorrectAnswers": ["Benghazi", "Tunis", "Alexandria"], "question": "What is the capital of Libya?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Europe", "id": 6685, "incorrectAnswers": ["South America", "Oceania", "Asia", "Africa", "North America"], "question": "Andorra is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "East Timor", "id": 5609, "incorrectAnswers": ["Solomon Islands", "Vanuatu", "Palau", "Brunei", "Nauru", "Federated States of Micronesia", "Fiji", "Philippines", "Malaysia", "Singapore", "Tuvalu", "Kiribati", "Marshall Islands", "Cambodia", "Vietnam", "Thailand"], "question": "Which of these countries borders Australia?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Austria", "id": 19550, "incorrectAnswers": ["Croatia", "San Marino", "Bosnia and Herzegovina", "Romania", "Poland"], "question": "Which country borders Italy, Switzerland, Germany, Czech Republic, Hungary, Slovenia, and Liechtenstein?", "type": "Multiple Choice" }];
 
 
-//quiz.init(testQuestions);
+quiz.init(testQuestions);
 
-const secondHalf = document.querySelector(".second-half");
-const firstHalf = document.querySelector(".first-half");
-const seconds = document.querySelector("#seconds");
+const secondHalf = document.querySelector(".second-half-js");
+const firstHalf = document.querySelector(".first-half-js");
+const seconds = document.querySelector("#seconds-js");
 
 let start;
 let timeInterval;
