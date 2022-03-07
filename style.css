@@ -124,11 +124,11 @@ a:link, a:visited {
     background-color: #D47AE8;
 }
 
-.bg-movies, .answer-highlight-film-and-tv:hover {
+.bg-film_and_tv, .answer-highlight-film_and_tv:hover {
     background-color: #EA3452;
 }
 
-.bg-literature, .answer-highlight-art-and-literature:hover {
+.bg-art_and_literature, .answer-highlight-art_and_literature:hover {
     background-color: #71FEFA;
 }
 
@@ -136,15 +136,15 @@ a:link, a:visited {
     background-color: #FFA552;
 }
 
-.bg-sport_and_leisure, .answer-highlight-sport-and-leisure:hover {
+.bg-sport_and_leisure, .answer-highlight-sport_and_leisure:hover {
     background-color: #D2FF96;
 }
 
-.bg-general_knowledge, .answer-highlight-general-knowledge:hover {
+.bg-general_knowledge, .answer-highlight-general_knowledge:hover {
     background-color: #C4AF9A;
 }
 
-.bg-society_and_culture, .answer-highlight-society-and-culture:hover {
+.bg-society_and_culture, .answer-highlight-society_and_culture:hover {
     background-color: #FF579F;
 }
 
