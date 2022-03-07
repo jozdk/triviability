@@ -96,7 +96,7 @@ class UIForQuiz {
             // answered: gamestate.answered,
             // points: gamestate.points,
             // board: gamestate.board,
-            handler: this.answerHandler
+            // handler: this.answerHandler
         });
 
         this.render(this.mainElement, this._quizElement.root);
@@ -150,28 +150,28 @@ class UIForQuiz {
 
     }
 
-    answerHandler(event) {
+    // answerHandler(event) {
 
-        console.log("answer event is being handled")
+    //     console.log("answer event is being handled")
 
-        const userAnswer = event.target.textContent;
-        // const { result, points, correctAnswer } = quiz.validate(userAnswer);
+    //     const userAnswer = event.target.textContent;
+    //     // const { result, points, correctAnswer } = quiz.validate(userAnswer);
 
-        quiz.validate(userAnswer)
+    //     quiz.validate(userAnswer)
 
-        //this.updateStats(points);
+    //     //this.updateStats(points);
 
-        // if (result === true) {
-        //     event.target.classList.add("correct");
-        // } else {
-        //     updateAnswers(userAnswer, correctAnswer);
-        // }
+    //     // if (result === true) {
+    //     //     event.target.classList.add("correct");
+    //     // } else {
+    //     //     updateAnswers(userAnswer, correctAnswer);
+    //     // }
 
-        // Or I could add a givenAnswer property to the question object, write a setter function that executes the validate function inside the question object
-        // Or I could write a setter function for the quiz that takes the given answer as an argument and advances the gamestate.
+    //     // Or I could add a givenAnswer property to the question object, write a setter function that executes the validate function inside the question object
+    //     // Or I could write a setter function for the quiz that takes the given answer as an argument and advances the gamestate.
 
-        // settings._quiz = event.target.textContent;
-    }
+    //     // settings._quiz = event.target.textContent;
+    // }
 
     // timeProgress() {
     //     this.progressBar.startTime = Date.now();
@@ -243,13 +243,13 @@ class Quiz {
         // this.ui.updateComponent("answers", currentQuestion);
 
         // Update UI
-        this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, handler: null });
+        this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate });
 
         this._gamestate.answered++;
 
-        setTimeout(() => {
+        // setTimeout(() => {
 
-        }, 3000)
+        // }, 3000)
 
         // return {
         //     result: currentQuestion.result,
@@ -258,6 +258,10 @@ class Quiz {
         // }
 
         //setTimeout(DisplayNextButton, 3000);
+    }
+
+    advance() {
+        this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate });
     }
 }
 
@@ -352,7 +356,7 @@ function buildNode(tag, properties) {
 
 
 class QuizComponent {
-    constructor({ question, gamestate, handler }) {
+    constructor({ question, gamestate }) {
         this.root = {
             element: buildNode("div", { id: "quiz-element", className: "container-xl" }),
             children: [
@@ -371,7 +375,7 @@ class QuizComponent {
                             element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-9 col-xxl-7 mt-5" }),
                             children: [
                                 new QuestionComponent({ category: question.category, question: question.question }),
-                                new Answers({ question, handler })
+                                new Answers({ question })
                             ]
                         }
                     ]
@@ -619,7 +623,7 @@ class QuestionText {
 }
 
 class Answers {
-    constructor({ question, handler }) {
+    constructor({ question }) {
 
         // let answers;
 
@@ -637,6 +641,20 @@ class Answers {
             
         // }
 
+        // const answers = [];
+
+        // for (let i = 0; i < question.multipleChoice.length; i++) {
+        //     if ()
+
+        //     answers.push(new Answer({
+        //         answer: question.multipleChoice[i],
+        //         result: question.result,
+        //         category: question.category,
+        //         handler }));
+        // }
+
+        const handler = question.result === "unanswered" ? (event) => quiz.validate(event.target.textContent) : null;
+
         const answers = question.multipleChoice.map((answer) => {
 
             if (question.result === "correct" && answer === question.correctAnswer.title) {
@@ -650,22 +668,14 @@ class Answers {
             if (question.result === "wrong" && answer === question.correctAnswer.title) {
                 return new Answer({ answer: answer, result: "actually-correct", category: { color: undefined }, handler: handler });
             }
+
+            if (question.result !== "unanswered") {
+                return new Answer({ answer, result: "white", category: { color: undefined }, handler: handler })
+            }
             
             return new Answer({ answer: answer, result: "white", category: question.category, handler: handler });     
 
         })
-
-        // const answers = [];
-
-        // for (let i = 0; i < question.multipleChoice.length; i++) {
-        //     if ()
-
-        //     answers.push(new Answer({
-        //         answer: question.multipleChoice[i],
-        //         result: question.result,
-        //         category: question.category,
-        //         handler }));
-        // }
 
         this.element = buildNode("div", { id: "answers-component", className: "row" });
         this.children = [
@@ -703,6 +713,11 @@ class Answer {
 
 class NextButton {
     constructor() {
+
+        const handler = () => {
+            quiz.advance();
+        }
+
         this.element = buildNode("div", { className: "row justify-content-center" }),
         this.children = [
             {
@@ -715,7 +730,7 @@ class NextButton {
                                 element: buildNode("div", { className: "col-5 col-lg-2 px-0 d-flex justify-content-md-end justify-content-center" }),
                                 children: [
                                     {
-                                        element: buildNode("button", { className: "btn btn-outline-dark px-4" }),
+                                        element: buildNode("button", { className: "btn btn-outline-dark px-4", onclick: handler }),
                                         children: [
                                             {
                                                 element: document.createTextNode("Next Question"),
