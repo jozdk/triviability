@@ -86,12 +86,14 @@ class Question {
 }
 
 class UIForQuiz {
-    constructor(question, gamestate) {
+    constructor(question, gamestate, timer) {
+        console.log(timer)
         this.mainElement = document.querySelector("#main");
         this._quizElement = new QuizComponent({
             // category: question.category,
             question: question,
             gamestate: gamestate,
+            timer: timer
             // multipleChoice: question.multipleChoice,
             // answered: gamestate.answered,
             // points: gamestate.points,
@@ -205,7 +207,8 @@ class Quiz {
             board: []
         };
         this.timer = {
-            total: 20
+            total: 20,
+            elapsed: 0
         };
         this.ui = {};
     }
@@ -215,7 +218,8 @@ class Quiz {
         this._questions.forEach((question, index) => {
             this._gamestate.board[index] = question.result;
         });
-        this.ui = new UIForQuiz(this._questions[0], this._gamestate);
+        console.log(this.timer)
+        this.ui = new UIForQuiz(this._questions[0], this._gamestate, this.timer);
         this.startTimer();
     }
 
@@ -246,7 +250,7 @@ class Quiz {
             this.timer.time = Date.now() - this.timer.start;
             this.timer.elapsed = Math.floor(this.timer.time / 1000);
 
-            this.ui.timeElement = new Time({ category: this._questions[this._gamestate.answered].category, time: this.timer.elapsed });
+            this.ui.timeElement = new Time({ category: this._questions[this._gamestate.answered].category, timer: this.timer });
 
             if (this.timer.elapsed === this.timer.total) {
                 clearInterval(this.timer.timeInterval);
@@ -256,29 +260,45 @@ class Quiz {
 
     }
 
+    resetTimer() {
+        this.timer.elapsed = 0;
+    }
+
     validate(answer) {
         
         // Stop timer
-        clearInterval(this.ui.timerVals.timeInterval);        
+        clearInterval(this.timer.timeInterval);
+        
+        const exactTime = Date.now() - this.timer.start;
+
+        console.log(exactTime)
 
         // Update quiz values
         this._questions[this._gamestate.answered].userAnswer = answer;
         this._questions[this._gamestate.answered].result = answer === this._questions[this._gamestate.answered].correctAnswer.title ? "correct" : "wrong";
         this._gamestate.board[this._gamestate.answered] = this._questions[this._gamestate.answered].result;
-        this._questions[this._gamestate.answered].time = this.ui.timerVals.elapsed ? this.ui.timerVals.elapsed : 0;
+        this._questions[this._gamestate.answered].time = this.timer.elapsed;
         // this._gamestate.points += this._questions[this._gamestate.answered].result === "correct" ? (20 - this._questions[this._gamestate.answered].time * 0.5) : 0;
 
         // Calculate score based on time elapsed
         if (this._questions[this._gamestate.answered].result === "correct") {
-            this._gamestate.points += (20 - this._questions[this._gamestate.answered].time * 0.5);
+            if (exactTime < 2000) this._gamestate.points += 10;
+            else if (exactTime < 4000) this._gamestate.points += 9;
+            else if (exactTime < 6000) this._gamestate.points += 8;
+            else if (exactTime < 8000) this._gamestate.points += 7;
+            else if (exactTime < 10000) this._gamestate.points += 6;
+            else if (exactTime < 1200) this._gamestate.points += 5;
+            else if (exactTime < 1400) this._gamestate.points += 4;
+            else if (exactTime < 1600) this._gamestate.points += 3;
+            else if (exactTime < 1800) this._gamestate.points += 2;
+            else if (exactTime < 2000) this._gamestate.points += 1;
         }
 
         // this.ui.updateComponent("stats", currentQuestion, this._gamestate);
         // this.ui.updateComponent("answers", currentQuestion);
 
         // Update UI
-        this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate });
-        this.ui.timerVals.seconds
+        this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
 
         this._gamestate.answered++;
 
@@ -296,7 +316,9 @@ class Quiz {
     }
 
     advance() {
-        this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate });
+        this.resetTimer();
+        this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
+        this.startTimer();
     }
 }
 
@@ -401,7 +423,7 @@ function buildNode(tag, properties) {
 
 
 class QuizComponent {
-    constructor({ question, gamestate }) {
+    constructor({ question, gamestate, timer }) {
         this.root = {
             element: buildNode("div", { id: "quiz-element", className: "container-xl" }),
             children: [
@@ -412,7 +434,7 @@ class QuizComponent {
                             element: buildNode("div", { id: "stats-component", className: "col-md-2 d-none d-md-flex bg-light rounded-lg me-2 mt-5 flex-column" }),
                             children: [
                                 new StatsHeader({ category: question.category, answered: gamestate.answered }),
-                                new Timer({ category: question.category, time: question.time }),
+                                new Timer({ category: question.category, timer }),
                                 new Score({ points: gamestate.points, board: gamestate.board })
                             ]
                         },
@@ -455,7 +477,7 @@ class StatsHeader {
 }
 
 class Timer {
-    constructor({ category, time }) {
+    constructor({ category, timer }) {
 
         this.element = buildNode("div", { id: "timer-component", className: "row py-3" });
         this.children = [
@@ -474,7 +496,7 @@ class Timer {
                     {
                         element: buildNode("div", { id: "timer-container" }),
                         children: [
-                            new Time({ category, total, time })
+                            new Time({ category, timer })
                             // {
                             //     element: buildNode("div", { className: "radial-timer" }),
                             //     children: [
@@ -575,16 +597,16 @@ class Timer {
 }
 
 class Time {
-    constructor({ category, total, time }) {
-
+    constructor({ category, timer }) {
+        
         const noDisplay = () => {
-            if (time > 6) {
+            if (timer.elapsed > timer.total / 2) {
                 return "d-none";
             }
         }
 
-        const secondHalf = time <= 6 ? `rotate(${time * 30}deg)` : "";
-        const firstHalf = time > 6 ? `rotate(${(time - 6) * 30}deg)` : "";
+        const secondHalf = timer.elapsed <= timer.total / 2 ? `rotate(${timer.elapsed * (360 / timer.total)}deg)` : "";
+        const firstHalf = timer.elapsed > timer.total / 2 ? `rotate(${(timer.elapsed - timer.total / 2) * (360 / timer.total)}deg)` : "";
 
         this.element = buildNode("div", { className: "radial-timer" });
         this.children = [
@@ -607,7 +629,7 @@ class Time {
                         element: buildNode("h4", { id: "seconds-js" }),
                         children: [
                             {
-                                element: document.createTextNode(`${total} - ${time}`),
+                                element: document.createTextNode(`${timer.total - timer.elapsed}`),
                                 children: null
                             }
                         ]
@@ -987,7 +1009,7 @@ function resultIcon(value) {
 const testQuestions = [{ "category": "Geography", "correctAnswer": "Africa", "id": 6696, "incorrectAnswers": ["South America", "Oceania", "Europe", "Asia", "North America"], "question": "Togo is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Sudan", "id": 6549, "incorrectAnswers": ["South Sudan", "Egypt", "Republic of the Congo", "Equatorial Guinea", "Gabon", "Benin", "Democratic Republic of the Congo", "Eritrea", "Uganda", "Togo", "São Tomé and Príncipe", "Rwanda", "Tunisia", "Malta"], "question": "Which of these countries borders Chad?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Asia", "id": 22872, "incorrectAnswers": ["Europe", "Africa", "North America", "South America"], "question": "Which is the Earth's largest continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "South America", "id": 6683, "incorrectAnswers": ["Oceania", "Europe", "Asia", "Africa", "North America"], "question": "Suriname is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Spain", "id": 5713, "incorrectAnswers": ["Portugal", "Andorra", "Mali", "Tunisia", "France", "Monaco", "Senegal", "Burkina Faso", "Switzerland", "The Gambia", "Malta", "Ireland", "Italy", "Belgium", "Luxembourg", "Liechtenstein", "Niger"], "question": "Morocco shares a land border with which of these countries?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Tripoli", "id": 19272, "incorrectAnswers": ["Benghazi", "Tunis", "Alexandria"], "question": "What is the capital of Libya?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Europe", "id": 6685, "incorrectAnswers": ["South America", "Oceania", "Asia", "Africa", "North America"], "question": "Andorra is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "East Timor", "id": 5609, "incorrectAnswers": ["Solomon Islands", "Vanuatu", "Palau", "Brunei", "Nauru", "Federated States of Micronesia", "Fiji", "Philippines", "Malaysia", "Singapore", "Tuvalu", "Kiribati", "Marshall Islands", "Cambodia", "Vietnam", "Thailand"], "question": "Which of these countries borders Australia?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Austria", "id": 19550, "incorrectAnswers": ["Croatia", "San Marino", "Bosnia and Herzegovina", "Romania", "Poland"], "question": "Which country borders Italy, Switzerland, Germany, Czech Republic, Hungary, Slovenia, and Liechtenstein?", "type": "Multiple Choice" }];
 
 
-quiz.init(testQuestions);
+//quiz.init(testQuestions);
 
 const secondHalf = document.querySelector(".second-half-js");
 const firstHalf = document.querySelector(".first-half-js");
