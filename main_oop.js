@@ -59,6 +59,7 @@ class Question {
         this.multipleChoice = this.makeMultipleChoice();
         this.userAnswer;
         this.result = "unanswered";
+        this.time = 12;
     }
 
     makeMultipleChoice() {
@@ -166,23 +167,32 @@ class UIForQuiz {
             this.timerVals.time = Date.now() - this.timerVals.start;
             this.timerVals.elapsed = Math.floor(this.timerVals.time / 1000);
 
-            if (this.timerVals.elapsed <= 6) {
-                document.querySelector("#timer-container").innerHTML = "";
-                this.render(document.querySelector("#timer-container"), new RadialTimer({
-                    category: quiz.questions[quiz.gamestate.answered].category,
-                    secondHalf: `rotate(${this.timerVals.degreeSecondHalf += 30}deg)`,
-                    seconds: --this.timerVals.seconds
-                }));
-            }
+            
+            document.querySelector("#timer-container").innerHTML = "";
+            this.render(document.querySelector("#timer-container"), new Time({
+                category: quiz.questions[quiz.gamestate.answered].category,
+                secondHalf: this.timerVals.elapsed <= 6 ? `rotate(${this.timerVals.degreeSecondHalf += 30}deg)` : "",
+                firstHalf: this.timerVals.elapsed > 6 ? `rotate(${this.timerVals.degreeFirstHalf += 30}deg)` : "",
+                seconds: --this.timerVals.seconds
+            })); 
 
-            if (this.timerVals.elapsed > 6) {
-                document.querySelector("#timer-container").innerHTML = "";
-                this.render(document.querySelector("#timer-container"), new RadialTimer({
-                    category: quiz.questions[quiz.gamestate.answered].category,
-                    firstHalf: `rotate(${this.timerVals.degreeFirstHalf += 30}deg)`,
-                    seconds: --this.timerVals.seconds
-                }));
-            }
+            // if (this.timerVals.elapsed <= 6) {
+            //     document.querySelector("#timer-container").innerHTML = "";
+            //     this.render(document.querySelector("#timer-container"), new Time({
+            //         category: quiz.questions[quiz.gamestate.answered].category,
+            //         secondHalf: `rotate(${this.timerVals.degreeSecondHalf += 30}deg)`,
+            //         seconds: --this.timerVals.seconds
+            //     }));
+            // }
+
+            // if (this.timerVals.elapsed > 6) {
+            //     document.querySelector("#timer-container").innerHTML = "";
+            //     this.render(document.querySelector("#timer-container"), new Time({
+            //         category: quiz.questions[quiz.gamestate.answered].category,
+            //         firstHalf: `rotate(${this.timerVals.degreeFirstHalf += 30}deg)`,
+            //         seconds: --this.timerVals.seconds
+            //     }));
+            // }
 
             if (this.timerVals.elapsed === 12) {
                 clearInterval(this.timerVals.timeInterval);
@@ -248,6 +258,7 @@ class Quiz {
 
         // Update UI
         this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate });
+        this.ui.timerVals.seconds
 
         this._gamestate.answered++;
 
@@ -352,7 +363,7 @@ function buildNode(tag, properties) {
     const element = document.createElement(tag);
     if (properties) {
         Object.keys(properties).forEach((propertyName) => {
-            if (typeof properties[propertyName] === "object") {
+            if (properties[propertyName] && typeof properties[propertyName] === "object") {
                 //const nestedObj = properties[propertyName];
                 Object.keys(properties[propertyName]).forEach((nestedProperty) => {
                     element[propertyName][nestedProperty] = properties[propertyName][nestedProperty];
@@ -381,7 +392,7 @@ class QuizComponent {
                             element: buildNode("div", { id: "stats-component", className: "col-md-2 d-none d-md-flex bg-light rounded-lg me-2 mt-5 flex-column" }),
                             children: [
                                 new StatsHeader({ category: question.category, answered: gamestate.answered }),
-                                new Timer({ category: question.category }),
+                                new Timer({ category: question.category, time: question.time }),
                                 new Score({ points: gamestate.points, board: gamestate.board })
                             ]
                         },
@@ -424,7 +435,7 @@ class StatsHeader {
 }
 
 class Timer {
-    constructor({ category }) {
+    constructor({ category, time }) {
         this.element = buildNode("div", { id: "timer-component", className: "row py-3" });
         this.children = [
             {
@@ -442,7 +453,7 @@ class Timer {
                     {
                         element: buildNode("div", { id: "timer-container" }),
                         children: [
-                            new RadialTimer({ category, seconds: 12 })
+                            new Time({ category, seconds: time })
                             // {
                             //     element: buildNode("div", { className: "radial-timer" }),
                             //     children: [
@@ -501,6 +512,18 @@ class Timer {
         // let timeInterval;
         // let time;
 
+        const grabAsync = () => {
+            return new Promise((resolve, reject) => {
+                document.querySelector
+            })
+        }
+
+        const selectAsync = async (selector) => {
+            while (document.querySelector(selector) === null) {
+                await grabAsync()
+            }
+        }
+
         this.state.start = Date.now();
         this.state.degree = 0;
         this.state.object = this.state.secondHalf;
@@ -530,8 +553,8 @@ class Timer {
     }
 }
 
-class RadialTimer {
-    constructor({ category, secondHalf = "", firstHalf = "", seconds }) {
+class Time {
+    constructor({ category, secondHalf, firstHalf, seconds }) {
 
         const noDisplay = () => {
             if (seconds <= 6) {
