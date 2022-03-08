@@ -59,7 +59,7 @@ class Question {
         this.multipleChoice = this.makeMultipleChoice();
         this.userAnswer;
         this.result = "unanswered";
-        this.time = 12;
+        this.time = 0;
     }
 
     makeMultipleChoice() {
@@ -98,10 +98,10 @@ class UIForQuiz {
             // board: gamestate.board,
             // handler: this.answerHandler
         });
-        this.timerVals = {};
+        this._timeElement;
 
         this.render(this.mainElement, this._quizElement.root);
-        this.countdown();
+        // this.countdown();
     }
 
     set quizElement(quizComp) {
@@ -110,34 +110,40 @@ class UIForQuiz {
         this.render(this.mainElement, this._quizElement.root);
     }
 
-    updateComponent(component, question, gamestate) {
-        switch (component) {
-            case "quizBox":
-                this._quizElement = new QuizComponent(question, gamestate, this.answerHandler);
-                this.render(this.mainElement, this._quizElement.abstractDOMTree.root)
-                break;
-            case "stats":
-                this.stats = new StatsComponent(question, gamestate.points);
-                this.render(document.querySelector("#stats-component"), this.stats.abstractDOMTree.root);
-                break;
-            case "answers":
-                this.answers = new AnswersComponent(question, null);
-                this.render(document.querySelector("#box-component"), this.answers.abstractDOMTree.root);
-                //document.querySelector("#answers-component").children[question.correctAnswer.index].firstElementChild.classList.add("correct");
-                break;
-        }
+    set timeElement(timeComp) {
+        this._timeElement = timeComp;
+        document.querySelector("#timer-container").innerHTML = "";
+        this.render(document.querySelector("#timer-container"), this._timeElement);
     }
 
-    updateStats(category, gamestate) {
-        this.stats = new StatsComponent(category, gamestate);
-        this.render(document.querySelector("#stats-component"), this.stats.abstractDOMTree.root);
-    }
+    // updateComponent(component, question, gamestate) {
+    //     switch (component) {
+    //         case "quizBox":
+    //             this._quizElement = new QuizComponent(question, gamestate, this.answerHandler);
+    //             this.render(this.mainElement, this._quizElement.abstractDOMTree.root)
+    //             break;
+    //         case "stats":
+    //             this.stats = new StatsComponent(question, gamestate.points);
+    //             this.render(document.querySelector("#stats-component"), this.stats.abstractDOMTree.root);
+    //             break;
+    //         case "answers":
+    //             this.answers = new AnswersComponent(question, null);
+    //             this.render(document.querySelector("#box-component"), this.answers.abstractDOMTree.root);
+    //             //document.querySelector("#answers-component").children[question.correctAnswer.index].firstElementChild.classList.add("correct");
+    //             break;
+    //     }
+    // }
 
-    updateAnswers(userAnswer, correctAnswer) {
-        // this.answers = new AnswersComponent(question, null);
-        // this.compileDOMTree(document.querySelector("#box-component"), this.answers.abstractDOMTree.root);
-        document.querySelector("#answers-component")
-    }
+    // updateStats(category, gamestate) {
+    //     this.stats = new StatsComponent(category, gamestate);
+    //     this.render(document.querySelector("#stats-component"), this.stats.abstractDOMTree.root);
+    // }
+
+    // updateAnswers(userAnswer, correctAnswer) {
+    //     // this.answers = new AnswersComponent(question, null);
+    //     // this.compileDOMTree(document.querySelector("#box-component"), this.answers.abstractDOMTree.root);
+    //     document.querySelector("#answers-component")
+    // }
 
     render(rootNode, startingNode) {
 
@@ -158,9 +164,9 @@ class UIForQuiz {
 
     countdown() {
         this.timerVals.start = Date.now();
-        this.timerVals.degreeFirstHalf = 0;
-        this.timerVals.degreeSecondHalf = 0;
-        this.timerVals.seconds = 12;
+        // this.timerVals.degreeFirstHalf = 0;
+        // this.timerVals.degreeSecondHalf = 0;
+        // this.timerVals.seconds = 12;
 
         this.timerVals.timeInterval = setInterval(() => {
 
@@ -171,28 +177,11 @@ class UIForQuiz {
             document.querySelector("#timer-container").innerHTML = "";
             this.render(document.querySelector("#timer-container"), new Time({
                 category: quiz.questions[quiz.gamestate.answered].category,
-                secondHalf: this.timerVals.elapsed <= 6 ? `rotate(${this.timerVals.degreeSecondHalf += 30}deg)` : "",
-                firstHalf: this.timerVals.elapsed > 6 ? `rotate(${this.timerVals.degreeFirstHalf += 30}deg)` : "",
-                seconds: --this.timerVals.seconds
+                // secondHalf: this.timerVals.elapsed <= 6 ? `rotate(${this.timerVals.degreeSecondHalf += 30}deg)` : "",
+                // firstHalf: this.timerVals.elapsed > 6 ? `rotate(${this.timerVals.degreeFirstHalf += 30}deg)` : "",
+                // seconds: --this.timerVals.seconds
+                time: this.timerVals.elapsed
             })); 
-
-            // if (this.timerVals.elapsed <= 6) {
-            //     document.querySelector("#timer-container").innerHTML = "";
-            //     this.render(document.querySelector("#timer-container"), new Time({
-            //         category: quiz.questions[quiz.gamestate.answered].category,
-            //         secondHalf: `rotate(${this.timerVals.degreeSecondHalf += 30}deg)`,
-            //         seconds: --this.timerVals.seconds
-            //     }));
-            // }
-
-            // if (this.timerVals.elapsed > 6) {
-            //     document.querySelector("#timer-container").innerHTML = "";
-            //     this.render(document.querySelector("#timer-container"), new Time({
-            //         category: quiz.questions[quiz.gamestate.answered].category,
-            //         firstHalf: `rotate(${this.timerVals.degreeFirstHalf += 30}deg)`,
-            //         seconds: --this.timerVals.seconds
-            //     }));
-            // }
 
             if (this.timerVals.elapsed === 12) {
                 clearInterval(this.timerVals.timeInterval);
@@ -215,6 +204,9 @@ class Quiz {
             points: 0,
             board: []
         };
+        this.timer = {
+            total: 20
+        };
         this.ui = {};
     }
 
@@ -224,6 +216,7 @@ class Quiz {
             this._gamestate.board[index] = question.result;
         });
         this.ui = new UIForQuiz(this._questions[0], this._gamestate);
+        this.startTimer();
     }
 
     set gamestate({ answered, points, board }) {
@@ -245,13 +238,40 @@ class Quiz {
         return this._questions;
     }
 
+    startTimer() {
+        this.timer.start = Date.now();
+
+        this.timer.timeInterval = setInterval(() => {
+
+            this.timer.time = Date.now() - this.timer.start;
+            this.timer.elapsed = Math.floor(this.timer.time / 1000);
+
+            this.ui.timeElement = new Time({ category: this._questions[this._gamestate.answered].category, time: this.timer.elapsed });
+
+            if (this.timer.elapsed === this.timer.total) {
+                clearInterval(this.timer.timeInterval);
+            }
+
+        }, 1000);
+
+    }
+
     validate(answer) {
-        console.log("answer is being validated")
-        // Update quiz
+        
+        // Stop timer
+        clearInterval(this.ui.timerVals.timeInterval);        
+
+        // Update quiz values
         this._questions[this._gamestate.answered].userAnswer = answer;
         this._questions[this._gamestate.answered].result = answer === this._questions[this._gamestate.answered].correctAnswer.title ? "correct" : "wrong";
-        this._gamestate.points += this._questions[this._gamestate.answered].result === "correct" ? 10 : 0;
         this._gamestate.board[this._gamestate.answered] = this._questions[this._gamestate.answered].result;
+        this._questions[this._gamestate.answered].time = this.ui.timerVals.elapsed ? this.ui.timerVals.elapsed : 0;
+        // this._gamestate.points += this._questions[this._gamestate.answered].result === "correct" ? (20 - this._questions[this._gamestate.answered].time * 0.5) : 0;
+
+        // Calculate score based on time elapsed
+        if (this._questions[this._gamestate.answered].result === "correct") {
+            this._gamestate.points += (20 - this._questions[this._gamestate.answered].time * 0.5);
+        }
 
         // this.ui.updateComponent("stats", currentQuestion, this._gamestate);
         // this.ui.updateComponent("answers", currentQuestion);
@@ -436,6 +456,7 @@ class StatsHeader {
 
 class Timer {
     constructor({ category, time }) {
+
         this.element = buildNode("div", { id: "timer-component", className: "row py-3" });
         this.children = [
             {
@@ -453,7 +474,7 @@ class Timer {
                     {
                         element: buildNode("div", { id: "timer-container" }),
                         children: [
-                            new Time({ category, seconds: time })
+                            new Time({ category, total, time })
                             // {
                             //     element: buildNode("div", { className: "radial-timer" }),
                             //     children: [
@@ -554,13 +575,16 @@ class Timer {
 }
 
 class Time {
-    constructor({ category, secondHalf, firstHalf, seconds }) {
+    constructor({ category, total, time }) {
 
         const noDisplay = () => {
-            if (seconds <= 6) {
+            if (time > 6) {
                 return "d-none";
             }
         }
+
+        const secondHalf = time <= 6 ? `rotate(${time * 30}deg)` : "";
+        const firstHalf = time > 6 ? `rotate(${(time - 6) * 30}deg)` : "";
 
         this.element = buildNode("div", { className: "radial-timer" });
         this.children = [
@@ -583,7 +607,7 @@ class Time {
                         element: buildNode("h4", { id: "seconds-js" }),
                         children: [
                             {
-                                element: document.createTextNode(`${seconds}`),
+                                element: document.createTextNode(`${total} - ${time}`),
                                 children: null
                             }
                         ]
