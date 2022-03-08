@@ -97,8 +97,10 @@ class UIForQuiz {
             // board: gamestate.board,
             // handler: this.answerHandler
         });
+        this.timerVals = {};
 
         this.render(this.mainElement, this._quizElement.root);
+        this.countdown();
     }
 
     set quizElement(quizComp) {
@@ -140,9 +142,9 @@ class UIForQuiz {
 
         rootNode.append(startingNode.element);
 
-        if (startingNode.componentDidMount) {
-            startingNode.componentDidMount();
-        }
+        // if (startingNode.componentDidMount) {
+        //     startingNode.componentDidMount();
+        // }
 
         if (startingNode.children) {
             startingNode.children.forEach((child) => {
@@ -153,43 +155,42 @@ class UIForQuiz {
 
     }
 
-    // answerHandler(event) {
+    countdown() {
+        this.timerVals.start = Date.now();
+        this.timerVals.degreeFirstHalf = 0;
+        this.timerVals.degreeSecondHalf = 0;
+        this.timerVals.seconds = 12;
 
-    //     console.log("answer event is being handled")
+        this.timerVals.timeInterval = setInterval(() => {
 
-    //     const userAnswer = event.target.textContent;
-    //     // const { result, points, correctAnswer } = quiz.validate(userAnswer);
+            this.timerVals.time = Date.now() - this.timerVals.start;
+            this.timerVals.elapsed = Math.floor(this.timerVals.time / 1000);
 
-    //     quiz.validate(userAnswer)
+            if (this.timerVals.elapsed <= 6) {
+                document.querySelector("#timer-container").innerHTML = "";
+                this.render(document.querySelector("#timer-container"), new RadialTimer({
+                    category: quiz.questions[quiz.gamestate.answered].category,
+                    secondHalf: `rotate(${this.timerVals.degreeSecondHalf += 30}deg)`,
+                    seconds: --this.timerVals.seconds
+                }));
+            }
 
-    //     //this.updateStats(points);
+            if (this.timerVals.elapsed > 6) {
+                document.querySelector("#timer-container").innerHTML = "";
+                this.render(document.querySelector("#timer-container"), new RadialTimer({
+                    category: quiz.questions[quiz.gamestate.answered].category,
+                    firstHalf: `rotate(${this.timerVals.degreeFirstHalf += 30}deg)`,
+                    seconds: --this.timerVals.seconds
+                }));
+            }
 
-    //     // if (result === true) {
-    //     //     event.target.classList.add("correct");
-    //     // } else {
-    //     //     updateAnswers(userAnswer, correctAnswer);
-    //     // }
+            if (this.timerVals.elapsed === 12) {
+                clearInterval(this.timerVals.timeInterval);
+            }
 
-    //     // Or I could add a givenAnswer property to the question object, write a setter function that executes the validate function inside the question object
-    //     // Or I could write a setter function for the quiz that takes the given answer as an argument and advances the gamestate.
+        }, 1000);
 
-    //     // settings._quiz = event.target.textContent;
-    // }
-
-    // timeProgress() {
-    //     this.progressBar.startTime = Date.now();
-    //     this.progressBar.timeInterval = setInterval(() => {
-    //         // const time = Date.now();
-    //         this.progressBar.width += 0.835;
-    //         this.progressBar.elem.style.width = this.progressBar.width + "px";
-    //     }, 10);
-
-    //     setTimeout(() => {
-    //         this.progressBar.elapsedTime = Date.now() - this.progressBar.startTime;
-    //         clearInterval(this.progressBar.timeInterval);
-    //         console.log()
-    //     }, 10000)
-    // }
+    }
 
 }
 
@@ -351,7 +352,15 @@ function buildNode(tag, properties) {
     const element = document.createElement(tag);
     if (properties) {
         Object.keys(properties).forEach((propertyName) => {
-            element[propertyName] = properties[propertyName];
+            if (typeof properties[propertyName] === "object") {
+                //const nestedObj = properties[propertyName];
+                Object.keys(properties[propertyName]).forEach((nestedProperty) => {
+                    element[propertyName][nestedProperty] = properties[propertyName][nestedProperty];
+                })
+            } else {
+                element[propertyName] = properties[propertyName];
+            }
+
         });
     }
 
@@ -433,37 +442,38 @@ class Timer {
                     {
                         element: buildNode("div", { id: "timer-container" }),
                         children: [
-                            {
-                                element: buildNode("div", { className: "radial-timer" }),
-                                children: [
-                                    {
-                                        element: buildNode("div", { className: `first-half-js bg-${category.color}` }),
-                                        children: null
-                                    },
-                                    {
-                                        element: buildNode("div", { className: "half-mask" }),
-                                        children: null
-                                    },
-                                    {
-                                        element: buildNode("div", { className: `second-half-js bg-${category.color}` }),
-                                        children: null
-                                    },
-                                    {
-                                        element: buildNode("div", { className: "seconds d-flex align-items-center justify-content-center lead" }),
-                                        children: [
-                                            {
-                                                element: buildNode("h4", { id: "seconds-js" }),
-                                                children: [
-                                                    {
-                                                        element: document.createTextNode("12"),
-                                                        children: null
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
+                            new RadialTimer({ category, seconds: 12 })
+                            // {
+                            //     element: buildNode("div", { className: "radial-timer" }),
+                            //     children: [
+                            //         {
+                            //             element: buildNode("div", { className: `first-half-js bg-${category.color}` }),
+                            //             children: null
+                            //         },
+                            //         {
+                            //             element: buildNode("div", { className: "half-mask" }),
+                            //             children: null
+                            //         },
+                            //         {
+                            //             element: buildNode("div", { className: `second-half-js bg-${category.color}` }),
+                            //             children: null
+                            //         },
+                            //         {
+                            //             element: buildNode("div", { className: "seconds d-flex align-items-center justify-content-center lead" }),
+                            //             children: [
+                            //                 {
+                            //                     element: buildNode("h4", { id: "seconds-js" }),
+                            //                     children: [
+                            //                         {
+                            //                             element: document.createTextNode(`${secs}`),
+                            //                             children: null
+                            //                         }
+                            //                     ]
+                            //                 }
+                            //             ]
+                            //         }
+                            //     ]
+                            // }
                         ]
                     }
                 ]
@@ -482,7 +492,7 @@ class Timer {
         }
     }
     componentDidMount() {
-        console.log("timer mounted");
+
         // this.state.secondHalf = document.querySelector(".second-half-js");
         // this.state.firstHalf = document.querySelector(".first-half-js");
         // this.state.seconds = document.querySelector("#seconds-js");
@@ -491,41 +501,73 @@ class Timer {
         // let timeInterval;
         // let time;
 
-        
         this.state.start = Date.now();
         this.state.degree = 0;
-        //secondHalf.style.transform = `rotate(${degree}deg)`
         this.state.object = this.state.secondHalf;
-        this.state.timeInterval = setInterval(function() {
-            try {
-                    this.state.time = Date.now() - this.state.start;
 
-                this.state.elapsed = Math.floor(this.state.time / 1000);
+        this.state.timeInterval = setInterval(function () {
 
-                this.state.seconds.textContent--;
+            this.state.time = Date.now() - this.state.start;
 
-                this.state.object.style.transform = `rotate(${this.state.degree += 30}deg)`;
+            this.state.elapsed = Math.floor(this.state.time / 1000);
 
-                if (this.state.elapsed === 6) {
-                    //clearInterval(timeInterval)
-                    this.state.secondHalf.style.display = "none";
-                    this.state.object = this.state.firstHalf;
-                    this.state.degree = 0;
-                }
+            this.state.seconds.textContent--;
 
-                if (this.state.elapsed === 12) {
-                    clearInterval(this.state.timeInterval);
-                }
-            } catch (err) {
+            this.state.object.style.transform = `rotate(${this.state.degree += 30}deg)`;
 
+            if (this.state.elapsed === 6) {
+                //clearInterval(timeInterval)
+                this.state.secondHalf.style.display = "none";
+                this.state.object = this.state.firstHalf;
+                this.state.degree = 0;
             }
-            
+
+            if (this.state.elapsed === 12) {
+                clearInterval(this.state.timeInterval);
+            }
 
         }.bind(this), 1000);
+    }
+}
 
-        
+class RadialTimer {
+    constructor({ category, secondHalf = "", firstHalf = "", seconds }) {
 
-        
+        const noDisplay = () => {
+            if (seconds <= 6) {
+                return "d-none";
+            }
+        }
+
+        this.element = buildNode("div", { className: "radial-timer" });
+        this.children = [
+            {
+                element: buildNode("div", { className: `first-half-js bg-${category.color}`, style: { transform: firstHalf } }),
+                children: null
+            },
+            {
+                element: buildNode("div", { className: "half-mask" }),
+                children: null
+            },
+            {
+                element: buildNode("div", { className: `second-half-js bg-${category.color} ${noDisplay()}`, style: { transform: secondHalf } }),
+                children: null
+            },
+            {
+                element: buildNode("div", { className: "seconds d-flex align-items-center justify-content-center lead" }),
+                children: [
+                    {
+                        element: buildNode("h4", { id: "seconds-js" }),
+                        children: [
+                            {
+                                element: document.createTextNode(`${seconds}`),
+                                children: null
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
     }
 }
 
