@@ -172,6 +172,7 @@ a:link, a:visited {
 
 .bg-answer-actually-correct {
     /* border: 5px solid green !important; */
+    background-color: #fff;
     box-shadow: inset 0px 0px 0px 5px green;
 }
 

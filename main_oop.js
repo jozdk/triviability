@@ -254,6 +254,7 @@ class Quiz {
 
             if (this.timer.elapsed === this.timer.total) {
                 clearInterval(this.timer.timeInterval);
+                this.validate();
             }
 
         }, 1000);
