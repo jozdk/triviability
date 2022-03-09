@@ -29,10 +29,14 @@ class Settings {
     async fetchQuestions() {
         try {
             const categories = this.checkCategories();
-            const url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
+            let url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
+            if (this._categories.length === 1 && this._categories[0] === "history") {
+                console.log("History selected");
+                url = `https://opentdb.com/api.php?amount=9&category=23&difficulty=easy&type=multiple`;
+            }
             const result = await fetch(url);
             const questions = await result.json();
-            quiz.init(questions);
+            questions.results ? quiz.init(questions.results) : quiz.init(questions);
         } catch (error) {
             console.log(error.message);
         }
@@ -51,11 +55,8 @@ class Question {
         };
         this.type = question.type;
         this.question = question.question;
-        this.correctAnswer = {
-            title: question.correctAnswer,
-            index: -1
-        };
-        this.wrongAnswers = question.incorrectAnswers;
+        this.correctAnswer = question.correctAnswer ? question.correctAnswer : question.correct_answer;
+        this.wrongAnswers = question.incorrectAnswers ? question.incorrectAnswers : question.incorrect_answers;
         this.multipleChoice = this.makeMultipleChoice();
         this.userAnswer;
         this.result = "unanswered";
@@ -72,14 +73,13 @@ class Question {
             allWrongAnswers.splice(random, 1);
         }
 
-        const choices = [this.correctAnswer.title, ...randomWrongAnswers].sort(() => 0.5 - Math.random());
-        this.correctAnswer.index = choices.indexOf(this.correctAnswer.title);
+        const choices = [this.correctAnswer, ...randomWrongAnswers].sort(() => 0.5 - Math.random());
         return choices;
     }
 
     // validate(answer) {
     //     this.userAnswer = answer;
-    //     this.result = answer === this.correctAnswer.title ? "correct" : "wrong";
+    //     this.result = answer === this.correctAnswer ? "correct" : "wrong";
     //     return this.result;
     // }
 
@@ -276,7 +276,7 @@ class Quiz {
 
         // Update quiz values
         this._questions[this._gamestate.answered].userAnswer = answer;
-        this._questions[this._gamestate.answered].result = answer === this._questions[this._gamestate.answered].correctAnswer.title ? "correct" : "wrong";
+        this._questions[this._gamestate.answered].result = answer === this._questions[this._gamestate.answered].correctAnswer ? "correct" : "wrong";
         this._gamestate.board[this._gamestate.answered] = this._questions[this._gamestate.answered].result;
         this._questions[this._gamestate.answered].time = this.timer.elapsed;
         // this._gamestate.points += this._questions[this._gamestate.answered].result === "correct" ? (20 - this._questions[this._gamestate.answered].time * 0.5) : 0;
@@ -831,7 +831,7 @@ class Answers {
 
         const answers = question.multipleChoice.map((answer) => {
 
-            if (question.result === "correct" && answer === question.correctAnswer.title) {
+            if (question.result === "correct" && answer === question.correctAnswer) {
                 return new Answer({ answer: answer, result: "correct", category: { color: undefined }, handler: handler });
             }
 
@@ -839,7 +839,7 @@ class Answers {
                 return new Answer({ answer: answer, result: "wrong", category: { color: undefined }, handler: handler });
             }
 
-            if (question.result === "wrong" && answer === question.correctAnswer.title) {
+            if (question.result === "wrong" && answer === question.correctAnswer) {
                 return new Answer({ answer: answer, result: "actually-correct", category: { color: undefined }, handler: handler });
             }
 
