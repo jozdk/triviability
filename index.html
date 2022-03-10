@@ -21,7 +21,7 @@
         <header class="bg-light">
             <div class="container">
                 <div class="row justify-content-center">
-                    <div class="col-md-9">
+                    <div class="col-lg-10">
                         <div class="navbar navbar-light">
                             <a href="#" class="navbar-brand">Triviability</a>
                         </div>
@@ -34,16 +34,16 @@
 
         <div id="main" class="flex-grow-1 d-flex flex-column px-0">
 
-            <div id="selection-menu" class="container">
+            <div id="selection-menu" class="container d-none">
 
                 <!-- Welcome Paragraph -->
 
-                <div class="row mt-3 justify-content-center">
-                    <div class="col-md-9">
-                        <p class="lead text-center">
+                <div class="row mb-4 mt-5 m-xxl-5 justify-content-center">
+                    <div class="col-12">
+                        <h5 class="text-center">
                             Welcome to Triviability! Choose your Categorie(s) and Click the Button below to Start your
                             Quiz!
-                        </p>
+                        </h5>
                     </div>
 
                 </div>
@@ -51,7 +51,7 @@
                 <!-- Selection Element -->
 
                 <div id="category-selection" class="row mt-3 mb-3 justify-content-center">
-                    <div class="col-md-9">
+                    <div class="col-md-9 col-xl-8">
                         <div class="row justify-content-center gy-4">
                             <div class="col-8 col-sm-6 col-lg-4">
                                 <div id="cat-science" class="card category category-highlight cursor bg-science">
@@ -152,7 +152,7 @@
                 <!-- Start Button -->
 
                 <div class="row justify-content-center">
-                    <div class="col-md-9">
+                    <div class="col-md-9 col-xl-8">
                         <button class="btn btn-outline-dark w-100" id="start-button">Start Quiz!</button>
                     </div>
                 </div>
@@ -162,10 +162,16 @@
 
             <!-- Quiz Element -->
 
-            <div id="quiz-element" class="container-xl d-none">
+            <div id="quiz-element" class="container-xl">
                 <div class="row justify-content-center">
 
-                    <div id="stats-component" class="col-md-2 d-none d-md-flex bg-light rounded-lg me-2 mt-5 flex-column">
+                    <div class="col-md-2 d-flex">
+
+                    <div class="row justify-content-end">
+
+                    
+
+                    <div id="stats-component" class="col-xl-10 col-md-11 d-none d-md-flex bg-light rounded-lg me-2 mt-5 flex-column">
 
                         <div class="row mb-1 p-3">
                             <div class="col rounded-lg p-2 bg-sport_and_leisure">
@@ -179,11 +185,11 @@
 
                                 <div class="timer-container">
                                     <div class="radial-timer">
-                                        <div class="first-half bg-sport_and_leisure"></div>
+                                        <div class="first-half-js bg-sport_and_leisure"></div>
                                         <div class="half-mask"></div>
-                                        <div class="second-half bg-sport_and_leisure"></div>
+                                        <div class="second-half-js bg-sport_and_leisure"></div>
                                         <div class="seconds d-flex align-items-center justify-content-center lead">
-                                            <h4 id="seconds">12</h4>
+                                            <h4 id="seconds-js">12</h4>
                                         </div>
                                     </div>
                                 </div>
@@ -231,7 +237,7 @@
 
                         </div> -->
 
-                        <div id="score-component" class="row mb-1 py-3 px-xxl-5 px-lg-4 px-md-1 text-center">
+                        <div id="score-component" class="row mb-1 py-3 px-lg-4 px-md-1 text-center">
 
                             <div class="col-12">
                                 <h5>Score</h5>
@@ -244,10 +250,10 @@
                                 <i class="bi bi-check-circle-fill fs-3 board-correct"></i>
                             </div>
                             <div class="col-4 px-0">
-                                <i class="bi bi-x-circle-fill fs-3 board-unanswered"></i>
+                                <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
                             </div>
                             <div class="col-4 px-0">
-                                <i class="bi bi-check-circle-fill fs-3 board-unanswered"></i>
+                                <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
                             </div>
                             <div class="col-4 px-0">
                                 <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
@@ -270,6 +276,9 @@
 
                         </div>
 
+                    </div>
+
+                    </div>
                     </div>
 
                     <!-- <div id="box-component" class="col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg d-none">
@@ -424,12 +433,13 @@
 
         <!-- Footer -->
 
-        <footer class="bg-light text-center text-lg-start">
-            <div class="">
-                <p class="mb-0 p-2">
-                    Questions from <a href="https://trivia.willfry.co.uk/">Trivia API</a>
-                </p>
+        <footer class="bg-light mt-5 text-center text-lg-start overflow-hidden">
+            <div class="row">
+                <div class="col pe-0">
+                    <p class="p-3 mb-0">Questions from <a href="https://trivia.willfry.co.uk/">Trivia API</a></p>
+                </div>
             </div>
+            
         </footer>
 
     </div>
