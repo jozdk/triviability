@@ -433,7 +433,7 @@ class QuizComponent {
                     children: [
                         new InfoRail({ question, gamestate, timer }),
                         {
-                            element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-9 col-xxl-7 mt-5" }),
+                            element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-8 col-xxl-7 mt-5" }),
                             children: [
                                 new QuestionComponent({ category: question.category, question: question.question }),
                                 new Answers({ question })
