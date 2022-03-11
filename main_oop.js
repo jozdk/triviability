@@ -463,16 +463,9 @@ class Quiz {
 
         // Calculate score based on time elapsed
         if (this._questions[this._gamestate.answered].result === "correct") {
-            if (exactTime < 2000) this._gamestate.points += 10;
-            else if (exactTime < 4000) this._gamestate.points += 9;
-            else if (exactTime < 6000) this._gamestate.points += 8;
-            else if (exactTime < 8000) this._gamestate.points += 7;
-            else if (exactTime < 10000) this._gamestate.points += 6;
-            else if (exactTime < 12000) this._gamestate.points += 5;
-            else if (exactTime < 14000) this._gamestate.points += 4;
-            else if (exactTime < 16000) this._gamestate.points += 3;
-            else if (exactTime < 18000) this._gamestate.points += 2;
-            else if (exactTime < 20000) this._gamestate.points += 1;
+            const bonus = Math.round((20000 - exactTime) / 2000);
+            this._gamestate.points += 10 + bonus;
+
         }
 
         // this.ui.updateComponent("stats", currentQuestion, this._gamestate);
@@ -514,7 +507,7 @@ class UIForSettings {
         this.mainElement = document.querySelector("#main");
         this.selectionMenuElement = new SelectionMenu();
 
-        //this.render(this.mainElement, this.selectionMenuElement);
+        this.render(this.mainElement, this.selectionMenuElement);
 
         // this.selectionElement.addEventListener("click", (event) => {
         //     if (event.target !== this.selectionElement && !event.target.classList.contains("col-sm-12")) {
