@@ -162,6 +162,12 @@ a:link, a:visited {
     }
 }
 
+@media (max-width: 576px) {
+    .fifty-fifty {
+        font-size: 13px;
+    }
+}
+
 .bg-answer-correct {
     background-color: green;
 }
@@ -268,3 +274,6 @@ a:link, a:visited {
     background-color: rgba(255, 255, 255, 0.418);
   }
 
+  .small-font {
+      font-size: 14px;
+  }
