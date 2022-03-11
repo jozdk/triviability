@@ -1,185 +1,185 @@
-// class SelectionMenu {
-//     constructor() {
-//         this.element = buildNode("div", { id: "selection-menu", className: "container" }),
-//         this.children = [
-//             new Welcome(),
-//             new Categories(),
-//             new StartButton()
-//         ]
-//     }
-// }
+class SelectionMenu {
+    constructor() {
+        this.element = buildNode("div", { id: "selection-menu", className: "container" }),
+        this.children = [
+            new Welcome(),
+            new Categories(),
+            new StartButton()
+        ]
+    }
+}
 
-// class Welcome {
-//     constructor() {
-//         this.element = buildNode("div", { className: "row mb-4 mt-5 m-xxl-5 justify-content-center" }),
-//         this.children = [
-//             {
-//                 element: buildNode("div", { className: "col-12" }),
-//                 children: [
-//                     {
-//                         element: buildNode("h5", { className: "text-center" }),
-//                         children: [
-//                             {
-//                                 element: document.createTextNode("Welcome to Triviability! Choose your Categorie(s) and Click the Button below to Start your Quiz!"),
-//                                 children: null
-//                             }
-//                         ]
-//                     }
-//                 ]
-//             }
-//         ]
-//     }
-// }
+class Welcome {
+    constructor() {
+        this.element = buildNode("div", { className: "row mb-4 mt-5 m-xxl-5 justify-content-center" }),
+        this.children = [
+            {
+                element: buildNode("div", { className: "col-12" }),
+                children: [
+                    {
+                        element: buildNode("h5", { className: "text-center" }),
+                        children: [
+                            {
+                                element: document.createTextNode("Welcome to Triviability! Choose your Categorie(s) and Click the Button below to Start your Quiz!"),
+                                children: null
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
 
-// class Categories {
-//     constructor() {
+class Categories {
+    constructor() {
 
-//         this.toggleSelection = (element, category) => {
-//             if (element.classList.contains("category-highlight")) {
-//                 element.classList.add("selected");
-//                 element.classList.remove("category-highlight");
-//                 settings.categories = {
-//                     category: category,
-//                     request: "add"
-//                 };
-//             } else if (element.classList.contains("selected")) {
-//                 element.classList.remove("selected");
-//                 element.classList.add("category-highlight");
-//                 settings.categories = {
-//                     category: category,
-//                     request: "remove"
-//                 }
-//             }
-//         }
+        this.toggleSelection = (element, category) => {
+            if (element.classList.contains("category-highlight")) {
+                element.classList.add("selected");
+                element.classList.remove("category-highlight");
+                settings.categories = {
+                    category: category,
+                    request: "add"
+                };
+            } else if (element.classList.contains("selected")) {
+                element.classList.remove("selected");
+                element.classList.add("category-highlight");
+                settings.categories = {
+                    category: category,
+                    request: "remove"
+                }
+            }
+        }
 
-//         const handler = (event) => {
-//             if (event.target !== this.selectionElement && !event.target.classList.contains("col-sm-12")) {
-//                 const elements = event.composedPath();
-//                 const targetElement = elements.find(element => element.classList.contains("category"));
-//                 const category = targetElement.firstElementChild.lastElementChild.innerText;
-//                 switch (category) {
-//                     case "Science":
-//                         this.toggleSelection(targetElement, "science");
-//                         break;
-//                     case "History":
-//                         this.toggleSelection(targetElement, "history");
-//                         break;
-//                     case "Geography":
-//                         this.toggleSelection(targetElement, "geography");
-//                         break;
-//                     case "Film & TV":
-//                         this.toggleSelection(targetElement, "movies");
-//                         break;
-//                     case "Art & Literature":
-//                         this.toggleSelection(targetElement, "literature");
-//                         break;
-//                     case "Music":
-//                         this.toggleSelection(targetElement, "music");
-//                         break;
-//                     case "Sport & Leisure":
-//                         this.toggleSelection(targetElement, "sport_and_leisure");
-//                         break;
-//                     case "General Knowledge":
-//                         this.toggleSelection(targetElement, "general_knowledge");
-//                         break;
-//                     case "Society & Culture":
-//                         this.toggleSelection(targetElement, "society_and_culture");
-//                         break;
-//                 }
-//             }
-//         }
+        const handler = (event) => {
+            if (event.target !== this.selectionElement && !event.target.classList.contains("col-sm-12")) {
+                const elements = event.composedPath();
+                const targetElement = elements.find(element => element.classList.contains("category"));
+                const category = targetElement.firstElementChild.lastElementChild.innerText;
+                switch (category) {
+                    case "Science":
+                        this.toggleSelection(targetElement, "science");
+                        break;
+                    case "History":
+                        this.toggleSelection(targetElement, "history");
+                        break;
+                    case "Geography":
+                        this.toggleSelection(targetElement, "geography");
+                        break;
+                    case "Film & TV":
+                        this.toggleSelection(targetElement, "movies");
+                        break;
+                    case "Arts & Literature":
+                        this.toggleSelection(targetElement, "literature");
+                        break;
+                    case "Music":
+                        this.toggleSelection(targetElement, "music");
+                        break;
+                    case "Sport & Leisure":
+                        this.toggleSelection(targetElement, "sport_and_leisure");
+                        break;
+                    case "General Knowledge":
+                        this.toggleSelection(targetElement, "general_knowledge");
+                        break;
+                    case "Society & Culture":
+                        this.toggleSelection(targetElement, "society_and_culture");
+                        break;
+                }
+            }
+        }
 
-//         const categories = ["Science", "History", "Geography", "Film & TV", "Art & Literature", "Music", "Sport & Leisure", "General Knowledge", "Society & Culture"]
-//             .map((category) => {
-//                 return new Category(category);
-//             });
+        const categories = ["Science", "History", "Geography", "Film & TV", "Arts & Literature", "Music", "Sport & Leisure", "General Knowledge", "Society & Culture"]
+            .map((category) => {
+                return new Category(category);
+            });
 
-//         this.element = buildNode("div", { id: "category-selection", className: "row mt-3 mb-3 justify-content-center", onclick: handler }),
-//         this.children = [
-//             {
-//                 element: buildNode("div", { className: "col-md-9 col-xl-8" }),
-//                 children: [
-//                     {
-//                         element: buildNode("div", { className: "row justify-content-center gy-4" }),
-//                         children: [
-//                             ...categories
-//                         ]
-//                     }
-//                 ]
-//             }
-//         ]
-//     }
-// }
+        this.element = buildNode("div", { id: "category-selection", className: "row mt-3 mb-3 justify-content-center", onclick: handler }),
+        this.children = [
+            {
+                element: buildNode("div", { className: "col-md-9 col-xl-8" }),
+                children: [
+                    {
+                        element: buildNode("div", { className: "row justify-content-center gy-4" }),
+                        children: [
+                            ...categories
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
 
-// class Category {
-//     constructor(category) {
+class Category {
+    constructor(category) {
 
-//         const cssCategory = category.toLowerCase().replace(/\s/g, "_").replace(/&/g, "and");
+        const cssCategory = category.toLowerCase().replace(/\s/g, "_").replace(/&/g, "and");
 
-//         this.element = buildNode("div", { className: "col-8 col-sm-6 col-lg-4" }),
-//         this.children = [
-//             {
-//                 element: buildNode("div", { id: `cat-${cssCategory}`, className: `card category category-highlight cursor bg-${cssCategory}` }),
-//                 children: [
-//                     {
-//                         element: buildNode("div", { className: "card-body text-center" }),
-//                         children: [
-//                             {
-//                                 element: buildNode("div", { className: "h1 mb-3" }),
-//                                 children: [
-//                                     {
-//                                         element: buildNode("img", { src: "science.svg", alt: category, className: "w-50" }),
-//                                         children: null
-//                                     }
-//                                 ]
-//                             },
-//                             {
-//                                 element: buildNode("h5", { className: "card-title" }),
-//                                 children: [
-//                                     {
-//                                         element: document.createTextNode(category),
-//                                         children: null
-//                                     }
-//                                 ]
-//                             }
-//                         ]
-//                     }
-//                 ]
-//             }
-//         ]
-//     }
-// }
+        this.element = buildNode("div", { className: "col-8 col-sm-6 col-lg-4" }),
+        this.children = [
+            {
+                element: buildNode("div", { id: `cat-${cssCategory}`, className: `card category category-highlight cursor bg-${cssCategory}` }),
+                children: [
+                    {
+                        element: buildNode("div", { className: "card-body text-center" }),
+                        children: [
+                            {
+                                element: buildNode("div", { className: "h1 mb-3" }),
+                                children: [
+                                    {
+                                        element: buildNode("img", { src: "science.svg", alt: category, className: "w-50" }),
+                                        children: null
+                                    }
+                                ]
+                            },
+                            {
+                                element: buildNode("h5", { className: "card-title" }),
+                                children: [
+                                    {
+                                        element: document.createTextNode(category),
+                                        children: null
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
 
-// class StartButton {
-//     constructor() {
+class StartButton {
+    constructor() {
 
-//         const handler = () => {
-//             if (settings.categories.length) {
-//                 settings.fetchQuestions();
-//                 //quiz.init(testQuestions);
-//                 document.querySelector("#main").innerHTML = "";
-//             }
-//         }
+        const handler = () => {
+            if (settings.categories.length) {
+                settings.fetchQuestions();
+                //quiz.init(testQuestions);
+                document.querySelector("#main").innerHTML = "";
+            }
+        }
 
-//         this.element = buildNode("div", { className: "row justify-content-center" }),
-//         this.children = [
-//             {
-//                 element: buildNode("div", { className: "col-md-9 col-xl-8" }),
-//                 children: [
-//                     {
-//                         element: buildNode("button", { id: "start-button", className: "btn btn-outline-dark w-100", onclick: handler }),
-//                         children: [
-//                             {
-//                                 element: document.createTextNode("Start Quiz!"),
-//                                 children: null
-//                             }
-//                         ]
-//                     }
-//                 ]
-//             }
-//         ]
-//     }
-// }
+        this.element = buildNode("div", { className: "row justify-content-center" }),
+        this.children = [
+            {
+                element: buildNode("div", { className: "col-md-9 col-xl-8" }),
+                children: [
+                    {
+                        element: buildNode("button", { id: "start-button", className: "btn btn-outline-dark w-100", onclick: handler }),
+                        children: [
+                            {
+                                element: document.createTextNode("Start Quiz!"),
+                                children: null
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
 
 // Settings
 
@@ -212,7 +212,8 @@ class Settings {
     async fetchQuestions() {
         try {
             const categories = this.checkCategories();
-            const url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
+            //const url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
+            const url = `https://the-trivia-api.com/questions?categories=${categories}&limit=9`
             const result = await fetch(url);
             const questions = await result.json();
             quiz.init(questions);
@@ -230,7 +231,7 @@ class Question {
     constructor(question) {
         this.category = {
             title: question.category,
-            color: question.category.toLowerCase().replace(/\s/g, "_")
+            color: question.category.toLowerCase().replace(/\s/g, "_").replace(/&/g, "and")
         };
         this.type = question.type;
         this.question = question.question;
@@ -507,79 +508,79 @@ class Quiz {
 
 class UIForSettings {
     constructor() {
-        this.selectionPage = document.querySelector("#selection-menu");
-        this.selectionElement = document.querySelector("#category-selection");
-        this.startButton = document.querySelector("#start-button");
-        //this.mainElement = document.querySelector("#main");
-        //this.selectionMenuElement = new SelectionMenu();
+        //this.selectionPage = document.querySelector("#selection-menu");
+        //this.selectionElement = document.querySelector("#category-selection");
+        //this.startButton = document.querySelector("#start-button");
+        this.mainElement = document.querySelector("#main");
+        this.selectionMenuElement = new SelectionMenu();
 
         //this.render(this.mainElement, this.selectionMenuElement);
 
-        this.selectionElement.addEventListener("click", (event) => {
-            if (event.target !== this.selectionElement && !event.target.classList.contains("col-sm-12")) {
-                const elements = event.composedPath();
-                const targetElement = elements.find(element => element.classList.contains("category"));
-                const category = targetElement.firstElementChild.lastElementChild.innerText;
-                switch (category) {
-                    case "Science":
-                        this.toggleSelection(targetElement, "science");
-                        break;
-                    case "History":
-                        this.toggleSelection(targetElement, "history");
-                        break;
-                    case "Geography":
-                        this.toggleSelection(targetElement, "geography");
-                        break;
-                    case "Film & TV":
-                        this.toggleSelection(targetElement, "movies");
-                        break;
-                    case "Art & Literature":
-                        this.toggleSelection(targetElement, "literature");
-                        break;
-                    case "Music":
-                        this.toggleSelection(targetElement, "music");
-                        break;
-                    case "Sport & Leisure":
-                        this.toggleSelection(targetElement, "sport_and_leisure");
-                        break;
-                    case "General Knowledge":
-                        this.toggleSelection(targetElement, "general_knowledge");
-                        break;
-                    case "Society & Culture":
-                        this.toggleSelection(targetElement, "society_and_culture");
-                        break;
-                }
-            }
+        // this.selectionElement.addEventListener("click", (event) => {
+        //     if (event.target !== this.selectionElement && !event.target.classList.contains("col-sm-12")) {
+        //         const elements = event.composedPath();
+        //         const targetElement = elements.find(element => element.classList.contains("category"));
+        //         const category = targetElement.firstElementChild.lastElementChild.innerText;
+        //         switch (category) {
+        //             case "Science":
+        //                 this.toggleSelection(targetElement, "science");
+        //                 break;
+        //             case "History":
+        //                 this.toggleSelection(targetElement, "history");
+        //                 break;
+        //             case "Geography":
+        //                 this.toggleSelection(targetElement, "geography");
+        //                 break;
+        //             case "Film & TV":
+        //                 this.toggleSelection(targetElement, "movies");
+        //                 break;
+        //             case "Art & Literature":
+        //                 this.toggleSelection(targetElement, "literature");
+        //                 break;
+        //             case "Music":
+        //                 this.toggleSelection(targetElement, "music");
+        //                 break;
+        //             case "Sport & Leisure":
+        //                 this.toggleSelection(targetElement, "sport_and_leisure");
+        //                 break;
+        //             case "General Knowledge":
+        //                 this.toggleSelection(targetElement, "general_knowledge");
+        //                 break;
+        //             case "Society & Culture":
+        //                 this.toggleSelection(targetElement, "society_and_culture");
+        //                 break;
+        //         }
+        //     }
 
-        });
+        // });
 
-        this.startButton.addEventListener("click", () => {
-            if (settings.categories.length) {
-                settings.fetchQuestions();
-                //quiz.init(testQuestions);
-                this.selectionPage.style.display = "none";
-            }
-        });
+        // this.startButton.addEventListener("click", () => {
+        //     if (settings.categories.length) {
+        //         settings.fetchQuestions();
+        //         //quiz.init(testQuestions);
+        //         this.selectionPage.style.display = "none";
+        //     }
+        // });
 
     }
 
-    toggleSelection(element, category) {
-        if (element.classList.contains("category-highlight")) {
-            element.classList.add("selected");
-            element.classList.remove("category-highlight");
-            settings.categories = {
-                category: category,
-                request: "add"
-            };
-        } else if (element.classList.contains("selected")) {
-            element.classList.remove("selected");
-            element.classList.add("category-highlight");
-            settings.categories = {
-                category: category,
-                request: "remove"
-            }
-        }
-    }
+    // toggleSelection(element, category) {
+    //     if (element.classList.contains("category-highlight")) {
+    //         element.classList.add("selected");
+    //         element.classList.remove("category-highlight");
+    //         settings.categories = {
+    //             category: category,
+    //             request: "add"
+    //         };
+    //     } else if (element.classList.contains("selected")) {
+    //         element.classList.remove("selected");
+    //         element.classList.add("category-highlight");
+    //         settings.categories = {
+    //             category: category,
+    //             request: "remove"
+    //         }
+    //     }
+    // }
 
     render(rootNode, startingNode) {
 
