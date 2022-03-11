@@ -212,14 +212,10 @@ class Settings {
     async fetchQuestions() {
         try {
             const categories = this.checkCategories();
-            let url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
-            if (this._categories.length === 1 && this._categories[0] === "history") {
-                console.log("History selected");
-                url = `https://opentdb.com/api.php?amount=9&category=23&difficulty=easy&type=multiple`;
-            }
+            const url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
             const result = await fetch(url);
             const questions = await result.json();
-            questions.results ? quiz.init(questions.results) : quiz.init(questions);
+            quiz.init(questions);
         } catch (error) {
             console.log(error.message);
         }
