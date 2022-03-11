@@ -94,7 +94,8 @@
                                 </div>
                             </div>
                             <div class="col-8 col-sm-6 col-lg-4">
-                                <div id="cat-art-lit" class="card category category-highlight cursor bg-art_and_literature">
+                                <div id="cat-art-lit"
+                                    class="card category category-highlight cursor bg-art_and_literature">
                                     <div class="card-body text-center">
                                         <div class="h1 mb-3">
                                             <img class="w-50" src="science.svg" alt="">
@@ -114,7 +115,8 @@
                                 </div>
                             </div>
                             <div class="col-8 col-sm-6 col-lg-4">
-                                <div id="cat-sport-leisure" class="card category category-highlight cursor bg-sport_and_leisure">
+                                <div id="cat-sport-leisure"
+                                    class="card category category-highlight cursor bg-sport_and_leisure">
                                     <div class="card-body text-center">
                                         <div class="h1 mb-3">
                                             <img class="w-50" src="science.svg" alt="">
@@ -124,7 +126,8 @@
                                 </div>
                             </div>
                             <div class="col-8 col-sm-6 col-lg-4">
-                                <div id="cat-general-knowledge" class="card category category-highlight cursor bg-general_knowledge">
+                                <div id="cat-general-knowledge"
+                                    class="card category category-highlight cursor bg-general_knowledge">
                                     <div class="card-body text-center">
                                         <div class="h1 mb-3">
                                             <img class="w-50" src="science.svg" alt="">
@@ -134,7 +137,8 @@
                                 </div>
                             </div>
                             <div class="col-8 col-sm-6 col-lg-4">
-                                <div id="cat-society-culture" class="card category category-highlight cursor bg-society_and_culture">
+                                <div id="cat-society-culture"
+                                    class="card category category-highlight cursor bg-society_and_culture">
                                     <div class="card-body text-center">
                                         <div class="h1 mb-3">
                                             <img class="w-50" src="science.svg" alt="">
@@ -162,123 +166,83 @@
 
             <!-- Quiz Element -->
 
-            <div id="quiz-element" class="container-lg">
+            <div id="quiz-element" class="container-lg d-none">
                 <div class="row justify-content-center">
 
-                    <div class="col-md-2 d-flex me-2">
+                    <div class="col-md-2 d-flex me-2 mt-5">
 
-                    <div class="row justify-content-end">
+                        <div class="row justify-content-end">
 
-                    
+                            <div id="stats-component"
+                                class="d-none d-md-flex col-md-12 col-xl-10 col-xxl-9 bg-light rounded-lg flex-column">
 
-                    <div id="stats-component" class="d-none d-md-flex col-md-12 col-xl-10 col-xxl-9 bg-light rounded-lg mt-5 flex-column">
+                                <div class="row mb-1 p-3">
+                                    <div class="col rounded-lg p-2 bg-geography">
+                                        <p class="px-0 my-2 text-center small-font">QUESTION 2 of 9</p>
+                                    </div>
+                                </div>
 
-                        <div class="row mb-1 p-3">
-                            <div class="col rounded-lg p-2 bg-geography">
-                                <p class="px-0 my-2 text-center small-font">QUESTION 2 of 9</p>
-                            </div>
-                        </div>
+                                <div id="timer-component" class="row py-3">
+                                    <div class="col text-center d-flex flex-column align-items-center">
+                                        <h5 class="mb-3">Timer</h5>
 
-                        <div id="timer-component" class="row py-3">
-                            <div class="col text-center d-flex flex-column align-items-center">
-                                <h5 class="mb-3">Timer</h5>
-
-                                <div class="timer-container">
-                                    <div class="radial-timer">
-                                        <div class="first-half-js bg-geography"></div>
-                                        <div class="half-mask"></div>
-                                        <div class="second-half-js bg-geography"></div>
-                                        <div class="seconds d-flex align-items-center justify-content-center lead">
-                                            <h4 id="seconds-js">20</h4>
+                                        <div class="timer-container">
+                                            <div class="radial-timer">
+                                                <div class="first-half-js bg-geography"></div>
+                                                <div class="half-mask"></div>
+                                                <div class="second-half-js bg-geography"></div>
+                                                <div
+                                                    class="seconds d-flex align-items-center justify-content-center lead">
+                                                    <h4 id="seconds-js">20</h4>
+                                                </div>
+                                            </div>
                                         </div>
+
                                     </div>
                                 </div>
-                                
-                            </div>
-                        </div>
 
-                        <!-- <div id="score-component" class="row mb-1 p-xxl-3 flex-grow-1">
-                            <div class="col">
-                                <div class="row h-100 p-lg-2 px-xl-4 text-center justify-content-center">
-                                    <h5>Score</h5>
-                                    <h3>0</h3>
-                                    <div class="col-4">
-                                        <i class="bi bi-check-circle-fill fs-3 text-correct"></i>
+                                <div id="score-component" class="row mb-1 py-3 px-lg-4 px-md-1 text-center">
+
+                                    <div class="col-12">
+                                        <h5>Score</h5>
                                     </div>
-                                    <div class="col-4">
-                                        <i class="bi bi-x-circle-fill fs-3 text-wrong"></i>
-                                    </div>
-                                    <div class="col-4">
-                                        <i class="bi bi-check-circle-fill fs-3 text-correct"></i>
-                                    </div>
-                                    <div class="col-4">
-                                        <i class="bi bi-circle-fill fs-3 text-white"></i>
-                                    </div>
-                                    <div class="col-4">
-                                        <i class="bi bi-circle-fill fs-3 text-white"></i>
-                                    </div>
-                                    <div class="col-4">
-                                        <i class="bi bi-circle-fill fs-3 text-white"></i>
-                                    </div>
-                                    <div class="col-4">
-                                        <i class="bi bi-circle-fill fs-3 text-white"></i>
-                                    </div>
-                                    <div class="col-4">
-                                        <i class="bi bi-circle-fill fs-3 text-white"></i>
-                                    </div>
-                                    <div class="col-4">
-                                        <i class="bi bi-circle-fill fs-3 text-white"></i>
+                                    <div class="col-12">
+                                        <h3 class="py-3">10</h3>
                                     </div>
 
+                                    <div class="col-4 px-0">
+                                        <i class="bi bi-check-circle-fill fs-3 board-correct"></i>
+                                    </div>
+                                    <div class="col-4 px-0">
+                                        <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
+                                    </div>
+                                    <div class="col-4 px-0">
+                                        <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
+                                    </div>
+                                    <div class="col-4 px-0">
+                                        <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
+                                    </div>
+                                    <div class="col-4 px-0">
+                                        <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
+                                    </div>
+                                    <div class="col-4 px-0">
+                                        <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
+                                    </div>
+                                    <div class="col-4 px-0">
+                                        <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
+                                    </div>
+                                    <div class="col-4 px-0">
+                                        <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
+                                    </div>
+                                    <div class="col-4 px-0">
+                                        <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
+                                    </div>
 
                                 </div>
-                            </div>
 
-
-                        </div> -->
-
-                        <div id="score-component" class="row mb-1 py-3 px-lg-4 px-md-1 text-center">
-
-                            <div class="col-12">
-                                <h5>Score</h5>
-                            </div>
-                            <div class="col-12">
-                                <h3 class="py-3">10</h3>
-                            </div>
-
-                            <div class="col-4 px-0">
-                                <i class="bi bi-check-circle-fill fs-3 board-correct"></i>
-                            </div>
-                            <div class="col-4 px-0">
-                                <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
-                            </div>
-                            <div class="col-4 px-0">
-                                <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
-                            </div>
-                            <div class="col-4 px-0">
-                                <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
-                            </div>
-                            <div class="col-4 px-0">
-                                <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
-                            </div>
-                            <div class="col-4 px-0">
-                                <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
-                            </div>
-                            <div class="col-4 px-0">
-                                <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
-                            </div>
-                            <div class="col-4 px-0">
-                                <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
-                            </div>
-                            <div class="col-4 px-0">
-                                <i class="bi bi-circle-fill fs-3 board-unanswered"></i>
                             </div>
 
                         </div>
-
-                    </div>
-
-                    </div>
                     </div>
 
                     <!-- <div id="box-component" class="col-11 col-sm-12 col-xl-9 col-xxl-7 bg-light mt-5 rounded-lg d-none">
@@ -348,8 +312,10 @@
                                             <div class="col-2 text-start text-sm-end px-1 px-sm-2">
                                                 <i class="bi bi-arrow-left-right fs-4 p-1 cursor joker-highlight"></i>
                                             </div>
-                                            <div class="col-2 d-flex align-items-center justify-content-end px-0 px-sm-2">                                                       
-                                                <strong class="border border-dark p-1 cursor fifty-fifty joker-highlight">50:50</strong>                                                                                                     
+                                            <div
+                                                class="col-2 d-flex align-items-center justify-content-end px-0 px-sm-2">
+                                                <strong
+                                                    class="border border-dark p-1 cursor fifty-fifty joker-highlight">50:50</strong>
                                             </div>
                                         </div>
                                     </div>
@@ -371,23 +337,31 @@
 
                                 <div class="row text-center lead px-md-2 py-3 gy-3">
                                     <div class="col-md-6 px-3 px-md-2">
-                                        <p class="rounded-lg py-2 py-md-5 bg-answer-white answer-highlight-geography my-0 border">Bootstrap</p>
+                                        <p
+                                            class="rounded-lg py-2 py-md-5 bg-answer-white answer-highlight-geography my-0 border">
+                                            Bootstrap</p>
                                     </div>
                                     <div class="col-md-6 px-3 px-md-2">
-                                        <p class="rounded-lg py-2 py-md-5 bg-answer-white answer-highlight-geography my-0 border">No Bootstrap</p>
+                                        <p
+                                            class="rounded-lg py-2 py-md-5 bg-answer-white answer-highlight-geography my-0 border">
+                                            No Bootstrap</p>
                                     </div>
                                     <div class="col-md-6 px-3 px-md-2">
-                                        <p class="rounded-lg py-2 py-md-5 bg-answer-white answer-highlight-geography my-0 border">Bootstrap + Custom
+                                        <p
+                                            class="rounded-lg py-2 py-md-5 bg-answer-white answer-highlight-geography my-0 border">
+                                            Bootstrap + Custom
                                             CSS</p>
                                     </div>
                                     <div class="col-md-6 px-3 px-md-2">
-                                        <p class="rounded-lg py-2 py-md-5 bg-answer-white answer-highlight-geography my-0 border">Magic</p>
+                                        <p
+                                            class="rounded-lg py-2 py-md-5 bg-answer-white answer-highlight-geography my-0 border">
+                                            Magic</p>
                                     </div>
                                 </div>
-                                
+
                             </div>
                         </div>
-                        
+
                     </div>
 
                     <!-- <div id="progress" class="row justify-content-center">
@@ -409,7 +383,9 @@
                     </div>
                 </div> -->
 
-                <div class="row justify-content-center">                  
+                <!-- Next Question Button -->
+
+                <div class="row justify-content-center">
                     <div class="col-11 col-md-10 col-xxl-9 mt-3">
                         <div class="row justify-content-center justify-content-md-end">
                             <div class="col-5 col-lg-3 px-0 d-flex justify-content-md-end justify-content-center">
@@ -439,7 +415,7 @@
                     <p class="p-3 mb-0">Questions from <a href="https://trivia.willfry.co.uk/">Trivia API</a></p>
                 </div>
             </div>
-            
+
         </footer>
 
     </div>

@@ -175,7 +175,7 @@ class UIForQuiz {
             this.timerVals.time = Date.now() - this.timerVals.start;
             this.timerVals.elapsed = Math.floor(this.timerVals.time / 1000);
 
-            
+
             document.querySelector("#timer-container").innerHTML = "";
             this.render(document.querySelector("#timer-container"), new Time({
                 category: quiz.questions[quiz.gamestate.answered].category,
@@ -183,7 +183,7 @@ class UIForQuiz {
                 // firstHalf: this.timerVals.elapsed > 6 ? `rotate(${this.timerVals.degreeFirstHalf += 30}deg)` : "",
                 // seconds: --this.timerVals.seconds
                 time: this.timerVals.elapsed
-            })); 
+            }));
 
             if (this.timerVals.elapsed === 12) {
                 clearInterval(this.timerVals.timeInterval);
@@ -266,10 +266,10 @@ class Quiz {
     }
 
     validate(answer) {
-        
+
         // Stop timer
         clearInterval(this.timer.timeInterval);
-        
+
         const exactTime = Date.now() - this.timer.start;
 
         console.log(exactTime)
@@ -426,19 +426,12 @@ function buildNode(tag, properties) {
 class QuizComponent {
     constructor({ question, gamestate, timer }) {
         this.root = {
-            element: buildNode("div", { id: "quiz-element", className: "container-xl" }),
+            element: buildNode("div", { id: "quiz-element", className: "container-lg" }),
             children: [
                 {
                     element: buildNode("div", { className: "row justify-content-center" }),
                     children: [
-                        {
-                            element: buildNode("div", { id: "stats-component", className: "col-md-2 d-none d-md-flex bg-light rounded-lg me-2 mt-5 flex-column" }),
-                            children: [
-                                new StatsHeader({ category: question.category, answered: gamestate.answered }),
-                                new Timer({ category: question.category, timer }),
-                                new Score({ points: gamestate.points, board: gamestate.board })
-                            ]
-                        },
+                        new InfoRail({ question, gamestate, timer }),
                         {
                             element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-9 col-xxl-7 mt-5" }),
                             children: [
@@ -455,7 +448,29 @@ class QuizComponent {
     }
 }
 
-class StatsHeader {
+class InfoRail {
+    constructor({ question, gamestate, timer }) {
+        this.element = buildNode("div", { className: "col-md-2 d-flex me-2 mt-5" }),
+        this.children = [
+            {
+                element: buildNode("div", { className: "row justify-content-end" }),
+                children: [
+                    {
+                        element: buildNode("div", { className: "d-none d-md-flex col-md-12 col-xl-10 col-xxl-9 bg-light rounded-lg flex-column" }),
+                        children: [
+                            new InfoHeader({ category: question.category, answered: gamestate.answered }),
+                            new Timer({ category: question.category, timer }),
+                            new Score({ points: gamestate.points, board: gamestate.board })
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+
+class InfoHeader {
     constructor({ category, answered }) {
         this.element = buildNode("div", { className: "row mb-1 p-3" });
         this.children = [
@@ -463,7 +478,7 @@ class StatsHeader {
                 element: buildNode("div", { className: `col rounded-lg p-2 bg-${category.color}` }),
                 children: [
                     {
-                        element: buildNode("p", { className: "px-0 my-2 text-center" }),
+                        element: buildNode("p", { className: "px-0 my-2 text-center small-font" }),
                         children: [
                             {
                                 element: document.createTextNode(`QUESTION ${answered + 1} of 9`),
@@ -599,7 +614,7 @@ class Timer {
 
 class Time {
     constructor({ category, timer }) {
-        
+
         const noDisplay = () => {
             if (timer.elapsed > timer.total / 2) {
                 return "d-none";
@@ -648,7 +663,7 @@ class Score {
             return new BoardField({ field });
         });
 
-        this.element = buildNode("div", { id: "score-component", className: "row mb-1 py-3 px-xxl-5 px-lg-4 px-md-1 text-center" });
+        this.element = buildNode("div", { id: "score-component", className: "row mb-1 py-3 px-lg-4 px-md-1 text-center" });
         this.children = [
             {
                 element: buildNode("div", { className: "col-12" }),
@@ -724,7 +739,7 @@ class QuestionHeader {
                                 element: buildNode("div", { className: "col-6 text-start" }),
                                 children: [
                                     {
-                                        element: buildNode("p", { className: "my-2" }),
+                                        element: buildNode("p", { className: "my-2 small-font" }),
                                         children: [
                                             {
                                                 element: document.createTextNode(category.title),
@@ -735,7 +750,7 @@ class QuestionHeader {
                                 ]
                             },
                             {
-                                element: buildNode("div", { className: "col-2 text-end" }),
+                                element: buildNode("div", { className: "col-2 text-start text-sm-end px-1 px-sm-2" }),
                                 children: [
                                     {
                                         element: buildNode("i", { className: "bi bi-hourglass-top fs-4 p-1 cursor joker-highlight" }),
@@ -744,7 +759,7 @@ class QuestionHeader {
                                 ]
                             },
                             {
-                                element: buildNode("div", { className: "col-2 text-end" }),
+                                element: buildNode("div", { className: "col-2 text-start text-sm-end px-1 px-sm-2" }),
                                 children: [
                                     {
                                         element: buildNode("i", { className: "bi bi-arrow-left-right fs-4 p-1 cursor joker-highlight" }),
@@ -753,10 +768,10 @@ class QuestionHeader {
                                 ]
                             },
                             {
-                                element: buildNode("div", { className: "col-2 d-flex align-items-center justify-content-end" }),
+                                element: buildNode("div", { className: "col-2 d-flex align-items-center justify-content-end px-0 px-sm-2" }),
                                 children: [
                                     {
-                                        element: buildNode("strong", { className: "border border-dark p-1 cursor joker-highlight" }),
+                                        element: buildNode("strong", { className: "border border-dark p-1 cursor fifty-fifty joker-highlight" }),
                                         children: [
                                             {
                                                 element: document.createTextNode("50:50"),
@@ -895,13 +910,13 @@ class NextButton {
         this.element = buildNode("div", { className: "row justify-content-center" }),
             this.children = [
                 {
-                    element: buildNode("div", { className: "col-11 col-xxl-9 mt-3" }),
+                    element: buildNode("div", { className: "col-11 col-md-10 col-xxl-9 mt-3" }),
                     children: [
                         {
                             element: buildNode("div", { className: "row justify-content-center justify-content-md-end" }),
                             children: [
                                 {
-                                    element: buildNode("div", { className: "col-5 col-lg-2 px-0 d-flex justify-content-md-end justify-content-center" }),
+                                    element: buildNode("div", { className: "col-5 col-lg-3 px-0 d-flex justify-content-md-end justify-content-center" }),
                                     children: [
                                         {
                                             element: buildNode("button", { className: "btn btn-outline-dark px-4", onclick: handler }),
@@ -1010,7 +1025,7 @@ function resultIcon(value) {
 const testQuestions = [{ "category": "Geography", "correctAnswer": "Africa", "id": 6696, "incorrectAnswers": ["South America", "Oceania", "Europe", "Asia", "North America"], "question": "Togo is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Sudan", "id": 6549, "incorrectAnswers": ["South Sudan", "Egypt", "Republic of the Congo", "Equatorial Guinea", "Gabon", "Benin", "Democratic Republic of the Congo", "Eritrea", "Uganda", "Togo", "São Tomé and Príncipe", "Rwanda", "Tunisia", "Malta"], "question": "Which of these countries borders Chad?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Asia", "id": 22872, "incorrectAnswers": ["Europe", "Africa", "North America", "South America"], "question": "Which is the Earth's largest continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "South America", "id": 6683, "incorrectAnswers": ["Oceania", "Europe", "Asia", "Africa", "North America"], "question": "Suriname is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Spain", "id": 5713, "incorrectAnswers": ["Portugal", "Andorra", "Mali", "Tunisia", "France", "Monaco", "Senegal", "Burkina Faso", "Switzerland", "The Gambia", "Malta", "Ireland", "Italy", "Belgium", "Luxembourg", "Liechtenstein", "Niger"], "question": "Morocco shares a land border with which of these countries?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Tripoli", "id": 19272, "incorrectAnswers": ["Benghazi", "Tunis", "Alexandria"], "question": "What is the capital of Libya?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Europe", "id": 6685, "incorrectAnswers": ["South America", "Oceania", "Asia", "Africa", "North America"], "question": "Andorra is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "East Timor", "id": 5609, "incorrectAnswers": ["Solomon Islands", "Vanuatu", "Palau", "Brunei", "Nauru", "Federated States of Micronesia", "Fiji", "Philippines", "Malaysia", "Singapore", "Tuvalu", "Kiribati", "Marshall Islands", "Cambodia", "Vietnam", "Thailand"], "question": "Which of these countries borders Australia?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Austria", "id": 19550, "incorrectAnswers": ["Croatia", "San Marino", "Bosnia and Herzegovina", "Romania", "Poland"], "question": "Which country borders Italy, Switzerland, Germany, Czech Republic, Hungary, Slovenia, and Liechtenstein?", "type": "Multiple Choice" }];
 
 
-//quiz.init(testQuestions);
+quiz.init(testQuestions);
 
 const secondHalf = document.querySelector(".second-half-js");
 const firstHalf = document.querySelector(".first-half-js");
