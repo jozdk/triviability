@@ -288,11 +288,11 @@ class Quiz {
             else if (exactTime < 6000) this._gamestate.points += 8;
             else if (exactTime < 8000) this._gamestate.points += 7;
             else if (exactTime < 10000) this._gamestate.points += 6;
-            else if (exactTime < 1200) this._gamestate.points += 5;
-            else if (exactTime < 1400) this._gamestate.points += 4;
-            else if (exactTime < 1600) this._gamestate.points += 3;
-            else if (exactTime < 1800) this._gamestate.points += 2;
-            else if (exactTime < 2000) this._gamestate.points += 1;
+            else if (exactTime < 12000) this._gamestate.points += 5;
+            else if (exactTime < 14000) this._gamestate.points += 4;
+            else if (exactTime < 16000) this._gamestate.points += 3;
+            else if (exactTime < 18000) this._gamestate.points += 2;
+            else if (exactTime < 20000) this._gamestate.points += 1;
         }
 
         // this.ui.updateComponent("stats", currentQuestion, this._gamestate);
