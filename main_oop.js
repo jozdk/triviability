@@ -1,6 +1,6 @@
 class SelectionMenu {
     constructor() {
-        this.element = buildNode("div", { id: "selection-menu", className: "container" }),
+        this.element = buildNode("div", { id: "selection-menu", className: "container" });
         this.children = [
             new Welcome(),
             new Categories(),
@@ -11,7 +11,7 @@ class SelectionMenu {
 
 class Welcome {
     constructor() {
-        this.element = buildNode("div", { className: "row mb-4 mt-5 m-xxl-5 justify-content-center" }),
+        this.element = buildNode("div", { className: "row mb-4 mt-5 m-xxl-5 justify-content-center" });
         this.children = [
             {
                 element: buildNode("div", { className: "col-12" }),
@@ -94,7 +94,7 @@ class Categories {
                 return new Category(category);
             });
 
-        this.element = buildNode("div", { id: "category-selection", className: "row mt-3 mb-3 justify-content-center", onclick: handler }),
+        this.element = buildNode("div", { id: "category-selection", className: "row mt-3 mb-3 justify-content-center", onclick: handler });
         this.children = [
             {
                 element: buildNode("div", { className: "col-md-9 col-xl-8" }),
@@ -116,7 +116,7 @@ class Category {
 
         const cssCategory = category.toLowerCase().replace(/\s/g, "_").replace(/&/g, "and");
 
-        this.element = buildNode("div", { className: "col-8 col-sm-6 col-lg-4" }),
+        this.element = buildNode("div", { className: "col-8 col-sm-6 col-lg-4" });
         this.children = [
             {
                 element: buildNode("div", { id: `cat-${cssCategory}`, className: `card category category-highlight cursor bg-${cssCategory}` }),
@@ -161,7 +161,7 @@ class StartButton {
             }
         }
 
-        this.element = buildNode("div", { className: "row justify-content-center" }),
+        this.element = buildNode("div", { className: "row justify-content-center" });
         this.children = [
             {
                 element: buildNode("div", { className: "col-md-9 col-xl-8" }),
@@ -199,6 +199,10 @@ class Settings {
 
     get categories() {
         return this._categories;
+    }
+
+    reset() {
+        this._categories = [];
     }
 
     checkCategories() {
@@ -280,7 +284,7 @@ class Question {
             }
         }
 
-        
+
     }
 
 }
@@ -302,6 +306,7 @@ class UIForQuiz {
         });
         this._timeElement;
 
+        this.mainElement.innerHTML = "";
         this.render(this.mainElement, this._quizElement.root);
         // this.countdown();
     }
@@ -462,6 +467,7 @@ class Quiz {
     }
 
     resetTimer() {
+        clearInterval(this.timer.timeInterval);
         this.timer.elapsed = 0;
     }
 
@@ -514,6 +520,15 @@ class Quiz {
         this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
         this.startTimer();
     }
+
+    reset() {
+        this.resetTimer();
+        this._questions = [];
+        this._gamestate.answered = 0;
+        this._gamestate.points = 0;
+        this._gamestate.board = [];
+        this.ui = {};
+    }
 }
 
 
@@ -525,9 +540,9 @@ class UIForSettings {
         //this.selectionElement = document.querySelector("#category-selection");
         //this.startButton = document.querySelector("#start-button");
         this.mainElement = document.querySelector("#main");
-        this.selectionMenuElement = new SelectionMenu();
+        this._selectionMenuElement = new SelectionMenu();
 
-        this.render(this.mainElement, this.selectionMenuElement);
+        this.render(this.mainElement, this._selectionMenuElement);
 
         // this.selectionElement.addEventListener("click", (event) => {
         //     if (event.target !== this.selectionElement && !event.target.classList.contains("col-sm-12")) {
@@ -575,6 +590,12 @@ class UIForSettings {
         //     }
         // });
 
+    }
+
+    set selectionMenuElement(menuComp) {
+        this._selectionMenuElement = menuComp;
+        this.mainElement.innerHTML = "";
+        this.render(this.mainElement, this._selectionMenuElement);
     }
 
     // toggleSelection(element, category) {
@@ -650,7 +671,7 @@ class QuizComponent {
                         }
                     ]
                 },
-                ...question.result !== "unanswered" ? [new NextButton()] : []
+                new Controls({ gamestate })
             ]
 
         }
@@ -659,7 +680,7 @@ class QuizComponent {
 
 class InfoRail {
     constructor({ question, gamestate, timer }) {
-        this.element = buildNode("div", { className: "col-md-2 d-flex me-2 mt-5" }),
+        this.element = buildNode("div", { className: "col-md-2 d-flex me-2 mt-5" });
         this.children = [
             {
                 element: buildNode("div", { className: "row justify-content-end" }),
@@ -1109,34 +1130,124 @@ class Answer {
     }
 }
 
-class NextButton {
+class Controls {
+    constructor({ gamestate }) {
+        console.log(gamestate.answered, gamestate.board[8]);
+        const text = gamestate.answered == 8 && gamestate.board[8] !== "unanswered" ? "View Results" : "Next Question";
+
+        this.element = buildNode("div", { className: "row justify-content-center mt-3" }),
+            this.children = [
+                new BackButton(),
+                {
+                    element: buildNode("div", { className: "col-6 col-md-7 col-lg-8 col-xxl-7" }),
+                    children: [
+                        {
+                            element: buildNode("div", { className: "row justify-content-end" }),
+                            children: [
+                                {
+                                    element: buildNode("div", { className: "col-0 col-sm" }),
+                                    children: null
+                                },
+                                ...gamestate.answered == 8 && gamestate.board[8] !== "unanswered" ? [new AgainButton()] : [],
+                                new NextButton({ text: text })
+                            ]
+                        }
+                    ]
+                }
+            ]
+    }
+}
+
+class BackButton {
     constructor() {
 
         const handler = () => {
-            quiz.advance();
+            // clearInterval(quiz.timer.timeInterval);
+            // settings.ui.selectionMenuElement = new SelectionMenu();
+            quiz.reset();
+            settings.reset();
+            settings.ui.selectionMenuElement = new SelectionMenu();
         }
 
-        this.element = buildNode("div", { className: "row justify-content-center" }),
+        this.element = buildNode("div", { className: "col-5 col-md-3 col-lg-2" }),
             this.children = [
                 {
-                    element: buildNode("div", { className: "col-11 col-md-10 col-xxl-9 mt-3" }),
+                    element: buildNode("div", { className: "row justify-content-end" }),
                     children: [
                         {
-                            element: buildNode("div", { className: "row justify-content-center justify-content-md-end" }),
+                            element: buildNode("div", { className: "col-md-12 col-xl-10 col-xxl-9 px-0" }),
                             children: [
                                 {
-                                    element: buildNode("div", { className: "col-5 col-lg-3 px-0 d-flex justify-content-md-end justify-content-center" }),
+                                    element: buildNode("button", { className: "btn btn-outline-dark", onclick: handler }),
                                     children: [
                                         {
-                                            element: buildNode("button", { className: "btn btn-outline-dark px-4", onclick: handler }),
+                                            element: buildNode("i", { className: "bi bi-arrow-left me-1" }),
+                                            children: null
+                                        },
+                                        {
+                                            element: buildNode("span"),
                                             children: [
                                                 {
-                                                    element: document.createTextNode("Next Question"),
+                                                    element: document.createTextNode("Categories"),
                                                     children: null
                                                 }
                                             ]
                                         }
                                     ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+    }
+}
+
+class AgainButton {
+    constructor() {
+
+        const handler = () => {
+            quiz.reset();
+            settings.fetchQuestions();
+        }
+
+        this.element = buildNode("div", { className: "col-auto pe-0 ps-1 ps-sm-2" }),
+            this.children = [
+                {
+                    element: buildNode("button", { className: "btn btn-outline-dark", onclick: handler }),
+                    children: [
+                        {
+                            element: document.createTextNode("Play again"),
+                            children: null
+                        }
+                    ]
+                }
+            ]
+    }
+}
+
+class NextButton {
+    constructor({ text }) {
+
+        const handler = () => {
+            quiz.advance();
+        }
+
+        this.element = buildNode("div", { className: "col-auto pe-0 ps-1 ps-sm-2" }),
+            this.children = [
+                {
+                    element: buildNode("button", { className: "btn btn-outline-dark", onclick: handler }),
+                    children: [
+                        {
+                            element: buildNode("span", { className: "span" }),
+                            children: [
+                                {
+                                    element: document.createTextNode(text),
+                                    children: null
+                                },
+                                {
+                                    element: buildNode("i", { className: "bi bi-arrow-right ms-1" }),
+                                    children: null
                                 }
                             ]
                         }
@@ -1231,10 +1342,10 @@ function resultIcon(value) {
 
 
 
-const testQuestionsB = [{ "category": "Geography", "correctAnswer": "Africa", "id": 6696, "incorrectAnswers": ["South America", "Oceania", "Europe", "Asia", "North America"], "question": "Togo is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Sudan", "id": 6549, "incorrectAnswers": ["South Sudan", "Egypt", "Republic of the Congo", "Equatorial Guinea", "Gabon", "Benin", "Democratic Republic of the Congo", "Eritrea", "Uganda", "Togo", "São Tomé and Príncipe", "Rwanda", "Tunisia", "Malta"], "question": "Which of these countries borders Chad?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Asia", "id": 22872, "incorrectAnswers": ["Europe", "Africa", "North America", "South America"], "question": "Which is the Earth's largest continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "South America", "id": 6683, "incorrectAnswers": ["Oceania", "Europe", "Asia", "Africa", "North America"], "question": "Suriname is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Spain", "id": 5713, "incorrectAnswers": ["Portugal", "Andorra", "Mali", "Tunisia", "France", "Monaco", "Senegal", "Burkina Faso", "Switzerland", "The Gambia", "Malta", "Ireland", "Italy", "Belgium", "Luxembourg", "Liechtenstein", "Niger"], "question": "Morocco shares a land border with which of these countries?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Tripoli", "id": 19272, "incorrectAnswers": ["Benghazi", "Tunis", "Alexandria"], "question": "What is the capital of Libya?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Europe", "id": 6685, "incorrectAnswers": ["South America", "Oceania", "Asia", "Africa", "North America"], "question": "Andorra is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "East Timor", "id": 5609, "incorrectAnswers": ["Solomon Islands", "Vanuatu", "Palau", "Brunei", "Nauru", "Federated States of Micronesia", "Fiji", "Philippines", "Malaysia", "Singapore", "Tuvalu", "Kiribati", "Marshall Islands", "Cambodia", "Vietnam", "Thailand"], "question": "Which of these countries borders Australia?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Austria", "id": 19550, "incorrectAnswers": ["Croatia", "San Marino", "Bosnia and Herzegovina", "Romania", "Poland"], "question": "Which country borders Italy, Switzerland, Germany, Czech Republic, Hungary, Slovenia, and Liechtenstein?", "type": "Multiple Choice" }];
+const testQuestions = [{ "category": "Geography", "correctAnswer": "Africa", "id": 6696, "incorrectAnswers": ["South America", "Oceania", "Europe", "Asia", "North America"], "question": "Togo is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Sudan", "id": 6549, "incorrectAnswers": ["South Sudan", "Egypt", "Republic of the Congo", "Equatorial Guinea", "Gabon", "Benin", "Democratic Republic of the Congo", "Eritrea", "Uganda", "Togo", "São Tomé and Príncipe", "Rwanda", "Tunisia", "Malta"], "question": "Which of these countries borders Chad?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Asia", "id": 22872, "incorrectAnswers": ["Europe", "Africa", "North America", "South America"], "question": "Which is the Earth's largest continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "South America", "id": 6683, "incorrectAnswers": ["Oceania", "Europe", "Asia", "Africa", "North America"], "question": "Suriname is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Spain", "id": 5713, "incorrectAnswers": ["Portugal", "Andorra", "Mali", "Tunisia", "France", "Monaco", "Senegal", "Burkina Faso", "Switzerland", "The Gambia", "Malta", "Ireland", "Italy", "Belgium", "Luxembourg", "Liechtenstein", "Niger"], "question": "Morocco shares a land border with which of these countries?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Tripoli", "id": 19272, "incorrectAnswers": ["Benghazi", "Tunis", "Alexandria"], "question": "What is the capital of Libya?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Europe", "id": 6685, "incorrectAnswers": ["South America", "Oceania", "Asia", "Africa", "North America"], "question": "Andorra is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "East Timor", "id": 5609, "incorrectAnswers": ["Solomon Islands", "Vanuatu", "Palau", "Brunei", "Nauru", "Federated States of Micronesia", "Fiji", "Philippines", "Malaysia", "Singapore", "Tuvalu", "Kiribati", "Marshall Islands", "Cambodia", "Vietnam", "Thailand"], "question": "Which of these countries borders Australia?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Austria", "id": 19550, "incorrectAnswers": ["Croatia", "San Marino", "Bosnia and Herzegovina", "Romania", "Poland"], "question": "Which country borders Italy, Switzerland, Germany, Czech Republic, Hungary, Slovenia, and Liechtenstein?", "type": "Multiple Choice" }];
 
 
-const testQuestions = [{"category":"Science","id":"622a1c3a7cc59eab6f95106f","correctAnswer":"Dynamite","incorrectAnswers":["The combustion engine","Plastic","The printing press"],"question":"What Did Alfred Nobel Invent Before Initiating His Nobel Peace Prize Award Scheme?","tags":[],"type":"Multiple Choice"},{"category":"Science","id":"622a1c377cc59eab6f950553","correctAnswer":"the relationship between electric phenomena and bodily processes","incorrectAnswers":["animals","the practice of escaping from restraints or other traps","plant diseases"],"question":"What is Electrophysiology the study of?","tags":[],"type":"Multiple Choice"},{"category":"Science","id":"622a1c377cc59eab6f950504","correctAnswer":"the signification and application of words","incorrectAnswers":["statistics such as births, deaths, income, or the incidence of disease, which illustrate the changing structure of human populations","crayfish","butterflies and moths"],"question":"What is Lexicology the study of?","tags":[],"type":"Multiple Choice"},{"category":"Science","id":"unknown","correctAnswer":"4","incorrectAnswers":["2","3","1"],"question":"How Many Chambers Are There In Your Heart?","tags":[],"type":"Multiple Choice"},{"category":"Science","id":"622a1c3a7cc59eab6f9510b3","correctAnswer":"Jupiter","incorrectAnswers":["Venus","Neptune","Saturn"],"question":"Name the largest planet in the solar system.","tags":[],"type":"Multiple Choice"},{"category":"Science","id":"622a1c377cc59eab6f950559","correctAnswer":"interactions among organisms and the water cycle","incorrectAnswers":["a variant of physiognomy","the structure of cells","the effect of evolution on ethology"],"question":"What is Ecohydrology the study of?","tags":[],"type":"Multiple Choice"},{"category":"Science","id":"622a1c3a7cc59eab6f950fd4","correctAnswer":"Asbestos","incorrectAnswers":["Bleach","Ethanol","Methadone"],"question":"Which substance takes its name from the Greek for `not flammable'?","tags":[],"type":"Multiple Choice"},{"category":"Science","id":"622a1c3a7cc59eab6f950fd8","correctAnswer":"Kidney","incorrectAnswers":["Liver","Lung"],"question":"Which vital organ does the adjective renal refer to?","tags":[],"type":"Multiple Choice"},{"category":"Science","id":"622a1c377cc59eab6f950544","correctAnswer":"race","incorrectAnswers":["parasites","in ethics, duty","rocks"],"question":"What is Ethnology the study of?","tags":[],"type":"Multiple Choice"}];
+const testQuestionsB = [{ "category": "Science", "id": "622a1c3a7cc59eab6f95106f", "correctAnswer": "Dynamite", "incorrectAnswers": ["The combustion engine", "Plastic", "The printing press"], "question": "What Did Alfred Nobel Invent Before Initiating His Nobel Peace Prize Award Scheme?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950553", "correctAnswer": "the relationship between electric phenomena and bodily processes", "incorrectAnswers": ["animals", "the practice of escaping from restraints or other traps", "plant diseases"], "question": "What is Electrophysiology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950504", "correctAnswer": "the signification and application of words", "incorrectAnswers": ["statistics such as births, deaths, income, or the incidence of disease, which illustrate the changing structure of human populations", "crayfish", "butterflies and moths"], "question": "What is Lexicology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "unknown", "correctAnswer": "4", "incorrectAnswers": ["2", "3", "1"], "question": "How Many Chambers Are There In Your Heart?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f9510b3", "correctAnswer": "Jupiter", "incorrectAnswers": ["Venus", "Neptune", "Saturn"], "question": "Name the largest planet in the solar system.", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950559", "correctAnswer": "interactions among organisms and the water cycle", "incorrectAnswers": ["a variant of physiognomy", "the structure of cells", "the effect of evolution on ethology"], "question": "What is Ecohydrology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f950fd4", "correctAnswer": "Asbestos", "incorrectAnswers": ["Bleach", "Ethanol", "Methadone"], "question": "Which substance takes its name from the Greek for `not flammable'?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f950fd8", "correctAnswer": "Kidney", "incorrectAnswers": ["Liver", "Lung"], "question": "Which vital organ does the adjective renal refer to?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950544", "correctAnswer": "race", "incorrectAnswers": ["parasites", "in ethics, duty", "rocks"], "question": "What is Ethnology the study of?", "tags": [], "type": "Multiple Choice" }];
 
 //quiz.init(testQuestions);
 

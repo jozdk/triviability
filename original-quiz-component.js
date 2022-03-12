@@ -375,3 +375,41 @@ class QuizComponent {
         }
     }
 }
+
+
+class NextButton {
+    constructor() {
+
+        const handler = () => {
+            quiz.advance();
+        }
+
+        this.element = buildNode("div", { className: "row justify-content-center" });
+        this.children = [
+            {
+                element: buildNode("div", { className: "col-11 col-md-10 col-xxl-9 mt-3" }),
+                children: [
+                    {
+                        element: buildNode("div", { className: "row justify-content-center justify-content-md-end" }),
+                        children: [
+                            {
+                                element: buildNode("div", { className: "col-5 col-lg-3 px-0 d-flex justify-content-md-end justify-content-center" }),
+                                children: [
+                                    {
+                                        element: buildNode("button", { className: "btn btn-outline-dark px-4", onclick: handler }),
+                                        children: [
+                                            {
+                                                element: document.createTextNode("Next Question"),
+                                                children: null
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
