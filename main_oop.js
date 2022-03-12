@@ -516,6 +516,9 @@ class Quiz {
     }
 
     advance() {
+        // if (this._questions[this._gamestate.answered].result === "unanswered") {
+            
+        // }
         this.resetTimer();
         this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
         this.startTimer();
@@ -671,7 +674,7 @@ class QuizComponent {
                         }
                     ]
                 },
-                new Controls({ gamestate })
+                new Controls({ gamestate, result: question.result })
             ]
 
         }
@@ -1131,9 +1134,9 @@ class Answer {
 }
 
 class Controls {
-    constructor({ gamestate }) {
-        console.log(gamestate.answered, gamestate.board[8]);
-        const text = gamestate.answered == 8 && gamestate.board[8] !== "unanswered" ? "View Results" : "Next Question";
+    constructor({ result, gamestate }) {
+
+        const text = gamestate.board[8] !== "unanswered" ? "View Results" : "Next Question";
 
         this.element = buildNode("div", { className: "row justify-content-center mt-3" }),
             this.children = [
@@ -1148,8 +1151,8 @@ class Controls {
                                     element: buildNode("div", { className: "col-0 col-sm" }),
                                     children: null
                                 },
-                                ...gamestate.answered == 8 && gamestate.board[8] !== "unanswered" ? [new AgainButton()] : [],
-                                new NextButton({ text: text })
+                                ...gamestate.board[8] !== "unanswered" ? [new AgainButton()] : [],
+                                new NextButton({ result: result, text: text })
                             ]
                         }
                     ]
@@ -1217,8 +1220,17 @@ class AgainButton {
                     element: buildNode("button", { className: "btn btn-outline-dark", onclick: handler }),
                     children: [
                         {
-                            element: document.createTextNode("Play again"),
+                            element: buildNode("i", { className: "bi bi-arrow-repeat me-1" }),
                             children: null
+                        },
+                        {
+                            element: buildNode("span"),
+                            children: [
+                                {
+                                    element: document.createTextNode("Play Again"),
+                                    children: null
+                                }
+                            ]
                         }
                     ]
                 }
@@ -1227,10 +1239,17 @@ class AgainButton {
 }
 
 class NextButton {
-    constructor({ text }) {
+    constructor({ result, text }) {
 
         const handler = () => {
-            quiz.advance();
+            if (result === "unanswered") {
+                quiz.validate(null);
+                setTimeout(() => {
+                    quiz.advance();
+                }, 1000);           
+            } else {
+                quiz.advance();
+            }
         }
 
         this.element = buildNode("div", { className: "col-auto pe-0 ps-1 ps-sm-2" }),
