@@ -152,7 +152,7 @@ a:link, a:visited {
     background-color: white;
 }
 
-.bg-answer-white:hover, .bg-answer-correct:hover, .bg-answer-wrong:hover {
+.bg-answer-white:hover, .bg-answer-correct:hover, .bg-answer-wrong:hover, .bg-answer-actually-correct:hover {
     cursor: pointer;
 }
 
