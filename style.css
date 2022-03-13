@@ -277,3 +277,16 @@ a:link, a:visited {
   .small-font {
       font-size: 14px;
   }
+
+  /* table {
+      width: 30%;
+  }
+
+  tr, td {
+      padding: 10px;
+  } */
+
+
+  .bg-gradient {
+    background-image: linear-gradient(to right, #EA3452, #71FEFA, #FFA552) !important;
+  }

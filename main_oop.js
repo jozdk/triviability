@@ -545,7 +545,7 @@ class UIForSettings {
         this.mainElement = document.querySelector("#main");
         this._selectionMenuElement = new SelectionMenu();
 
-        this.render(this.mainElement, this._selectionMenuElement);
+        //this.render(this.mainElement, this._selectionMenuElement);
 
         // this.selectionElement.addEventListener("click", (event) => {
         //     if (event.target !== this.selectionElement && !event.target.classList.contains("col-sm-12")) {
