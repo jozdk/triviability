@@ -84,8 +84,8 @@ a:link, a:visited {
 }
 
 .rounded-lg {
-    border: 1px hidden black;
-    border-radius: 10px;
+    border: 1px hidden black !important;
+    border-radius: 10px !important;
 }
 
 /* #quiz-element {
@@ -113,39 +113,39 @@ a:link, a:visited {
 
 
 .bg-science, .answer-highlight-science:hover {
-    background-color: #03FCBA;
+    background-color: #03FCBA !important;
 }
 
 .bg-history, .answer-highlight-history:hover {
-    background-color: #FFF75C;
+    background-color: #FFF75C !important;
 }
 
 .bg-geography, .answer-highlight-geography:hover {
-    background-color: #D47AE8;
+    background-color: #D47AE8 !important;
 }
 
 .bg-film_and_tv, .answer-highlight-film_and_tv:hover {
-    background-color: #EA3452;
+    background-color: #EA3452 !important;
 }
 
 .bg-arts_and_literature, .answer-highlight-arts_and_literature:hover {
-    background-color: #71FEFA;
+    background-color: #71FEFA !important;
 }
 
 .bg-music, .answer-highlight-music:hover {
-    background-color: #FFA552;
+    background-color: #FFA552 !important;
 }
 
 .bg-sport_and_leisure, .answer-highlight-sport_and_leisure:hover {
-    background-color: #D2FF96;
+    background-color: #D2FF96 !important;
 }
 
 .bg-general_knowledge, .answer-highlight-general_knowledge:hover {
-    background-color: #C4AF9A;
+    background-color: #C4AF9A !important;
 }
 
 .bg-society_and_culture, .answer-highlight-society_and_culture:hover {
-    background-color: #FF579F;
+    background-color: #FF579F !important;
 }
 
 .bg-answer-white {
@@ -287,6 +287,63 @@ a:link, a:visited {
   } */
 
 
-  .bg-gradient {
-    background-image: linear-gradient(to right, #EA3452, #71FEFA, #FFA552) !important;
+  .bg-gradient-a {
+    background-image: linear-gradient(to right, #03FCBA, #FFF75C, #D47AE8) !important;
   }
+
+  .bg-gradient-b {
+      background-image: linear-gradient(to right, #EA3452, #71FEFA, #FFA552) !important;
+  }
+
+  .bg-gradient-c {
+      background-image: linear-gradient(to right, #D2FF96, #C4AF9A, #FF579F) !important;
+  }
+
+  .nr-box {
+      height: 50px;
+      width: 50px;
+  }
+
+  .bg-science-light {
+      background-color: #03fcba8a !important;
+  }
+
+  .bg-history-light {
+      background-color: #fff75c8a !important;
+  }
+
+  .bg-geography-light {
+    background-color: #d47ae88f !important;
+  }
+
+  .bg-film_and_tv-light {
+      background-color: #ea34528a !important;
+  }
+
+  .bg-arts_and_literature-light {
+      background-color: #71fef98a !important;
+  }
+
+  .bg-music-light {
+      background-color: #ffa6528a !important;
+  }
+  
+  .bg-sport_and_leisure-light {
+      background-color: #d1ff968e !important;
+  }
+
+  .bg-general_knowledge-light {
+      background-color: #c4af9a85 !important;
+  }
+
+  .bg-society_and_culture-light {
+      background-color: #ff57a08c !important;
+  }
+
+  .bg-radial-gradient {
+      background-image: radial-gradient(#03FCBA, #03fcba36) !important;
+  }
+
+  .bg-radial-gradient-history {
+    background-image: radial-gradient(#FFF75C, #fff75c3b) !important;
+}
