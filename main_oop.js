@@ -245,6 +245,7 @@ class Question {
         this.userAnswer;
         this.result = "unanswered";
         this.time = 0;
+        this.points;
     }
 
     makeMultipleChoice() {
@@ -484,14 +485,15 @@ class Quiz {
         this._questions[this._gamestate.answered].userAnswer = answer;
         this._questions[this._gamestate.answered].result = answer === this._questions[this._gamestate.answered].correctAnswer ? "correct" : "wrong";
         this._gamestate.board[this._gamestate.answered] = this._questions[this._gamestate.answered].result;
-        this._questions[this._gamestate.answered].time = this.timer.elapsed;
-        // this._gamestate.points += this._questions[this._gamestate.answered].result === "correct" ? (20 - this._questions[this._gamestate.answered].time * 0.5) : 0;
+        this._questions[this._gamestate.answered].time = exactTime;
 
         // Calculate score based on time elapsed
         if (this._questions[this._gamestate.answered].result === "correct") {
             const bonus = Math.round((20000 - exactTime) / 2000);
+            this._questions[this._gamestate.answered].points = 10 + bonus;
             this._gamestate.points += 10 + bonus;
-
+        } else {
+            this._questions[this._gamestate.answered].points = 0;
         }
 
         // this.ui.updateComponent("stats", currentQuestion, this._gamestate);
@@ -502,17 +504,6 @@ class Quiz {
 
         this._gamestate.answered++;
 
-        // setTimeout(() => {
-
-        // }, 3000)
-
-        // return {
-        //     result: currentQuestion.result,
-        //     points: this._gamestate.points,
-        //     correctAnswer: currentQuestion.correctAnswer.index
-        // }
-
-        //setTimeout(DisplayNextButton, 3000);
     }
 
     advance() {
