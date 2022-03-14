@@ -1,3 +1,188 @@
+class Stats {
+    constructor({ questions, gamestate }) {
+
+        // Calculate stats
+        const amountTotal = questions.length;
+        const correct = questions.filter(question => question.result === "correct").length;
+        const percent = correct / amountTotal * 100;
+        const colors = questions.map(question => question.category.color);
+        const times = questions.map(question => question.time);
+        const timeTotal = Math.round(times.reduce((acc, curr) => acc + curr) / 1000);
+        const average = Math.round(timeTotal / questions.length) / 1000;
+        const fastest = Math.min(...times) / 1000;
+        const categories = questions.map(question => question.category.title);
+
+        // Create Element
+        this.element = buildNode("div", { id: "stats-element", className: "container" });
+        this.children = [
+            {
+                element: buildNode("div", { className: "row justify-content-center" }),
+                children: [
+                    new StatsBox({ title: "General", colors: colors, stats: { correct: `${correct} of ${amountTotal} = ${percent}%`, score: gamestate.points, categories: categories } }),
+                    new StatsBox({ title: "Time", colors: colors, stats: { "Time (total)": timeTotal, "&#8709; time per answer": average, "Fastest correct answer": fastest } }),
+                    new StatsBox({ title: "Jokers", colors: colors, stats: { "Fifty-Fifty": "No", Switch: "No", Time: "No" } })
+                ]
+            },
+            new ControlsB(),
+            new Overview({ questions })        
+        ]
+    }
+}
+
+class Overview {
+    constructor({ questions }) {
+
+        const tableRows = Object.keys()
+
+        this.element = buildNode("div", { className: "row justify-content-center mt-5" });
+        this.children = [
+            {
+                element: buildNode("div", {  className: "col-11 col-md-10 col-xxl-9"}),
+                children: [
+                    new Table()
+                ]
+            }
+        ]
+    }
+}
+
+class ControlsB {
+    constructor() {
+        this.element = buildNode("div", { id: "controls-b", className: "row justify-content-center mt-5" });
+        this.children = [
+            {
+                element: buildNode("div", { className: "col-11 col-md-10 col-xxl-9" }),
+                children: [
+                    {
+                        element: buildNode("div", { className: "row justify-content-end" }),
+                        children: [
+                            {
+                                element: buildNode("div", { className: "col-auto" }),
+                                children: [
+                                    {
+                                        element: buildNode("button", { className: "btn btn-outline-dark" }),
+                                        children: [
+                                            {
+                                                element: buildNode("i", { className: "bi bi-grid-3x3-gap" }),
+                                                children: null
+                                            },
+                                            {
+                                                element: buildNode("span", { className: "align-middle" }),
+                                                children: [
+                                                    {
+                                                        element: document.createTextNode("Categories"),
+                                                        children: null
+                                                    }
+                                                ]
+                                            }
+                                        ]                                    
+                                    }
+                                ]                            
+                            },
+                            {
+                                element: buildNode("div", { className: "col-auto" }),
+                                children: [
+                                    {
+                                        element: buildNode("button", { className: "btn btn-outline-dark" }),
+                                        children: [
+                                            {
+                                                element: buildNode("i", { className: "bi bi-arrow-repeat" }),
+                                                children: null
+                                            },
+                                            {
+                                                element: buildNode("span", { className: "align-middle" }),
+                                                children: [
+                                                    {
+                                                        element: document.createTextNode("Play Again"),
+                                                        children: null
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+class StatsBox {
+    constructor({ colors, title, stats }) {
+        this.element = buildNode("div", { className: "col-auto mt-5" });
+        this.children = [
+            {
+                element: buildNode("div", { className: "card p-3 bg-light rounded-lg", style: { minWidth: "250px" } }),
+                children: [
+                    {
+                        element: buildNode("div", { className: "card-header rounded-lg" }),
+                        children: [
+                            {
+                                element: buildNode("span", { className: "fs-5" }),
+                                children: [
+                                    {
+                                        element: document.createTextNode(title),
+                                        children: null
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        element: buildNode("div", { className: "card-body" }),
+                        children: [
+                            new Table({ stats })
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+class Table {
+    constructor({ stats }) {
+
+        const tableRows = Object.keys(stats).forEach((key) => {
+            return new TableRow({ key, value: stats[key] });
+        })
+
+        this.element = buildNode("table", { className: "table" });
+        this.children = [
+            ...tableRows
+        ]
+    }
+}
+
+class TableRow {
+    constructor({ key, value }) {
+        this.element = buildNode("tr");
+        this.children = [
+            {
+                element: buildNode("td"),
+                children: [
+                    {
+                        element: document.createTextNode(key),
+                        children: null
+                    }
+                ]
+            },
+            {
+                element: buildNode("td", { className: "fw-bold" }),
+                children: [
+                    {
+                        element: document.createTextNode(value),
+                        children: null
+                    }
+                ]
+            }
+        ]
+    }
+}
+
 class SelectionMenu {
     constructor() {
         this.element = buildNode("div", { id: "selection-menu", className: "container" });
