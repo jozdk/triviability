@@ -10,7 +10,8 @@ class Stats {
         const timeTotal = Math.round(times.reduce((acc, curr) => acc + curr) / 1000);
         const average = Math.round(timeTotal / questions.length) / 1000;
         const fastest = Math.min(...times) / 1000;
-        const categories = questions.map(question => question.category.title);
+        const categories = questions.map(question => question.category.title).filter((category, index, arr) => arr.indexOf(category) === index);
+        console.log(categories)
 
         // Create Element
         this.element = buildNode("div", { id: "stats-element", className: "container" });
@@ -18,13 +19,15 @@ class Stats {
             {
                 element: buildNode("div", { className: "row justify-content-center" }),
                 children: [
-                    new StatsBox({ title: "General", colors: colors, stats: { correct: `${correct} of ${amountTotal} = ${percent}%`, score: gamestate.points, categories: categories } }),
-                    new StatsBox({ title: "Time", colors: colors, stats: { "Time (total)": timeTotal, "&#8709; time per answer": average, "Fastest correct answer": fastest } }),
-                    new StatsBox({ title: "Jokers", colors: colors, stats: { "Fifty-Fifty": "No", Switch: "No", Time: "No" } })
+                    new StatsBox({ title: "General", colors: colors, stats: [{ key: "Correct", value: `${correct} of ${amountTotal} = ${percent}%` }, { key: "Score", value: gamestate.points }, { key: "Categories", value: { element: buildNode("ul", { className: "list-group list-group-flush", style: { listStyle: "none" } }), children: [  ...categories.map(category => {
+                        return { element: buildNode("li", { textContent: category }) }
+                    })] } }] }),
+                    new StatsBox({ title: "Time", colors: colors, stats: [{ key: "Time (total)", value: timeTotal }, { key: "⌀ time per answer", value: average }, { key: "Fastest correct answer", value: fastest }] }),
+                    new StatsBox({ title: "Jokers", colors: colors, stats: [{ key: { element: buildNode("span", { className: "border border-dark p-1 me-1 small-font", textContent: "50:50" }) }, value: "No" }, { key: { element: buildNode("i", { className: "bi bi-arrow-left-right me-1" }) }, value: "No"}, { key: { element: buildNode("i", { className: "bi bi-hourglass-top me-1" }) }, value: "No"} ] })
                 ]
             },
             new ControlsB(),
-            new Overview({ questions })        
+            new Overview({ questions })
         ]
     }
 }
@@ -32,16 +35,51 @@ class Stats {
 class Overview {
     constructor({ questions }) {
 
-        const tableRows = Object.keys()
+        const tableData = questions.map((question, index) => {
+            return {
+                no: index + 1,
+                question: question.question,
+                answer: new AnswersList({ question }),
+                seconds: question.time,
+                points: question.points,
+                category: question.category.title
+            };
+        });
 
         this.element = buildNode("div", { className: "row justify-content-center mt-5" });
         this.children = [
             {
-                element: buildNode("div", {  className: "col-11 col-md-10 col-xxl-9"}),
+                element: buildNode("div", { className: "col-11 col-md-10 col-xxl-9" }),
                 children: [
-                    new Table()
+                    new Table({ tableData: tableData, tableHead: {no: "No", question: "Question", answer: "Your Answer", seconds: "Seconds", points: "Points", category: "Categories"} })
                 ]
             }
+        ];
+    }
+}
+
+class AnswersList {
+    constructor({ question }) {
+
+        const ListElement = (answer) => {
+            let color;
+            if (answer === question.correctAnswer) color = "green";
+            else if (question.result === "wrong" && answer === question.userAnswer) color = "darkred";
+            else color = "";
+
+            return {
+                element: buildNode("li", { className: "list-group-item", style: { color }, textContent: answer }),
+                children: null
+            };
+        }
+    
+        const listElements = question.multipleChoice.map(answer => {
+            return ListElement(answer);
+        })
+
+        this.element = buildNode("ul", { className: "list-group list-group-flush" });
+        this.children = [
+            ...listElements
         ]
     }
 }
@@ -63,7 +101,7 @@ class ControlsB {
                                         element: buildNode("button", { className: "btn btn-outline-dark" }),
                                         children: [
                                             {
-                                                element: buildNode("i", { className: "bi bi-grid-3x3-gap" }),
+                                                element: buildNode("i", { className: "bi bi-grid-3x3-gap me-1" }),
                                                 children: null
                                             },
                                             {
@@ -75,9 +113,9 @@ class ControlsB {
                                                     }
                                                 ]
                                             }
-                                        ]                                    
+                                        ]
                                     }
-                                ]                            
+                                ]
                             },
                             {
                                 element: buildNode("div", { className: "col-auto" }),
@@ -86,7 +124,7 @@ class ControlsB {
                                         element: buildNode("button", { className: "btn btn-outline-dark" }),
                                         children: [
                                             {
-                                                element: buildNode("i", { className: "bi bi-arrow-repeat" }),
+                                                element: buildNode("i", { className: "bi bi-arrow-repeat me-1" }),
                                                 children: null
                                             },
                                             {
@@ -115,10 +153,10 @@ class StatsBox {
         this.element = buildNode("div", { className: "col-auto mt-5" });
         this.children = [
             {
-                element: buildNode("div", { className: "card p-3 bg-light rounded-lg", style: { minWidth: "250px" } }),
+                element: buildNode("div", { className: "card p-3 bg-light rounded-lg", style: { minWidth: "300px" } }),
                 children: [
                     {
-                        element: buildNode("div", { className: "card-header rounded-lg" }),
+                        element: buildNode("div", { className: "card-header rounded-lg" }), // color!
                         children: [
                             {
                                 element: buildNode("span", { className: "fs-5" }),
@@ -134,7 +172,7 @@ class StatsBox {
                     {
                         element: buildNode("div", { className: "card-body" }),
                         children: [
-                            new Table({ stats })
+                            new Table({ tableData: stats })
                         ]
                     }
                 ]
@@ -144,41 +182,68 @@ class StatsBox {
 }
 
 class Table {
-    constructor({ stats }) {
+    constructor({ tableData, tableHead }) {
 
-        const tableRows = Object.keys(stats).forEach((key) => {
-            return new TableRow({ key, value: stats[key] });
+        // const tableRows = Object.keys(stats).forEach((key) => {
+        //     return new TableRow({ key, value: stats[key] });
+        // })
+        
+        const tableRows = tableData.map((item) => {
+            return new TableRow({ item });
         })
 
         this.element = buildNode("table", { className: "table" });
         this.children = [
-            ...tableRows
+            ...tableHead ? [{ element: buildNode("thead"), children: [new TableRow({ item: tableHead })] }] : [],
+            {
+                element: buildNode("tbody"),
+                children: [
+                    ...tableRows
+                ]
+            }
+            
         ]
     }
 }
 
 class TableRow {
-    constructor({ key, value }) {
+    constructor({ item }) {
+        
+        const tableCells = Object.keys(item).map(key => {
+            return new TableCell({ datum: item[key] })
+        })
+
         this.element = buildNode("tr");
         this.children = [
-            {
-                element: buildNode("td"),
-                children: [
-                    {
-                        element: document.createTextNode(key),
-                        children: null
-                    }
-                ]
-            },
-            {
-                element: buildNode("td", { className: "fw-bold" }),
-                children: [
-                    {
-                        element: document.createTextNode(value),
-                        children: null
-                    }
-                ]
-            }
+            ...tableCells
+            // {
+            //     element: buildNode("td"),
+            //     children: [
+            //         {
+            //             element: document.createTextNode(key),
+            //             children: null
+            //         }
+            //     ]
+            // },
+            // {
+            //     element: buildNode("td", { className: "fw-bold" }),
+            //     children: [
+            //         {
+            //             element: document.createTextNode(value),
+            //             children: null
+            //         }
+            //     ]
+            // }
+        ]
+    }
+}
+
+class TableCell {
+    constructor({ datum }) {
+        this.element = buildNode("td");
+        this.children = [
+            ...typeof datum === "string" || typeof datum === "number" ? [{ element: document.createTextNode(`${datum}`), children: null }] : [],
+            ...typeof datum === "object" && !Array.isArray(datum) ? [datum] : []
         ]
     }
 }
@@ -708,6 +773,11 @@ class Quiz {
         this._gamestate.board = [];
         this.ui = {};
     }
+
+    showResults() {
+        this.mainElement.innerHTML = "";
+        this.ui.render(this.mainElement, new Stats({ questions: this._questions, gamestate: this._gamestate }));
+    }
 }
 
 
@@ -820,7 +890,7 @@ function buildNode(tag, properties) {
                 Object.keys(properties[propertyName]).forEach((nestedProperty) => {
                     element[propertyName][nestedProperty] = properties[propertyName][nestedProperty];
                 })
-            } else {
+            } else if (properties[propertyName]) {
                 element[propertyName] = properties[propertyName];
             }
 
@@ -1453,14 +1523,19 @@ class NextButton {
     constructor({ result, text }) {
 
         const handler = () => {
-            if (result === "unanswered") {
-                quiz.validate(null);
-                setTimeout(() => {
+            if (text === "Next Question") {
+                if (result === "unanswered") {
+                    quiz.validate(null);
+                    setTimeout(() => {
+                        quiz.advance();
+                    }, 1000);
+                } else {
                     quiz.advance();
-                }, 1000);
-            } else {
-                quiz.advance();
+                }
+            } else if (text === "View Results") {
+                quiz.showResults();
             }
+
         }
 
         this.element = buildNode("div", { className: "col-auto pe-0 ps-1 ps-sm-2" });
@@ -1572,7 +1647,7 @@ function resultIcon(value) {
 
 
 
-const testQuestions = [{ "category": "Geography", "correctAnswer": "Africa", "id": 6696, "incorrectAnswers": ["South America", "Oceania", "Europe", "Asia", "North America"], "question": "Togo is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Sudan", "id": 6549, "incorrectAnswers": ["South Sudan", "Egypt", "Republic of the Congo", "Equatorial Guinea", "Gabon", "Benin", "Democratic Republic of the Congo", "Eritrea", "Uganda", "Togo", "São Tomé and Príncipe", "Rwanda", "Tunisia", "Malta"], "question": "Which of these countries borders Chad?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Asia", "id": 22872, "incorrectAnswers": ["Europe", "Africa", "North America", "South America"], "question": "Which is the Earth's largest continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "South America", "id": 6683, "incorrectAnswers": ["Oceania", "Europe", "Asia", "Africa", "North America"], "question": "Suriname is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Spain", "id": 5713, "incorrectAnswers": ["Portugal", "Andorra", "Mali", "Tunisia", "France", "Monaco", "Senegal", "Burkina Faso", "Switzerland", "The Gambia", "Malta", "Ireland", "Italy", "Belgium", "Luxembourg", "Liechtenstein", "Niger"], "question": "Morocco shares a land border with which of these countries?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Tripoli", "id": 19272, "incorrectAnswers": ["Benghazi", "Tunis", "Alexandria"], "question": "What is the capital of Libya?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Europe", "id": 6685, "incorrectAnswers": ["South America", "Oceania", "Asia", "Africa", "North America"], "question": "Andorra is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "East Timor", "id": 5609, "incorrectAnswers": ["Solomon Islands", "Vanuatu", "Palau", "Brunei", "Nauru", "Federated States of Micronesia", "Fiji", "Philippines", "Malaysia", "Singapore", "Tuvalu", "Kiribati", "Marshall Islands", "Cambodia", "Vietnam", "Thailand"], "question": "Which of these countries borders Australia?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Austria", "id": 19550, "incorrectAnswers": ["Croatia", "San Marino", "Bosnia and Herzegovina", "Romania", "Poland"], "question": "Which country borders Italy, Switzerland, Germany, Czech Republic, Hungary, Slovenia, and Liechtenstein?", "type": "Multiple Choice" }];
+const testQuestions = [{ "category": "Geography", "correctAnswer": "Africa", "id": 6696, "incorrectAnswers": ["South America", "Oceania", "Europe", "Asia", "North America"], "question": "Togo is located on which continent?", "type": "Multiple Choice" }, { "category": "Science", "correctAnswer": "Sudan", "id": 6549, "incorrectAnswers": ["South Sudan", "Egypt", "Republic of the Congo", "Equatorial Guinea", "Gabon", "Benin", "Democratic Republic of the Congo", "Eritrea", "Uganda", "Togo", "São Tomé and Príncipe", "Rwanda", "Tunisia", "Malta"], "question": "Which of these countries borders Chad?", "type": "Multiple Choice" }, { "category": "Arts & Literature", "correctAnswer": "Asia", "id": 22872, "incorrectAnswers": ["Europe", "Africa", "North America", "South America"], "question": "Which is the Earth's largest continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "South America", "id": 6683, "incorrectAnswers": ["Oceania", "Europe", "Asia", "Africa", "North America"], "question": "Suriname is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Spain", "id": 5713, "incorrectAnswers": ["Portugal", "Andorra", "Mali", "Tunisia", "France", "Monaco", "Senegal", "Burkina Faso", "Switzerland", "The Gambia", "Malta", "Ireland", "Italy", "Belgium", "Luxembourg", "Liechtenstein", "Niger"], "question": "Morocco shares a land border with which of these countries?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Tripoli", "id": 19272, "incorrectAnswers": ["Benghazi", "Tunis", "Alexandria"], "question": "What is the capital of Libya?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Europe", "id": 6685, "incorrectAnswers": ["South America", "Oceania", "Asia", "Africa", "North America"], "question": "Andorra is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "East Timor", "id": 5609, "incorrectAnswers": ["Solomon Islands", "Vanuatu", "Palau", "Brunei", "Nauru", "Federated States of Micronesia", "Fiji", "Philippines", "Malaysia", "Singapore", "Tuvalu", "Kiribati", "Marshall Islands", "Cambodia", "Vietnam", "Thailand"], "question": "Which of these countries borders Australia?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Austria", "id": 19550, "incorrectAnswers": ["Croatia", "San Marino", "Bosnia and Herzegovina", "Romania", "Poland"], "question": "Which country borders Italy, Switzerland, Germany, Czech Republic, Hungary, Slovenia, and Liechtenstein?", "type": "Multiple Choice" }];
 
 
 const testQuestionsB = [{ "category": "Science", "id": "622a1c3a7cc59eab6f95106f", "correctAnswer": "Dynamite", "incorrectAnswers": ["The combustion engine", "Plastic", "The printing press"], "question": "What Did Alfred Nobel Invent Before Initiating His Nobel Peace Prize Award Scheme?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950553", "correctAnswer": "the relationship between electric phenomena and bodily processes", "incorrectAnswers": ["animals", "the practice of escaping from restraints or other traps", "plant diseases"], "question": "What is Electrophysiology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950504", "correctAnswer": "the signification and application of words", "incorrectAnswers": ["statistics such as births, deaths, income, or the incidence of disease, which illustrate the changing structure of human populations", "crayfish", "butterflies and moths"], "question": "What is Lexicology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "unknown", "correctAnswer": "4", "incorrectAnswers": ["2", "3", "1"], "question": "How Many Chambers Are There In Your Heart?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f9510b3", "correctAnswer": "Jupiter", "incorrectAnswers": ["Venus", "Neptune", "Saturn"], "question": "Name the largest planet in the solar system.", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950559", "correctAnswer": "interactions among organisms and the water cycle", "incorrectAnswers": ["a variant of physiognomy", "the structure of cells", "the effect of evolution on ethology"], "question": "What is Ecohydrology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f950fd4", "correctAnswer": "Asbestos", "incorrectAnswers": ["Bleach", "Ethanol", "Methadone"], "question": "Which substance takes its name from the Greek for `not flammable'?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f950fd8", "correctAnswer": "Kidney", "incorrectAnswers": ["Liver", "Lung"], "question": "Which vital organ does the adjective renal refer to?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950544", "correctAnswer": "race", "incorrectAnswers": ["parasites", "in ethics, duty", "rocks"], "question": "What is Ethnology the study of?", "tags": [], "type": "Multiple Choice" }];
@@ -1619,3 +1694,7 @@ function rotate() {
 
 //rotate();
 
+const testQuestionsC = testQuestions.map((question) => new Question(question));
+const stats = new Stats({ questions: testQuestionsC, gamestate: { points: 132 } });
+
+depthFirstTraversalTest(document.querySelector("#main"), stats)
