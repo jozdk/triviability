@@ -501,7 +501,7 @@ class Settings {
         try {
             const categories = this.checkCategories();
             //const url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
-            const url = `https://the-trivia-api.com/questions?categories=${categories}&limit=9`
+            const url = `https://the-trivia-api.com/questions?categories=${categories}&limit=10`
             const result = await fetch(url);
             const questions = await result.json();
             quiz.init(questions);
@@ -706,9 +706,11 @@ class Quiz {
             elapsed: 0
         };
         this.ui = {};
+        this._extraQuestion;
     }
 
     init(questions) {
+        this._extraQuestion = new Question(questions.pop());
         this._questions = questions.map((question) => new Question(question));
         this._questions.forEach((question, index) => {
             this._gamestate.board[index] = question.result;
@@ -831,11 +833,27 @@ class Quiz {
                 random2 = Math.floor(Math.random() * currentQuestion.multipleChoice.length);
             }
 
-            this._questions[this._gamestate.answered].hide = { random1, random2 };
+            this._questions[this._gamestate.answered].fifty = { random1, random2 };
             this._gamestate.jokers.fifty = false;
             this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
-            //this._gamestate.jokers.fifty = "unavail";
-            //delete this._questions[this._gamestate.answered].hide;
+        } else if (joker === "time" && this._gamestate.jokers.time) {
+            this.resetTimer();
+            this._questions[this._gamestate.answered].time = true;
+            this._gamestate.jokers.time = false;
+            this.ui.quizElement = new QuizComponent({ question:  this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer});
+            this.startTimer();
+        } else if (joker === "switch" && this._gamestate.jokers.switch) {            
+            clearInterval(this.timer.timeInterval);
+            this._gamestate.jokers.switch = false;
+            this._questions[this._gamestate.answered].switch = true;
+            this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer});
+            setTimeout(() => {
+                this._questions[this._gamestate.answered] = this._extraQuestion;
+                this._questions[this._gamestate.answered].switched = true;
+                this.timer.elapsed = 0;
+                this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer});
+                this.startTimer();
+            }, 1000);
         }
     }
 }
@@ -1297,7 +1315,7 @@ class QuestionHeader {
                                 element: buildNode("div", { className: "col-2 text-start text-sm-end px-1 px-sm-2" }),
                                 children: [
                                     {
-                                        element: buildNode("i", { id: "time", className: "bi bi-hourglass-top fs-4 p-1 cursor joker-highlight", onclick: jokers.time ? handler : null }),
+                                        element: buildNode("i", { id: "time", className: `bi bi-hourglass-top fs-4 p-1 cursor ${jokers.time ? "joker-highlight" : "selected"}`, onclick: jokers.time ? handler : null }),
                                         children: null
                                     }
                                 ]
@@ -1306,7 +1324,7 @@ class QuestionHeader {
                                 element: buildNode("div", { className: "col-2 text-start text-sm-end px-1 px-sm-2" }),
                                 children: [
                                     {
-                                        element: buildNode("i", { id: "switch", className: "bi bi-arrow-left-right fs-4 p-1 cursor joker-highlight", onclick: jokers.switch ? handler : null }),
+                                        element: buildNode("i", { id: "switch", className: `bi bi-arrow-left-right fs-4 p-1 cursor ${jokers.switch ? "joker-highlight" : "selected"}`, onclick: jokers.switch ? handler : null }),
                                         children: null
                                     }
                                 ]
@@ -1386,7 +1404,7 @@ class Answers {
         //         handler }));
         // }
 
-        const handler = question.result === "unanswered" ? (event) => quiz.validate(event.target.textContent) : null;
+        const handler = question.result === "unanswered" && !question.switch ? (event) => quiz.validate(event.target.textContent) : null;
 
         const answers = question.multipleChoice.map((answer, index) => {
 
@@ -1402,11 +1420,15 @@ class Answers {
                 return new Answer({ answer, color: "actually-correct", category: { color: undefined }, handler });
             }
 
-            if (question.hide && (index === question.hide.random1 || index === question.hide.random2)) {
+            if (question.fifty && (index === question.fifty.random1 || index === question.fifty.random2)) {
                 return new Answer({ answer: null, color: null, category: null, handler: null });
             }
 
-            if (question.result !== "unanswered") {
+            if (question.switch && answer === question.correctAnswer) {
+                return new Answer({ answer, color: "actually-correct", category: { color: undefined }, handler })
+            }
+
+            if (question.result !== "unanswered" || question.switch) {
                 return new Answer({ answer, color: "white", category: { color: undefined }, handler })
             }
 
@@ -1838,6 +1860,19 @@ const testQuestionsScience = [
             "feces"
         ],
         "question": "What is Cryptology the study of?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c377cc59eab6f950540",
+        "correctAnswer": "writing systems",
+        "incorrectAnswers": [
+          "the field of dermatological anatomical pathology",
+          "the atmosphere",
+          "existence"
+        ],
+        "question": "What is Grammatology the study of?",
         "tags": [],
         "type": "Multiple Choice"
     }
