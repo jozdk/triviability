@@ -27,9 +27,9 @@ class Stats {
                             ["Score", gamestate.points],
                             ["Categories", {
                                 element: buildNode("ul", { className: "list-group list-group-flush", style: { listStyle: "none" } }),
-                                children: [ ...categories.map((cat) => {
+                                children: [...categories.map((cat) => {
                                     return { element: buildNode("li", { textContent: cat }) };
-                                }) ]
+                                })]
                             }]
                         ]
                     }),
@@ -46,9 +46,9 @@ class Stats {
                         title: "Jokers",
                         colors: colors,
                         stats: [
-                            [ { element: buildNode("span", { className: "border border-dark p-1 me-1 small-font", textContent: "50:50" }) }, "No" ],
-                            [ { element: buildNode("i", { className: "bi bi-arrow-left-right me-1" }) }, "No" ],
-                            [ { element: buildNode("i", { className: "bi bi-hourglass-top me-1" }) }, "No" ]
+                            [{ element: buildNode("span", { className: "border border-dark p-1 me-1 small-font", textContent: "50:50" }) }, "No"],
+                            [{ element: buildNode("i", { className: "bi bi-arrow-left-right me-1" }) }, "No"],
+                            [{ element: buildNode("i", { className: "bi bi-hourglass-top me-1" }) }, "No"]
                         ]
                     })
                 ]
@@ -100,7 +100,7 @@ class AnswersList {
                 children: null
             };
         }
-    
+
         const listElements = question.multipleChoice.map(answer => {
             return ListElement(answer);
         })
@@ -227,7 +227,7 @@ class Table {
                 headProps[index] = { style: { fontWeight: "bold" } }
             })
         }
-        
+
         const tableRows = tableData.map((row, index) => {
             return new TableRow({ row, props: props[index] });
         })
@@ -235,18 +235,19 @@ class Table {
         this.element = buildNode("table", { className: "table" });
         this.children = [
             ...tableHead ? [
-            {
-                element: buildNode("thead"), 
-                children: [
-                    new TableRow({ row: tableHead, props: headProps })
-                ] }] : [],
+                {
+                    element: buildNode("thead"),
+                    children: [
+                        new TableRow({ row: tableHead, props: headProps })
+                    ]
+                }] : [],
             {
                 element: buildNode("tbody"),
                 children: [
                     ...tableRows
                 ]
             }
-            
+
         ]
     }
 }
@@ -693,7 +694,12 @@ class Quiz {
         this._gamestate = {
             answered: 0,
             points: 0,
-            board: []
+            board: [],
+            jokers: {
+                fifty: "avail",
+                switch: "avail",
+                time: "avail"
+            }
         };
         this.timer = {
             total: 20,
@@ -768,7 +774,7 @@ class Quiz {
         this._questions[this._gamestate.answered].userAnswer = answer;
         this._questions[this._gamestate.answered].result = answer === this._questions[this._gamestate.answered].correctAnswer ? "correct" : "wrong";
         this._gamestate.board[this._gamestate.answered] = this._questions[this._gamestate.answered].result;
-        this._questions[this._gamestate.answered].time = exactTime;
+        this._questions[this._gamestate.answered].time = exactTime <= 20000 ? exactTime : 20000;
 
         // Calculate score based on time elapsed
         if (this._questions[this._gamestate.answered].result === "correct") {
@@ -807,9 +813,30 @@ class Quiz {
         this.ui = {};
     }
 
+    // Highly preliminary. It is to be considered if there should be one more controlling Stats Object next to Settings and Quiz, where the calculations of 
+    // stats take place and which passes them to the stats component. Or the UI Objects for Quiz and Settings need to be incorporated by the components, that
+    // would be responsible for their own rendering then
     showResults() {
         document.querySelector("#main").innerHTML = "";
         this.ui.render(document.querySelector("#main"), new Stats({ questions: this._questions, gamestate: this._gamestate }));
+    }
+
+    useJoker(joker) {
+        if (joker === "fifty" && this._gamestate.jokers.fifty === "avail") {
+            const currentQuestion = this._questions[this._gamestate.answered];
+            let random1, random2;
+
+            while (currentQuestion.multipleChoice[random1] === currentQuestion.correctAnswer || currentQuestion.multipleChoice[random2] === currentQuestion.correctAnswer || random1 === random2) {
+                random1 = Math.floor(Math.random() * currentQuestion.multipleChoice.length);
+                random2 = Math.floor(Math.random() * currentQuestion.multipleChoice.length);
+            }
+
+            this._questions[this._gamestate.answered].hide = { random1, random2 };
+            this._gamestate.jokers.fifty = "active";
+            this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
+            this._gamestate.jokers.fifty = "unavail";
+            //delete this._questions[this._gamestate.answered].hide;
+        }
     }
 }
 
@@ -824,7 +851,7 @@ class UIForSettings {
         this.mainElement = document.querySelector("#main");
         this._selectionMenuElement = new SelectionMenu();
 
-        this.render(this.mainElement, this._selectionMenuElement);
+        //this.render(this.mainElement, this._selectionMenuElement);
 
         // this.selectionElement.addEventListener("click", (event) => {
         //     if (event.target !== this.selectionElement && !event.target.classList.contains("col-sm-12")) {
@@ -945,10 +972,10 @@ class QuizComponent {
                     children: [
                         new InfoRail({ question, gamestate, timer }),
                         {
-                            element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-8 col-xxl-7 mt-5" }),
+                            element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-8 col-xxl-7 mt-5 d-flex flex-column", style: { minHeight: "539px" } }),
                             children: [
-                                new QuestionComponent({ category: question.category, question: question.question }),
-                                new Answers({ question })
+                                new QuestionComponent({ category: question.category, question: question.question, jokers: gamestate.jokers }),
+                                new Answers({ question, jokers: gamestate.jokers })
                             ]
                         }
                     ]
@@ -1223,13 +1250,13 @@ class BoardField {
 }
 
 class QuestionComponent {
-    constructor({ category, question }) {
+    constructor({ category, question, jokers }) {
         this.element = buildNode("div", { id: "question-component", className: "row" });
         this.children = [
             {
                 element: buildNode("div", { className: "col bg-light rounded-lg" }),
                 children: [
-                    new QuestionHeader({ category }),
+                    new QuestionHeader({ category, jokers }),
                     new QuestionText({ question })
                 ]
             }
@@ -1238,7 +1265,12 @@ class QuestionComponent {
 }
 
 class QuestionHeader {
-    constructor({ category }) {
+    constructor({ category, jokers }) {
+
+        const handler = (event) => {
+            quiz.useJoker(event.target.id);
+        }
+
         this.element = buildNode("div", { id: "question-header-component", className: "row mb-1 p-3" });
         this.children = [
             {
@@ -1265,7 +1297,7 @@ class QuestionHeader {
                                 element: buildNode("div", { className: "col-2 text-start text-sm-end px-1 px-sm-2" }),
                                 children: [
                                     {
-                                        element: buildNode("i", { className: "bi bi-hourglass-top fs-4 p-1 cursor joker-highlight" }),
+                                        element: buildNode("i", { id: "time", className: "bi bi-hourglass-top fs-4 p-1 cursor joker-highlight", onclick: jokers.time === "avail" ? handler : null }),
                                         children: null
                                     }
                                 ]
@@ -1274,7 +1306,7 @@ class QuestionHeader {
                                 element: buildNode("div", { className: "col-2 text-start text-sm-end px-1 px-sm-2" }),
                                 children: [
                                     {
-                                        element: buildNode("i", { className: "bi bi-arrow-left-right fs-4 p-1 cursor joker-highlight" }),
+                                        element: buildNode("i", { id: "switch", className: "bi bi-arrow-left-right fs-4 p-1 cursor joker-highlight", onclick: jokers.switch === "avail" ? handler : null }),
                                         children: null
                                     }
                                 ]
@@ -1283,7 +1315,7 @@ class QuestionHeader {
                                 element: buildNode("div", { className: "col-2 d-flex align-items-center justify-content-end px-0 px-sm-2" }),
                                 children: [
                                     {
-                                        element: buildNode("strong", { className: "border border-dark p-1 cursor fifty-fifty joker-highlight" }),
+                                        element: buildNode("strong", { id: "fifty", className: "border border-dark p-1 cursor fifty-fifty joker-highlight", onclick: jokers.fifty === "avail" ? handler : null }),
                                         children: [
                                             {
                                                 element: document.createTextNode("50:50"),
@@ -1324,7 +1356,7 @@ class QuestionText {
 }
 
 class Answers {
-    constructor({ question }) {
+    constructor({ question, jokers }) {
 
         // let answers;
 
@@ -1356,29 +1388,35 @@ class Answers {
 
         const handler = question.result === "unanswered" ? (event) => quiz.validate(event.target.textContent) : null;
 
-        const answers = question.multipleChoice.map((answer) => {
+        console.log(question)
+
+        const answers = question.multipleChoice.map((answer, index) => {
 
             if (question.result === "correct" && answer === question.correctAnswer) {
-                return new Answer({ answer: answer, result: "correct", category: { color: undefined }, handler: handler });
+                return new Answer({ answer, color: "correct", category: { color: undefined }, handler });
             }
 
             if (question.result === "wrong" && answer === question.userAnswer) {
-                return new Answer({ answer: answer, result: "wrong", category: { color: undefined }, handler: handler });
+                return new Answer({ answer, color: "wrong", category: { color: undefined }, handler });
             }
 
             if (question.result === "wrong" && answer === question.correctAnswer) {
-                return new Answer({ answer: answer, result: "actually-correct", category: { color: undefined }, handler: handler });
+                return new Answer({ answer, color: "actually-correct", category: { color: undefined }, handler });
+            }
+
+            if (question.hide && (index === question.hide.random1 || index === question.hide.random2)) {
+                return new Answer({ answer: null, color: null, category: null, handler: null });
             }
 
             if (question.result !== "unanswered") {
-                return new Answer({ answer, result: "white", category: { color: undefined }, handler: handler })
+                return new Answer({ answer, color: "white", category: { color: undefined }, handler })
             }
 
-            return new Answer({ answer: answer, result: "white", category: question.category, handler: handler });
+            return new Answer({ answer, color: "white", category: question.category, handler });
 
         })
 
-        this.element = buildNode("div", { id: "answers-component", className: "row" });
+        this.element = buildNode("div", { id: "answers-component", className: "row flex-grow-1" });
         this.children = [
             {
                 element: buildNode("div", { className: "col bg-light rounded-lg mt-2" }),
@@ -1396,18 +1434,20 @@ class Answers {
 }
 
 class Answer {
-    constructor({ answer, result, category, handler }) {
-        this.element = buildNode("div", { className: "col-md-6 px-3 px-md-2" });
+    constructor({ answer, color, category, handler }) {
+
+        this.element = buildNode("div", { className: `col-md-6 px-3 px-md-2 ${answer ? "" : "mt-0"}` });
         this.children = [
-            {
-                element: buildNode("p", { className: `rounded-lg p-2 py-md-5 my-0 bg-answer-${result} border answer-highlight-${category.color}`, onclick: handler }),
+            ... answer ?
+            [{
+                element: buildNode("p", { className: `rounded-lg p-2 py-md-5 my-0 bg-answer-${color} border answer-highlight-${category.color}`, onclick: handler }),
                 children: [
                     {
                         element: document.createTextNode(answer),
                         children: null
                     }
                 ]
-            }
+            }] : []
         ]
     }
 }
@@ -1685,7 +1725,7 @@ const testQuestions = [{ "category": "Geography", "correctAnswer": "Africa", "id
 
 const testQuestionsB = [{ "category": "Science", "id": "622a1c3a7cc59eab6f95106f", "correctAnswer": "Dynamite", "incorrectAnswers": ["The combustion engine", "Plastic", "The printing press"], "question": "What Did Alfred Nobel Invent Before Initiating His Nobel Peace Prize Award Scheme?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950553", "correctAnswer": "the relationship between electric phenomena and bodily processes", "incorrectAnswers": ["animals", "the practice of escaping from restraints or other traps", "plant diseases"], "question": "What is Electrophysiology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950504", "correctAnswer": "the signification and application of words", "incorrectAnswers": ["statistics such as births, deaths, income, or the incidence of disease, which illustrate the changing structure of human populations", "crayfish", "butterflies and moths"], "question": "What is Lexicology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "unknown", "correctAnswer": "4", "incorrectAnswers": ["2", "3", "1"], "question": "How Many Chambers Are There In Your Heart?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f9510b3", "correctAnswer": "Jupiter", "incorrectAnswers": ["Venus", "Neptune", "Saturn"], "question": "Name the largest planet in the solar system.", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950559", "correctAnswer": "interactions among organisms and the water cycle", "incorrectAnswers": ["a variant of physiognomy", "the structure of cells", "the effect of evolution on ethology"], "question": "What is Ecohydrology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f950fd4", "correctAnswer": "Asbestos", "incorrectAnswers": ["Bleach", "Ethanol", "Methadone"], "question": "Which substance takes its name from the Greek for `not flammable'?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f950fd8", "correctAnswer": "Kidney", "incorrectAnswers": ["Liver", "Lung"], "question": "Which vital organ does the adjective renal refer to?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950544", "correctAnswer": "race", "incorrectAnswers": ["parasites", "in ethics, duty", "rocks"], "question": "What is Ethnology the study of?", "tags": [], "type": "Multiple Choice" }];
 
-//quiz.init(testQuestions);
+quiz.init(testQuestions);
 
 const secondHalf = document.querySelector(".second-half-js");
 const firstHalf = document.querySelector(".first-half-js");

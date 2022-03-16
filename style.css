@@ -274,6 +274,10 @@ a:link, a:visited {
     background-color: rgba(255, 255, 255, 0.418);
   }
 
+  .joker-used {
+    background-color: rgba(255, 255, 255, 0.418);
+  }
+
   .small-font {
       font-size: 14px;
   }
