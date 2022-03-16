@@ -160,6 +160,10 @@ a:link, a:visited {
     .bg-custom {
         background-color: #D2FF96;
     }
+
+    .answer-box {
+        min-height: 46px;
+    }
 }
 
 @media (max-width: 576px) {
@@ -167,6 +171,13 @@ a:link, a:visited {
         font-size: 13px;
     }
 }
+
+@media (min-width: 768px) {
+    .answer-box {
+        min-height: 126px;
+    }
+}
+
 
 .bg-answer-correct {
     background-color: green;
@@ -274,9 +285,9 @@ a:link, a:visited {
     background-color: rgba(255, 255, 255, 0.418);
   }
 
-  .joker-used {
-    background-color: rgba(255, 255, 255, 0.418);
-  }
+  /* .joker-used {
+    filter: opacity(25%);
+  } */
 
   .small-font {
       font-size: 14px;

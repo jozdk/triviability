@@ -696,9 +696,9 @@ class Quiz {
             points: 0,
             board: [],
             jokers: {
-                fifty: "avail",
-                switch: "avail",
-                time: "avail"
+                fifty: true,
+                switch: true,
+                time: true
             }
         };
         this.timer = {
@@ -822,7 +822,7 @@ class Quiz {
     }
 
     useJoker(joker) {
-        if (joker === "fifty" && this._gamestate.jokers.fifty === "avail") {
+        if (joker === "fifty" && this._gamestate.jokers.fifty) {
             const currentQuestion = this._questions[this._gamestate.answered];
             let random1, random2;
 
@@ -832,9 +832,9 @@ class Quiz {
             }
 
             this._questions[this._gamestate.answered].hide = { random1, random2 };
-            this._gamestate.jokers.fifty = "active";
+            this._gamestate.jokers.fifty = false;
             this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
-            this._gamestate.jokers.fifty = "unavail";
+            //this._gamestate.jokers.fifty = "unavail";
             //delete this._questions[this._gamestate.answered].hide;
         }
     }
@@ -972,10 +972,10 @@ class QuizComponent {
                     children: [
                         new InfoRail({ question, gamestate, timer }),
                         {
-                            element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-8 col-xxl-7 mt-5 d-flex flex-column", style: { minHeight: "539px" } }),
+                            element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-8 col-xxl-7 mt-5" }),
                             children: [
                                 new QuestionComponent({ category: question.category, question: question.question, jokers: gamestate.jokers }),
-                                new Answers({ question, jokers: gamestate.jokers })
+                                new Answers({ question })
                             ]
                         }
                     ]
@@ -1297,7 +1297,7 @@ class QuestionHeader {
                                 element: buildNode("div", { className: "col-2 text-start text-sm-end px-1 px-sm-2" }),
                                 children: [
                                     {
-                                        element: buildNode("i", { id: "time", className: "bi bi-hourglass-top fs-4 p-1 cursor joker-highlight", onclick: jokers.time === "avail" ? handler : null }),
+                                        element: buildNode("i", { id: "time", className: "bi bi-hourglass-top fs-4 p-1 cursor joker-highlight", onclick: jokers.time ? handler : null }),
                                         children: null
                                     }
                                 ]
@@ -1306,7 +1306,7 @@ class QuestionHeader {
                                 element: buildNode("div", { className: "col-2 text-start text-sm-end px-1 px-sm-2" }),
                                 children: [
                                     {
-                                        element: buildNode("i", { id: "switch", className: "bi bi-arrow-left-right fs-4 p-1 cursor joker-highlight", onclick: jokers.switch === "avail" ? handler : null }),
+                                        element: buildNode("i", { id: "switch", className: "bi bi-arrow-left-right fs-4 p-1 cursor joker-highlight", onclick: jokers.switch ? handler : null }),
                                         children: null
                                     }
                                 ]
@@ -1315,7 +1315,7 @@ class QuestionHeader {
                                 element: buildNode("div", { className: "col-2 d-flex align-items-center justify-content-end px-0 px-sm-2" }),
                                 children: [
                                     {
-                                        element: buildNode("strong", { id: "fifty", className: "border border-dark p-1 cursor fifty-fifty joker-highlight", onclick: jokers.fifty === "avail" ? handler : null }),
+                                        element: buildNode("strong", { id: "fifty", className: `border border-dark p-1 cursor fifty-fifty ${jokers.fifty ? "joker-highlight" : "selected"}`, onclick: jokers.fifty ? handler : null }),
                                         children: [
                                             {
                                                 element: document.createTextNode("50:50"),
@@ -1356,7 +1356,7 @@ class QuestionText {
 }
 
 class Answers {
-    constructor({ question, jokers }) {
+    constructor({ question }) {
 
         // let answers;
 
@@ -1388,8 +1388,6 @@ class Answers {
 
         const handler = question.result === "unanswered" ? (event) => quiz.validate(event.target.textContent) : null;
 
-        console.log(question)
-
         const answers = question.multipleChoice.map((answer, index) => {
 
             if (question.result === "correct" && answer === question.correctAnswer) {
@@ -1416,7 +1414,7 @@ class Answers {
 
         })
 
-        this.element = buildNode("div", { id: "answers-component", className: "row flex-grow-1" });
+        this.element = buildNode("div", { id: "answers-component", className: "row" });
         this.children = [
             {
                 element: buildNode("div", { className: "col bg-light rounded-lg mt-2" }),
@@ -1436,18 +1434,18 @@ class Answers {
 class Answer {
     constructor({ answer, color, category, handler }) {
 
-        this.element = buildNode("div", { className: `col-md-6 px-3 px-md-2 ${answer ? "" : "mt-0"}` });
+        this.element = buildNode("div", { className: "col-md-6 px-3 px-md-2 answer-box" });
         this.children = [
-            ... answer ?
-            [{
-                element: buildNode("p", { className: `rounded-lg p-2 py-md-5 my-0 bg-answer-${color} border answer-highlight-${category.color}`, onclick: handler }),
-                children: [
-                    {
-                        element: document.createTextNode(answer),
-                        children: null
-                    }
-                ]
-            }] : []
+            ...answer ?
+                [{
+                    element: buildNode("p", { className: `rounded-lg p-2 py-md-5 my-0 bg-answer-${color} border answer-highlight-${category.color}`, onclick: handler }),
+                    children: [
+                        {
+                            element: document.createTextNode(answer),
+                            children: null
+                        }
+                    ]
+                }] : []
         ]
     }
 }
@@ -1725,7 +1723,127 @@ const testQuestions = [{ "category": "Geography", "correctAnswer": "Africa", "id
 
 const testQuestionsB = [{ "category": "Science", "id": "622a1c3a7cc59eab6f95106f", "correctAnswer": "Dynamite", "incorrectAnswers": ["The combustion engine", "Plastic", "The printing press"], "question": "What Did Alfred Nobel Invent Before Initiating His Nobel Peace Prize Award Scheme?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950553", "correctAnswer": "the relationship between electric phenomena and bodily processes", "incorrectAnswers": ["animals", "the practice of escaping from restraints or other traps", "plant diseases"], "question": "What is Electrophysiology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950504", "correctAnswer": "the signification and application of words", "incorrectAnswers": ["statistics such as births, deaths, income, or the incidence of disease, which illustrate the changing structure of human populations", "crayfish", "butterflies and moths"], "question": "What is Lexicology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "unknown", "correctAnswer": "4", "incorrectAnswers": ["2", "3", "1"], "question": "How Many Chambers Are There In Your Heart?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f9510b3", "correctAnswer": "Jupiter", "incorrectAnswers": ["Venus", "Neptune", "Saturn"], "question": "Name the largest planet in the solar system.", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950559", "correctAnswer": "interactions among organisms and the water cycle", "incorrectAnswers": ["a variant of physiognomy", "the structure of cells", "the effect of evolution on ethology"], "question": "What is Ecohydrology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f950fd4", "correctAnswer": "Asbestos", "incorrectAnswers": ["Bleach", "Ethanol", "Methadone"], "question": "Which substance takes its name from the Greek for `not flammable'?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f950fd8", "correctAnswer": "Kidney", "incorrectAnswers": ["Liver", "Lung"], "question": "Which vital organ does the adjective renal refer to?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950544", "correctAnswer": "race", "incorrectAnswers": ["parasites", "in ethics, duty", "rocks"], "question": "What is Ethnology the study of?", "tags": [], "type": "Multiple Choice" }];
 
-quiz.init(testQuestions);
+const testQuestionsScience = [
+    {
+        "category": "Science",
+        "id": "622a1c3a7cc59eab6f9510b9",
+        "correctAnswer": "Aves",
+        "incorrectAnswers": [
+            "Birdilia",
+            "Flowana",
+            "Aerilys"
+        ],
+        "question": "In the animal kingdom, if reptiles are in class reptilia, then birds are in class ____?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c377cc59eab6f9504e7",
+        "correctAnswer": "nerves",
+        "incorrectAnswers": [
+            "embryos",
+            "the study and psychology of organisms with regard to their functions and structures",
+            "mollusks"
+        ],
+        "question": "What is Neurology the study of?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c377cc59eab6f9505aa",
+        "correctAnswer": "algae",
+        "incorrectAnswers": [
+            "the interrelationships between living organisms and their environment",
+            "study of human characteristics",
+            "the same as otolaryngology"
+        ],
+        "question": "What is Algology the study of?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c3a7cc59eab6f951071",
+        "correctAnswer": "Leeches",
+        "incorrectAnswers": [
+            "Vampire Bats",
+            "Cobras",
+            "Wasps"
+        ],
+        "question": "What Creatures Were Frequently Used To Bleed Patients In The Nineteeth Century?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c3a7cc59eab6f9510f2",
+        "correctAnswer": "Cloud",
+        "incorrectAnswers": [
+            "Planet",
+            "Island",
+            "Volcano"
+        ],
+        "question": "Cirrus and Cumulus are types of what?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c377cc59eab6f950583",
+        "correctAnswer": "the study and the art of bell ringing",
+        "incorrectAnswers": [
+            "the specialty in medicine that deals with diseases of the lungs and the respiratory tract",
+            "internal secretory glands",
+            "the effect of evolution on ethology"
+        ],
+        "question": "What is Campanology the study of?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c3a7cc59eab6f95104f",
+        "correctAnswer": "Distance",
+        "incorrectAnswers": [
+            "Time",
+            "Pressure",
+            "Magnetism"
+        ],
+        "question": " What does a micron measure?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c377cc59eab6f950494",
+        "correctAnswer": "a branch of geology that studies sediments",
+        "incorrectAnswers": [
+            "bones",
+            "the study and treatment of diseases of the urogenital tract",
+            "the eyes"
+        ],
+        "question": "What is Sedimentology the study of?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c377cc59eab6f95056b",
+        "correctAnswer": "how to encrypt and decrypt secret messages",
+        "incorrectAnswers": [
+            "animal diseases",
+            "sacred texts",
+            "feces"
+        ],
+        "question": "What is Cryptology the study of?",
+        "tags": [],
+        "type": "Multiple Choice"
+    }
+]
+
+quiz.init(testQuestionsScience);
 
 const secondHalf = document.querySelector(".second-half-js");
 const firstHalf = document.querySelector(".first-half-js");
