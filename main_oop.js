@@ -46,9 +46,9 @@ class Stats {
                         title: "Jokers",
                         colors: colors,
                         stats: [
-                            [{ element: buildNode("span", { className: "border border-dark p-1 me-1 small-font", textContent: "50:50" }) }, "No"],
-                            [{ element: buildNode("i", { className: "bi bi-arrow-left-right me-1" }) }, "No"],
-                            [{ element: buildNode("i", { className: "bi bi-hourglass-top me-1" }) }, "No"]
+                            [{ element: buildNode("span", { className: "border border-dark p-1 me-1 small-font", textContent: "50:50" }) }, gamestate.jokers.fifty ? "Not used" : "Used"],
+                            [{ element: buildNode("i", { className: "bi bi-arrow-left-right me-1" }) }, gamestate.jokers.switch ? "Not used" : "Used"],
+                            [{ element: buildNode("i", { className: "bi bi-hourglass-top me-1" }) }, gamestate.jokers.time ? "Not used" : "Used"]
                         ]
                     })
                 ]
@@ -812,6 +812,7 @@ class Quiz {
         this._gamestate.answered = 0;
         this._gamestate.points = 0;
         this._gamestate.board = [];
+        this._gamestate.jokers = { fifty: true, switch: true, time: true };
         this.ui = {};
     }
 
@@ -869,7 +870,7 @@ class UIForSettings {
         this.mainElement = document.querySelector("#main");
         this._selectionMenuElement = new SelectionMenu();
 
-        //this.render(this.mainElement, this._selectionMenuElement);
+        this.render(this.mainElement, this._selectionMenuElement);
 
         // this.selectionElement.addEventListener("click", (event) => {
         //     if (event.target !== this.selectionElement && !event.target.classList.contains("col-sm-12")) {
@@ -1359,7 +1360,7 @@ class QuestionText {
                 element: buildNode("div", { className: "col text-center p-4 p-md-5" }),
                 children: [
                     {
-                        element: buildNode("p", { className: "lead" }),
+                        element: buildNode("p", { className: "lead", style: { userSelect: "none" } }),
                         children: [
                             {
                                 element: document.createTextNode(question),
@@ -1878,7 +1879,7 @@ const testQuestionsScience = [
     }
 ]
 
-quiz.init(testQuestionsScience);
+//quiz.init(testQuestionsScience);
 
 const secondHalf = document.querySelector(".second-half-js");
 const firstHalf = document.querySelector(".first-half-js");
