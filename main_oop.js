@@ -4,7 +4,7 @@ class Stats {
         // Calculate stats
         const amountTotal = questions.length;
         const correct = questions.filter(question => question.result === "correct").length;
-        const percent = (correct / amountTotal * 100).toFixed(2);
+        const percent = (correct / amountTotal * 100) % 1 === 0 ? (correct / amountTotal * 100) : (correct / amountTotal * 100).toFixed(2);
         const colors = questions.map(question => question.category.color).filter((cat, i, arr) => arr.indexOf(cat) === i);
         const times = questions.map(question => question.time);
         const timeTotal = times.reduce((acc, curr) => acc + curr) / 1000;
@@ -193,7 +193,7 @@ class StatsBox {
                 element: buildNode("div", { className: "card p-3 bg-light rounded-lg", style: { minWidth: "300px" } }),
                 children: [
                     {
-                        element: buildNode("div", { className: "card-header rounded-lg", style: { backgroundImage: `linear-gradient(to right, ${colors.map(color => hexColors[color]).sort(() => 0.5 - Math.random())})` } }),
+                        element: buildNode("div", { className: `card-header rounded-lg${colors.length === 1 ? ` bg-${colors}` : ""}`, style: { backgroundImage: colors.length > 1 ? `linear-gradient(to right, ${colors.map(color => hexColors[color]).sort(() => 0.5 - Math.random())})` : "" } }),
                         children: [
                             {
                                 element: buildNode("span", { className: "fs-5" }),
@@ -337,39 +337,37 @@ class Categories {
         }
 
         const handler = (event) => {
-            if (event.target !== this.selectionElement && !event.target.classList.contains("col-sm-12")) {
-                const elements = event.composedPath();
-                const targetElement = elements.find(element => element.classList.contains("category"));
-                const category = targetElement.firstElementChild.lastElementChild.innerText;
-                switch (category) {
-                    case "Science":
-                        this.toggleSelection(targetElement, "science");
-                        break;
-                    case "History":
-                        this.toggleSelection(targetElement, "history");
-                        break;
-                    case "Geography":
-                        this.toggleSelection(targetElement, "geography");
-                        break;
-                    case "Film & TV":
-                        this.toggleSelection(targetElement, "movies");
-                        break;
-                    case "Arts & Literature":
-                        this.toggleSelection(targetElement, "literature");
-                        break;
-                    case "Music":
-                        this.toggleSelection(targetElement, "music");
-                        break;
-                    case "Sport & Leisure":
-                        this.toggleSelection(targetElement, "sport_and_leisure");
-                        break;
-                    case "General Knowledge":
-                        this.toggleSelection(targetElement, "general_knowledge");
-                        break;
-                    case "Society & Culture":
-                        this.toggleSelection(targetElement, "society_and_culture");
-                        break;
-                }
+            const elements = event.composedPath();
+            const targetElement = elements.find(element => element.classList && element.classList.contains("category"));
+            const category = targetElement ? targetElement.firstElementChild.lastElementChild.innerText : null;
+            switch (category) {
+                case "Science":
+                    this.toggleSelection(targetElement, "science");
+                    break;
+                case "History":
+                    this.toggleSelection(targetElement, "history");
+                    break;
+                case "Geography":
+                    this.toggleSelection(targetElement, "geography");
+                    break;
+                case "Film & TV":
+                    this.toggleSelection(targetElement, "movies");
+                    break;
+                case "Arts & Literature":
+                    this.toggleSelection(targetElement, "literature");
+                    break;
+                case "Music":
+                    this.toggleSelection(targetElement, "music");
+                    break;
+                case "Sport & Leisure":
+                    this.toggleSelection(targetElement, "sport_and_leisure");
+                    break;
+                case "General Knowledge":
+                    this.toggleSelection(targetElement, "general_knowledge");
+                    break;
+                case "Society & Culture":
+                    this.toggleSelection(targetElement, "society_and_culture");
+                    break;
             }
         }
 
@@ -378,13 +376,13 @@ class Categories {
                 return new Category(category);
             });
 
-        this.element = buildNode("div", { id: "category-selection", className: "row mt-3 mb-3 justify-content-center", onclick: handler });
+        this.element = buildNode("div", { id: "category-selection", className: "row mt-3 mb-3 justify-content-center" });
         this.children = [
             {
                 element: buildNode("div", { className: "col-md-9 col-xl-8" }),
                 children: [
                     {
-                        element: buildNode("div", { className: "row justify-content-center gy-4" }),
+                        element: buildNode("div", { className: "row justify-content-center gy-4", onclick: handler }),
                         children: [
                             ...categories
                         ]
@@ -471,6 +469,7 @@ class Settings {
     constructor() {
         this._categories = [];
         this.ui = new UIForSettings();
+        this.originalQuestions;
     }
 
     set categories(selected) {
@@ -504,6 +503,7 @@ class Settings {
             const url = `https://the-trivia-api.com/questions?categories=${categories}&limit=10`
             const result = await fetch(url);
             const questions = await result.json();
+            this.originalQuestions = questions;
             quiz.init(questions);
         } catch (error) {
             console.log(error.message);
@@ -698,7 +698,7 @@ class Quiz {
             jokers: {
                 fifty: true,
                 switch: true,
-                time: true
+                lookup: true
             }
         };
         this.timer = {
@@ -812,7 +812,7 @@ class Quiz {
         this._gamestate.answered = 0;
         this._gamestate.points = 0;
         this._gamestate.board = [];
-        this._gamestate.jokers = { fifty: true, switch: true, time: true };
+        this._gamestate.jokers = { fifty: true, switch: true, lookup: true };
         this.ui = {};
     }
 
@@ -841,20 +841,29 @@ class Quiz {
             this.resetTimer();
             this._questions[this._gamestate.answered].time = true;
             this._gamestate.jokers.time = false;
-            this.ui.quizElement = new QuizComponent({ question:  this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer});
+            this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
             this.startTimer();
-        } else if (joker === "switch" && this._gamestate.jokers.switch) {            
+        } else if (joker === "switch" && this._gamestate.jokers.switch) {
             clearInterval(this.timer.timeInterval);
             this._gamestate.jokers.switch = false;
             this._questions[this._gamestate.answered].switch = true;
-            this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer});
+            this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
             setTimeout(() => {
                 this._questions[this._gamestate.answered] = this._extraQuestion;
                 this._questions[this._gamestate.answered].switched = true;
                 this.timer.elapsed = 0;
-                this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer});
+                this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
                 this.startTimer();
             }, 1000);
+        } else if (joker === "lookup") {
+            this._gamestate.jokers.lookup = false;
+            this._questions[this._gamestate.answered].lookup = true;
+            //const queryString = this._questions[this._gamestate.answered].question.replace(/\s/gm, "+").replace(/\?/gm, "%3F");
+            //const url = `https://google.com/search?q=${queryString}`;
+            //window.open(url, "", "width=900,height=600,noopener,noreferrer");
+            this.resetTimer();
+            this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
+            this.startTimer();
         }
     }
 }
@@ -993,7 +1002,7 @@ class QuizComponent {
                         {
                             element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-8 col-xxl-7 mt-5" }),
                             children: [
-                                new QuestionComponent({ category: question.category, question: question.question, jokers: gamestate.jokers }),
+                                new QuestionComponent({ question, jokers: gamestate.jokers }),
                                 new Answers({ question })
                             ]
                         }
@@ -1269,14 +1278,14 @@ class BoardField {
 }
 
 class QuestionComponent {
-    constructor({ category, question, jokers }) {
+    constructor({ question, jokers }) {
         this.element = buildNode("div", { id: "question-component", className: "row" });
         this.children = [
             {
                 element: buildNode("div", { className: "col bg-light rounded-lg" }),
                 children: [
-                    new QuestionHeader({ category, jokers }),
-                    new QuestionText({ question })
+                    new QuestionHeader({ question, jokers }),
+                    new QuestionText({ question: question.question })
                 ]
             }
         ]
@@ -1284,7 +1293,9 @@ class QuestionComponent {
 }
 
 class QuestionHeader {
-    constructor({ category, jokers }) {
+    constructor({ question, jokers }) {
+
+        const queryString = jokers.lookup && question.result === "unanswered" ? question.question.replace(/\s/gm, "+").replace(/\?/gm, "%3F") : "";
 
         const handler = (event) => {
             quiz.useJoker(event.target.id);
@@ -1293,7 +1304,7 @@ class QuestionHeader {
         this.element = buildNode("div", { id: "question-header-component", className: "row mb-1 p-3" });
         this.children = [
             {
-                element: buildNode("div", { className: `col-12 rounded-lg p-2 bg-${category.color}` }),
+                element: buildNode("div", { className: `col-12 rounded-lg p-2 bg-${question.category.color}` }),
                 children: [
                     {
                         element: buildNode("div", { className: "row px-2" }),
@@ -1305,7 +1316,7 @@ class QuestionHeader {
                                         element: buildNode("p", { className: "my-2 small-font" }),
                                         children: [
                                             {
-                                                element: document.createTextNode(category.title),
+                                                element: document.createTextNode(question.category.title),
                                                 children: null
                                             }
                                         ]
@@ -1316,8 +1327,13 @@ class QuestionHeader {
                                 element: buildNode("div", { className: "col-2 text-start text-sm-end px-1 px-sm-2" }),
                                 children: [
                                     {
-                                        element: buildNode("i", { id: "time", className: `bi bi-hourglass-top fs-4 p-1 cursor ${jokers.time ? "joker-highlight" : "selected"}`, onclick: jokers.time ? handler : null }),
-                                        children: null
+                                        element: buildNode("a", { href: jokers.lookup && question.result === "unanswered" && !question.switch ? `https://google.com/search?q=${queryString}` : "", target: "_blank", rel: "noopener noreferrer", style: { color: "black" } }),
+                                        children: [
+                                            {
+                                                element: buildNode("i", { id: "lookup", className: `bi bi-search fs-4 p-1 cursor ${jokers.lookup ? "joker-highlight" : "selected"}`, onclick: jokers.lookup && question.result === "unanswered" && !question.switch ? handler : null }),
+                                                children: null
+                                            }
+                                        ]
                                     }
                                 ]
                             },
@@ -1325,7 +1341,7 @@ class QuestionHeader {
                                 element: buildNode("div", { className: "col-2 text-start text-sm-end px-1 px-sm-2" }),
                                 children: [
                                     {
-                                        element: buildNode("i", { id: "switch", className: `bi bi-arrow-left-right fs-4 p-1 cursor ${jokers.switch ? "joker-highlight" : "selected"}`, onclick: jokers.switch ? handler : null }),
+                                        element: buildNode("i", { id: "switch", className: `bi bi-arrow-left-right fs-4 p-1 cursor ${jokers.switch ? "joker-highlight" : "selected"}`, onclick: jokers.switch && question.result === "unanswered" && !question.switch ? handler : null }),
                                         children: null
                                     }
                                 ]
@@ -1334,7 +1350,7 @@ class QuestionHeader {
                                 element: buildNode("div", { className: "col-2 d-flex align-items-center justify-content-end px-0 px-sm-2" }),
                                 children: [
                                     {
-                                        element: buildNode("strong", { id: "fifty", className: `border border-dark p-1 cursor fifty-fifty ${jokers.fifty ? "joker-highlight" : "selected"}`, onclick: jokers.fifty ? handler : null }),
+                                        element: buildNode("strong", { id: "fifty", className: `border border-dark p-1 cursor fifty-fifty ${jokers.fifty ? "joker-highlight" : "selected"}`, onclick: jokers.fifty && question.result === "unanswered" && !question.switch ? handler : null }),
                                         children: [
                                             {
                                                 element: document.createTextNode("50:50"),
@@ -1748,132 +1764,132 @@ const testQuestionsB = [{ "category": "Science", "id": "622a1c3a7cc59eab6f95106f
 
 const testQuestionsScience = [
     {
-        "category": "Science",
-        "id": "622a1c3a7cc59eab6f9510b9",
-        "correctAnswer": "Aves",
+        "category": "Music",
+        "id": "622a1c397cc59eab6f950c2d",
+        "correctAnswer": "ABBA",
         "incorrectAnswers": [
-            "Birdilia",
-            "Flowana",
-            "Aerilys"
+            "In Flames",
+            "HammerFall",
+            "Katatonia"
         ],
-        "question": "In the animal kingdom, if reptiles are in class reptilia, then birds are in class ____?",
+        "question": "Which Swedish pop group released the album 'The Visitors'?",
         "tags": [],
         "type": "Multiple Choice"
     },
     {
-        "category": "Science",
-        "id": "622a1c377cc59eab6f9504e7",
-        "correctAnswer": "nerves",
+        "category": "Music",
+        "id": "622a1c387cc59eab6f950bcc",
+        "correctAnswer": "Alice in Chains",
         "incorrectAnswers": [
-            "embryos",
-            "the study and psychology of organisms with regard to their functions and structures",
-            "mollusks"
+            "Poison",
+            "Three 6 Mafia",
+            "The Velvet Underground"
         ],
-        "question": "What is Neurology the study of?",
+        "question": "Which American grunge band released the studio album 'Dirt'?",
         "tags": [],
         "type": "Multiple Choice"
     },
     {
-        "category": "Science",
-        "id": "622a1c377cc59eab6f9505aa",
-        "correctAnswer": "algae",
+        "category": "General Knowledge",
+        "id": "622a1c357cc59eab6f94fc86",
+        "correctAnswer": "Erinaceous",
         "incorrectAnswers": [
-            "the interrelationships between living organisms and their environment",
-            "study of human characteristics",
-            "the same as otolaryngology"
+            "Sprunt",
+            "Whippersnapper",
+            "Frankenfood"
         ],
-        "question": "What is Algology the study of?",
+        "question": "Which word is defined as 'of, pertaining to, or resembling a hedgehog'?",
         "tags": [],
         "type": "Multiple Choice"
     },
     {
-        "category": "Science",
-        "id": "622a1c3a7cc59eab6f951071",
-        "correctAnswer": "Leeches",
+        "category": "General Knowledge",
+        "id": "622a1c357cc59eab6f94fc58",
+        "correctAnswer": "Whippersnapper",
         "incorrectAnswers": [
-            "Vampire Bats",
-            "Cobras",
-            "Wasps"
+            "Salopettes",
+            "Cabotage",
+            "Bumfuzzle"
         ],
-        "question": "What Creatures Were Frequently Used To Bleed Patients In The Nineteeth Century?",
+        "question": "Which word is defined as 'a young person considered to be presumptuous or overconfident'?",
         "tags": [],
         "type": "Multiple Choice"
     },
     {
-        "category": "Science",
-        "id": "622a1c3a7cc59eab6f9510f2",
-        "correctAnswer": "Cloud",
+        "category": "Music",
+        "id": "622a1c347cc59eab6f94fb9f",
+        "correctAnswer": "\"Hooked on a Feeling\" by B.J. Thomas",
         "incorrectAnswers": [
-            "Planet",
-            "Island",
-            "Volcano"
+            "\"Immigrant Song\" by Led Zeppelin",
+            "\"What I Got\" by Sublime",
+            "\"American Pie\" by Don McLean"
         ],
-        "question": "Cirrus and Cumulus are types of what?",
+        "question": "Which song begins with the lyrics: \"Ooga-chaka, Ooga-ooga / Ooga-chaka, Ooga-ooga...\"?",
         "tags": [],
         "type": "Multiple Choice"
     },
     {
-        "category": "Science",
-        "id": "622a1c377cc59eab6f950583",
-        "correctAnswer": "the study and the art of bell ringing",
+        "category": "General Knowledge",
+        "id": "622a1c367cc59eab6f9500cc",
+        "correctAnswer": "Surfing",
         "incorrectAnswers": [
-            "the specialty in medicine that deals with diseases of the lungs and the respiratory tract",
-            "internal secretory glands",
-            "the effect of evolution on ethology"
+            "Yoga",
+            "Piano Playing",
+            "Ballroom Dancing"
         ],
-        "question": "What is Campanology the study of?",
+        "question": "Green Room, Crystal Cathedral & Walking The Dog are all terms from what?",
         "tags": [],
         "type": "Multiple Choice"
     },
     {
-        "category": "Science",
-        "id": "622a1c3a7cc59eab6f95104f",
-        "correctAnswer": "Distance",
+        "category": "Music",
+        "id": "622a1c397cc59eab6f950bff",
+        "correctAnswer": "Muse",
         "incorrectAnswers": [
-            "Time",
-            "Pressure",
-            "Magnetism"
+            "Tears for Fears",
+            "Bullet For My Valentine",
+            "Enter Shikari"
         ],
-        "question": " What does a micron measure?",
+        "question": "Which English rock band released the song 'Sunburn'?",
         "tags": [],
         "type": "Multiple Choice"
     },
     {
-        "category": "Science",
-        "id": "622a1c377cc59eab6f950494",
-        "correctAnswer": "a branch of geology that studies sediments",
+        "category": "Music",
+        "id": "622a1c357cc59eab6f94fe8b",
+        "correctAnswer": "Rihanna",
         "incorrectAnswers": [
-            "bones",
-            "the study and treatment of diseases of the urogenital tract",
-            "the eyes"
+            "Drake",
+            "Nicki Minaj",
+            "Ricky Martin"
         ],
-        "question": "What is Sedimentology the study of?",
+        "question": "Which Barbadian singer, songwriter, and businesswoman released the song 'Russian Roulette'?",
         "tags": [],
         "type": "Multiple Choice"
     },
     {
-        "category": "Science",
-        "id": "622a1c377cc59eab6f95056b",
-        "correctAnswer": "how to encrypt and decrypt secret messages",
+        "category": "Music",
+        "id": "622a1c397cc59eab6f950db6",
+        "correctAnswer": "The Rolling Stones",
         "incorrectAnswers": [
-            "animal diseases",
-            "sacred texts",
-            "feces"
+            "McFly",
+            "Delirious?",
+            "Depeche Mode"
         ],
-        "question": "What is Cryptology the study of?",
+        "question": "Which band includes 'Keith Richards'?",
         "tags": [],
         "type": "Multiple Choice"
     },
     {
-        "category": "Science",
-        "id": "622a1c377cc59eab6f950540",
-        "correctAnswer": "writing systems",
+        "category": "Music",
+        "id": "622a1c387cc59eab6f950b8a",
+        "correctAnswer": "The Jimi Hendrix Experience",
         "incorrectAnswers": [
-          "the field of dermatological anatomical pathology",
-          "the atmosphere",
-          "existence"
+            "Poison",
+            "The Pussycat Dolls",
+            "Three 6 Mafia"
         ],
-        "question": "What is Grammatology the study of?",
+        "question": "Which English-American psychedelic rock band released the album 'Are You Experienced'?",
         "tags": [],
         "type": "Multiple Choice"
     }
