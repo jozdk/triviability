@@ -594,7 +594,7 @@ class Question {
             color: question.category.toLowerCase().replace(/\s/g, "_").replace(/&/g, "and")
         };
         this.type = question.type;
-        this.question = question.question;
+        this.question = question.category === "Film & TV" ? question.question.replace(/featued/gm, "featured") : question.question;
         this.correctAnswer = question.category === "Science" ? this.fixLowerCase(question.correctAnswer) : question.correctAnswer;
         this.wrongAnswers = question.category === "Science" ? this.fixLowerCase(question.incorrectAnswers) : question.incorrectAnswers;
         this.multipleChoice = this.makeMultipleChoice();
