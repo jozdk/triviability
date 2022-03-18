@@ -5,13 +5,38 @@ class Stats {
         const amountTotal = questions.length;
         const correct = questions.filter(question => question.result === "correct").length;
         const percent = (correct / amountTotal * 100) % 1 === 0 ? (correct / amountTotal * 100) : (correct / amountTotal * 100).toFixed(2);
+        const percentScore = gamestate.points / (questions.length * 20) * 100;
+        let emoji;
+        if (percentScore >= 85) emoji = "bi bi-emoji-sunglasses";
+        else if (percentScore >= 70) emoji = "bi bi-emoji-laughing";
+        else if (percentScore >= 55) emoji = "bi bi-emoji-smile";
+        else if (percentScore >= 40) emoji = "bi bi-emoji-neutral";
+        else if (percentScore >= 25) emoji = "bi bi-emoji-smile-upside-down";
+        else if (percentScore >= 0) emoji = "bi bi-emoji-dizzy";
+        console.log(Math.round(percentScore));
         const colors = questions.map(question => question.category.color).filter((cat, i, arr) => arr.indexOf(cat) === i);
         const times = questions.map(question => question.time);
         const timeTotal = times.reduce((acc, curr) => acc + curr) / 1000;
         const average = (timeTotal / questions.length).toFixed(3);
         const fastest = Math.min(...times) / 1000;
+        const categoryCount = {};
+        questions.forEach((q) => categoryCount[q.category.title] = categoryCount[q.category.title] ? categoryCount[q.category.title] + 1 : 1);
         const categories = questions.map(question => question.category.title).filter((category, index, arr) => arr.indexOf(category) === index);
-        console.log(colors);
+        Object.keys(categoryCount).forEach(cat => {
+            categories[categories.indexOf(cat)] = { category: cat, percent: Math.round(categoryCount[cat] / amountTotal * 100) }
+        });
+        const catUnused = settings.categories.map(cat => {
+            let category = (cat[0].toUpperCase() + cat.slice(1))
+            .replace("and", "&")
+            .replace(/_/g, " ")
+            .replace(/(?<=\s)[a-z]/g, (match) => match.toUpperCase());
+            if (category === "Movies") category = "Film & TV";
+            if (category === "Literature") category = "Arts & Literature";
+            console.log(category);
+            console.log(!categories.find(cat => cat.category === category))
+            return category;
+        }).filter(category => !categories.find(cat => cat.category === category));
+        console.log(catUnused);
 
         // Create Element
         this.element = buildNode("div", { id: "stats-element", className: "container" });
@@ -24,13 +49,46 @@ class Stats {
                         colors: colors,
                         stats: [
                             ["Correct", `${correct} of ${amountTotal} = ${percent}%`],
-                            ["Score", gamestate.points],
-                            ["Categories", {
-                                element: buildNode("ul", { className: "list-group list-group-flush", style: { listStyle: "none" } }),
-                                children: [...categories.map((cat) => {
-                                    return { element: buildNode("li", { textContent: cat }) };
-                                })]
-                            }]
+                            [
+                                "Score",
+                                [
+                                    {
+                                        element: buildNode("span", { textContent: gamestate.points }),
+                                        children: null
+                                    },
+                                    {
+                                        element: buildNode("i", { className: `${emoji} ms-2` }),
+                                        children: null
+                                    }
+                                ]
+                            ],
+                            [
+                                "Categories",
+                                [
+                                    {
+                                        element: buildNode("ul", { className: "list-group list-group-flush", style: { listStyle: "none" } }),
+                                        children: [
+                                            ...categories.map((cat) => {
+                                                return {
+                                                    element: buildNode("li", { textContent: `${cat.category} (${cat.percent}%)` }),
+                                                    children: null
+                                                };
+                                            })]
+                                    },
+                                    {
+                                        element: buildNode("ul", { className: "list-group list-group-flush", style: { color: "darkgrey", listStyle: "none" } }),
+                                        children: [
+                                            ...catUnused.map(cat => {
+                                                return {
+                                                    element: buildNode("li", { textContent: cat }),
+                                                    children: null
+                                                }
+                                            })
+                                        ]
+                                    }
+                                ]
+
+                            ]
                         ]
                     }),
                     new StatsBox({
@@ -46,15 +104,16 @@ class Stats {
                         title: "Jokers",
                         colors: colors,
                         stats: [
-                            [{ element: buildNode("span", { className: "border border-dark p-1 me-1 small-font", textContent: "50:50" }) }, gamestate.jokers.fifty ? "Not used" : "Used"],
-                            [{ element: buildNode("i", { className: "bi bi-arrow-left-right me-1" }) }, gamestate.jokers.switch ? "Not used" : "Used"],
-                            [{ element: buildNode("i", { className: "bi bi-hourglass-top me-1" }) }, gamestate.jokers.time ? "Not used" : "Used"]
+                            [{ element: buildNode("span", { className: "border border-dark p-1 me-1 small-font", textContent: "50:50" }) }, gamestate.jokers.fifty ? "No" : "Yes"],
+                            [{ element: buildNode("i", { className: "bi bi-arrow-left-right me-1" }) }, gamestate.jokers.switch ? "No" : "Yes"],
+                            [{ element: buildNode("i", { className: "bi bi-search me-1" }) }, gamestate.jokers.time ? "No" : "Yes"]
                         ]
                     })
                 ]
             },
             new ControlsB(),
-            new Overview({ questions })
+            new Overview({ questions }),
+            new ControlsB()
         ]
     }
 }
@@ -114,6 +173,18 @@ class AnswersList {
 
 class ControlsB {
     constructor() {
+
+        const catHandler = () => {
+            quiz.reset();
+            settings.reset();
+            settings.ui.selectionMenuElement = new SelectionMenu();
+        }
+
+        const playHandler = () => {
+            quiz.reset();
+            settings.fetchQuestions();
+        }
+
         this.element = buildNode("div", { id: "controls-b", className: "row justify-content-center mt-5" });
         this.children = [
             {
@@ -126,7 +197,7 @@ class ControlsB {
                                 element: buildNode("div", { className: "col-auto" }),
                                 children: [
                                     {
-                                        element: buildNode("button", { className: "btn btn-outline-dark" }),
+                                        element: buildNode("button", { className: "btn btn-outline-dark", onclick: catHandler }),
                                         children: [
                                             {
                                                 element: buildNode("i", { className: "bi bi-grid-3x3-gap me-1" }),
@@ -149,7 +220,7 @@ class ControlsB {
                                 element: buildNode("div", { className: "col-auto" }),
                                 children: [
                                     {
-                                        element: buildNode("button", { className: "btn btn-outline-dark" }),
+                                        element: buildNode("button", { className: "btn btn-outline-dark", onclick: playHandler }),
                                         children: [
                                             {
                                                 element: buildNode("i", { className: "bi bi-arrow-repeat me-1" }),
@@ -277,7 +348,8 @@ class DataCell {
         this.element = buildNode("td", props);
         this.children = [
             ...datum !== Object(datum) ? [{ element: document.createTextNode(`${datum}`), children: null }] : [],
-            ...typeof datum === "object" && !Array.isArray(datum) ? [datum] : []
+            ...typeof datum === "object" && !Array.isArray(datum) ? [datum] : [],
+            ...Array.isArray(datum) ? [...datum] : []
         ]
     }
 }
@@ -468,8 +540,8 @@ class StartButton {
 class Settings {
     constructor() {
         this._categories = [];
-        this.ui = new UIForSettings();
         this.originalQuestions;
+        this.ui = new UIForSettings(); 
     }
 
     set categories(selected) {
@@ -1764,7 +1836,7 @@ const testQuestionsB = [{ "category": "Science", "id": "622a1c3a7cc59eab6f95106f
 
 const testQuestionsScience = [
     {
-        "category": "Music",
+        "category": "Science",
         "id": "622a1c397cc59eab6f950c2d",
         "correctAnswer": "ABBA",
         "incorrectAnswers": [
@@ -1777,7 +1849,7 @@ const testQuestionsScience = [
         "type": "Multiple Choice"
     },
     {
-        "category": "Music",
+        "category": "History",
         "id": "622a1c387cc59eab6f950bcc",
         "correctAnswer": "Alice in Chains",
         "incorrectAnswers": [
