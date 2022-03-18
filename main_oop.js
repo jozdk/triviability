@@ -360,6 +360,7 @@ class SelectionMenu {
         this.children = [
             new Welcome(),
             new Categories(),
+            new Params(),
             new StartButton()
         ]
     }
@@ -451,7 +452,7 @@ class Categories {
         this.element = buildNode("div", { id: "category-selection", className: "row mt-3 mb-3 justify-content-center" });
         this.children = [
             {
-                element: buildNode("div", { className: "col-md-9 col-xl-8" }),
+                element: buildNode("div", { className: "col-md-9 col-xl-8 col-xxl-7" }),
                 children: [
                     {
                         element: buildNode("div", { className: "row justify-content-center gy-4", onclick: handler }),
@@ -504,6 +505,60 @@ class Category {
     }
 }
 
+class Params {
+    constructor() {
+        this.element = buildNode("div", { className: "row justify-content-center mt-2 py-3" });
+        this.children = [
+            {
+                element: buildNode("div", { className: "col-md-9 col-xl-8 col-xxl-7" }),
+                children: [
+                    {
+                        element: buildNode("div", { className: "row justify-content-center" }),
+                        children: [
+                            {
+                                element: buildNode("div", { className: "col-11 col-sm d-flex" }),
+                                children: [
+                                    {
+                                        element: buildNode("input", { id: "amount", type: "range", className: "form-range", max: "20", value: 9, oninput: (e) => e.target.nextElementSibling.textContent = e.target.value }),
+                                        children: null
+                                    },
+                                    {
+                                        element: buildNode("label", { htmlFor: "amount", className: "form-label ms-3", style: { minWidth: "20px" }, textContent: "9" }),
+                                        children: null
+                                    }
+                                ]
+                            },
+                            {
+                                element: buildNode("div", { className: "col-12 col-sm-4 d-flex justify-content-end" }),
+                                children: [
+                                    new Switch({ type: "Random" }),
+                                    new Switch ({ type: "All" })
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+class Switch {
+    constructor({ type }) {
+        this.element = buildNode("div", { className: "form-check form-check-inline form-switch" });
+        this.children = [
+            {
+                element: buildNode("input", { className: "form-check-input", type: "checkbox", id: type.toLowerCase() }),
+                children: null
+            },
+            {
+                element: buildNode("label", { htmlFor: type.toLowerCase(), className: "form-check-label no-select", textContent: type }),
+                children: null
+            }
+        ]
+    }
+}
+
 class StartButton {
     constructor() {
 
@@ -518,7 +573,7 @@ class StartButton {
         this.element = buildNode("div", { className: "row justify-content-center" });
         this.children = [
             {
-                element: buildNode("div", { className: "col-md-9 col-xl-8" }),
+                element: buildNode("div", { className: "col-md-9 col-xl-8 col-xxl-7" }),
                 children: [
                     {
                         element: buildNode("button", { id: "start-button", className: "btn btn-outline-dark w-100", onclick: handler }),
