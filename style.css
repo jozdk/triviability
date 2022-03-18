@@ -362,3 +362,7 @@ a:link, a:visited {
   .bg-radial-gradient-history {
     background-image: radial-gradient(#FFF75C, #fff75c3b) !important;
 }
+
+.no-select {
+    user-select: none;
+}
