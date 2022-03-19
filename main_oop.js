@@ -449,7 +449,7 @@ class Categories {
                 return new Category(category);
             });
 
-        this.element = buildNode("div", { id: "category-selection", className: "row mt-3 mb-3 justify-content-center" });
+        this.element = buildNode("div", { id: "category-selection", className: "row mt-3 justify-content-center" });
         this.children = [
             {
                 element: buildNode("div", { className: "col-md-9 col-xl-8 col-xxl-7" }),
@@ -513,23 +513,23 @@ class Params {
                 element: buildNode("div", { className: "col-md-9 col-xl-8 col-xxl-7" }),
                 children: [
                     {
-                        element: buildNode("div", { className: "row justify-content-center" }),
+                        element: buildNode("div", { className: "row justify-content-between" }),
                         children: [
                             {
-                                element: buildNode("div", { className: "col-11 col-sm d-flex" }),
+                                element: buildNode("div", { className: "col-11 col-sm-8 d-flex" }),
                                 children: [
                                     {
-                                        element: buildNode("input", { id: "amount", type: "range", className: "form-range", max: "20", value: 9, oninput: (e) => e.target.nextElementSibling.textContent = e.target.value }),
+                                        element: buildNode("input", { id: "amount", type: "range", className: "form-range", min: "6", max: "20", value: "9", oninput: (e) => e.target.nextElementSibling.textContent = `${e.target.value} Questions` }),
                                         children: null
                                     },
                                     {
-                                        element: buildNode("label", { htmlFor: "amount", className: "form-label ms-3", style: { minWidth: "20px" }, textContent: "9" }),
+                                        element: buildNode("label", { htmlFor: "amount", className: "form-label ms-3", style: { whiteSpace: "nowrap", minWidth: "100px" }, textContent: "9 Questions" }),
                                         children: null
                                     }
                                 ]
                             },
                             {
-                                element: buildNode("div", { className: "col-12 col-sm-4 d-flex justify-content-end" }),
+                                element: buildNode("div", { className: "col-12 col-sm-4 d-flex justify-content-end pb-3" }),
                                 children: [
                                     new Switch({ type: "Random" }),
                                     new Switch ({ type: "All" })
@@ -545,10 +545,21 @@ class Params {
 
 class Switch {
     constructor({ type }) {
+
+        const handler = (e) => {      
+            if (e.target.checked === true) {
+                if (e.target.parentElement.nextElementSibling) {
+                    e.target.parentElement.nextElementSibling.firstElementChild.checked = false;
+                } else {
+                    e.target.parentElement.previousElementSibling.firstElementChild.checked = false;
+                }
+            }
+        }
+
         this.element = buildNode("div", { className: "form-check form-check-inline form-switch" });
         this.children = [
             {
-                element: buildNode("input", { className: "form-check-input", type: "checkbox", id: type.toLowerCase() }),
+                element: buildNode("input", { className: "form-check-input", type: "checkbox", id: type.toLowerCase(), oninput: handler }),
                 children: null
             },
             {
@@ -570,7 +581,7 @@ class StartButton {
             }
         }
 
-        this.element = buildNode("div", { className: "row justify-content-center" });
+        this.element = buildNode("div", { className: "row justify-content-center mt-3" });
         this.children = [
             {
                 element: buildNode("div", { className: "col-md-9 col-xl-8 col-xxl-7" }),
@@ -1006,7 +1017,7 @@ class UIForSettings {
         this.mainElement = document.querySelector("#main");
         this._selectionMenuElement = new SelectionMenu();
 
-        this.render(this.mainElement, this._selectionMenuElement);
+        //this.render(this.mainElement, this._selectionMenuElement);
 
         // this.selectionElement.addEventListener("click", (event) => {
         //     if (event.target !== this.selectionElement && !event.target.classList.contains("col-sm-12")) {

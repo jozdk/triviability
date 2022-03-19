@@ -35,7 +35,7 @@
 
         <div id="main" class="flex-grow-1 d-flex flex-column px-0">
 
-            <div id="selection-menu" class="container d-none">
+            <div id="selection-menu" class="container">
 
                 <!-- Welcome Paragraph -->
 
@@ -52,7 +52,15 @@
                 <!-- Selection Element -->
 
                 <div id="category-selection" class="row mt-3 justify-content-center">
-                    <div class="col-md-9 col-xl-8 col-xxl-7">
+                    <div class="col-md-9 col-xl-8 col-xxl-7" style="position: relative;">
+                        <div class="row justify-content-end py-2">
+                            <div class="col-auto">
+                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Quiz Settings">
+                                    <i class="bi bi-gear fs-4 cursor" data-bs-toggle="modal" data-bs-target="#settings"></i>
+                                </span>
+                                
+                            </div>
+                        </div>
                         <div class="row justify-content-center gy-4">
                             <div class="col-8 col-sm-6 col-lg-4">
                                 <div id="cat-science" class="card category category-highlight cursor bg-science">
@@ -154,11 +162,95 @@
 
                 </div>
 
+                <div class="modal fade" id="settings" tabindex="-1" aria-labelledby="settingsLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="settingsLabel">Quiz Settings</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+
+                                <div class="container-fluid">
+                                    <div class="row justify-content-center mt-2 py-3">
+
+                                        <div class="col-8 text-center">
+                                            <label for="amount" class="form-label ms-3" style="white-space: nowrap;">9
+                                                Questions</label>
+                                            <input type="range" class="form-range" id="amount" min="6" max="20"
+                                                value="6" oninput="this.previousElementSibling.textContent = this.value + ' Questions'">
+
+                                        </div>
+                                        <div class="col-8 d-flex justify-content-end mt-5">
+                                            <div class="form-check form-check-inline form-switch pb-3">
+                                                <input class="form-check-input" type="checkbox" id="random">
+                                                <label class="form-check-label no-select" for="random">Random</label>
+                                            </div>
+                                            <div class="form-check form-check-inline form-switch pb-3">
+                                                <input class="form-check-input" type="checkbox" id="all">
+                                                <label class="form-check-label no-select" for="all">All</label>
+                                            </div>
+                                        </div>
+
+
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Other Settings Params -->
 
-                <div class="row justify-content-center mt-2 py-3">
+                <div class="row justify-content-center mt-2 py-3 d-none">
                     <div class="col-md-9 col-xl-8 col-xxl-7">
-                        <!-- <div class="row">
+                        
+
+                        <div class="row justify-content-between">
+                            <div class="col-11 col-sm-8 d-flex">
+                                
+                                <input type="range" class="form-range" id="amount" min="6" max="20" value="9" oninput="this.nextElementSibling.textContent = this.value + ' Questions'">
+                                <label for="amount" class="form-label ms-3 mb-0" style="white-space: nowrap;">9 Questions</label>
+                            </div>
+                            <div class="col-12 col-sm-4 d-flex justify-content-end">
+                                <!-- <div class="form-check form-check-inline form-switch pb-3">
+                                    <input class="form-check-input" type="checkbox" id="random">
+                                    <label class="form-check-label no-select" for="random">Random</label>
+                                </div>
+                                <div class="form-check form-check-inline form-switch pb-3">
+                                    <input class="form-check-input" type="checkbox" id="all">
+                                    <label class="form-check-label no-select" for="all">All</label>
+                                </div> -->
+
+                                <div class="form-check form-check-inline pb-3">
+                                    <input class="form-check-input" type="checkbox" id="random">
+                                    <label class="form-check-label no-select" for="random">Random</label>
+                                </div>
+                                <div class="form-check form-check-inline pb-3">
+                                    <input class="form-check-input" type="checkbox" id="all">
+                                    <label class="form-check-label no-select" for="all">All</label>
+                                </div>
+
+                                <!-- <i class="bi bi-question-square cursor fs-4 px-2" data-bs-toggle="tooltip"
+                                data-bs-placement="top" title="Random"></i>
+                                <i class="bi bi-check2-square cursor fs-3 px-2" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" title="Select All"></i> -->
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- <div class="row">
 
                             <div class="col"></div>
                             <div class="col-2 d-flex">
@@ -175,32 +267,9 @@
                             
                         </div> -->
 
-                        <div class="row justify-content-center">
-                            <div class="col-11 col-sm d-flex">
-                                
-                                <input type="range" class="form-range" id="amount" max="20">
-                                <label for="amount" class="form-label ms-3"></label>
-                            </div>
-                            <div class="col-12 col-sm-4 d-flex justify-content-end">
-                                <div class="form-check form-check-inline form-switch">
-                                    <input class="form-check-input" type="checkbox" id="random">
-                                    <label class="form-check-label no-select" for="random">Random</label>
-                                </div>
-                                <div class="form-check form-check-inline form-switch">
-                                    <input class="form-check-input" type="checkbox" id="all" checked>
-                                    <label class="form-check-label no-select" for="all">All</label>
-                                </div>
-                            </div>
-                        </div>
-
-
-
-                    </div>
-                </div>
-
                 <!-- Start Button -->
 
-                <div class="row justify-content-center mt-2">
+                <div class="row justify-content-center mt-3">
                     <div class="col-md-9 col-xl-8 col-xxl-7">
                         <button class="btn btn-outline-dark w-100" id="start-button">Start Quiz!</button>
                     </div>
