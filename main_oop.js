@@ -835,22 +835,11 @@ class UIForQuiz {
     constructor(question, gamestate, timer) {
         console.log(timer)
         this.mainElement = document.querySelector("#main");
-        this._quizElement = new QuizComponent({
-            // category: question.category,
-            question: question,
-            gamestate: gamestate,
-            timer: timer
-            // multipleChoice: question.multipleChoice,
-            // answered: gamestate.answered,
-            // points: gamestate.points,
-            // board: gamestate.board,
-            // handler: this.answerHandler
-        });
+        this._quizElement = new QuizComponent({ question, gamestate, timer });
         this._timeElement;
 
         this.mainElement.innerHTML = "";
         this.render(this.mainElement, this._quizElement.root);
-        // this.countdown();
     }
 
     set quizElement(quizComp) {
@@ -864,35 +853,6 @@ class UIForQuiz {
         document.querySelector("#timer-container").innerHTML = "";
         this.render(document.querySelector("#timer-container"), this._timeElement);
     }
-
-    // updateComponent(component, question, gamestate) {
-    //     switch (component) {
-    //         case "quizBox":
-    //             this._quizElement = new QuizComponent(question, gamestate, this.answerHandler);
-    //             this.render(this.mainElement, this._quizElement.abstractDOMTree.root)
-    //             break;
-    //         case "stats":
-    //             this.stats = new StatsComponent(question, gamestate.points);
-    //             this.render(document.querySelector("#stats-component"), this.stats.abstractDOMTree.root);
-    //             break;
-    //         case "answers":
-    //             this.answers = new AnswersComponent(question, null);
-    //             this.render(document.querySelector("#box-component"), this.answers.abstractDOMTree.root);
-    //             //document.querySelector("#answers-component").children[question.correctAnswer.index].firstElementChild.classList.add("correct");
-    //             break;
-    //     }
-    // }
-
-    // updateStats(category, gamestate) {
-    //     this.stats = new StatsComponent(category, gamestate);
-    //     this.render(document.querySelector("#stats-component"), this.stats.abstractDOMTree.root);
-    // }
-
-    // updateAnswers(userAnswer, correctAnswer) {
-    //     // this.answers = new AnswersComponent(question, null);
-    //     // this.compileDOMTree(document.querySelector("#box-component"), this.answers.abstractDOMTree.root);
-    //     document.querySelector("#answers-component")
-    // }
 
     render(rootNode, startingNode) {
 
@@ -908,35 +868,6 @@ class UIForQuiz {
             })
 
         }
-
-    }
-
-    countdown() {
-        this.timerVals.start = Date.now();
-        // this.timerVals.degreeFirstHalf = 0;
-        // this.timerVals.degreeSecondHalf = 0;
-        // this.timerVals.seconds = 12;
-
-        this.timerVals.timeInterval = setInterval(() => {
-
-            this.timerVals.time = Date.now() - this.timerVals.start;
-            this.timerVals.elapsed = Math.floor(this.timerVals.time / 1000);
-
-
-            document.querySelector("#timer-container").innerHTML = "";
-            this.render(document.querySelector("#timer-container"), new Time({
-                category: quiz.questions[quiz.gamestate.answered].category,
-                // secondHalf: this.timerVals.elapsed <= 6 ? `rotate(${this.timerVals.degreeSecondHalf += 30}deg)` : "",
-                // firstHalf: this.timerVals.elapsed > 6 ? `rotate(${this.timerVals.degreeFirstHalf += 30}deg)` : "",
-                // seconds: --this.timerVals.seconds
-                time: this.timerVals.elapsed
-            }));
-
-            if (this.timerVals.elapsed === 12) {
-                clearInterval(this.timerVals.timeInterval);
-            }
-
-        }, 1000);
 
     }
 
