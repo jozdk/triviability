@@ -360,7 +360,7 @@ class SelectionMenu {
         this.children = [
             new Welcome(),
             new Categories(),
-            new Params(),
+            new SettingsModal(),
             new StartButton()
         ]
     }
@@ -368,7 +368,7 @@ class SelectionMenu {
 
 class Welcome {
     constructor() {
-        this.element = buildNode("div", { className: "row mb-4 mt-5 m-xxl-5 justify-content-center" });
+        this.element = buildNode("div", { className: "row mb-4 mt-5 justify-content-center" });
         this.children = [
             {
                 element: buildNode("div", { className: "col-12" }),
@@ -454,6 +454,7 @@ class Categories {
             {
                 element: buildNode("div", { className: "col-md-9 col-xl-8 col-xxl-7" }),
                 children: [
+                    new ParamsButtons(),
                     {
                         element: buildNode("div", { className: "row justify-content-center gy-4", onclick: handler }),
                         children: [
@@ -505,34 +506,99 @@ class Category {
     }
 }
 
-class Params {
+class ParamsButtons {
     constructor() {
-        this.element = buildNode("div", { className: "row justify-content-center mt-2 py-3" });
+        this.element = buildNode("div", { className: "row justify-content-end py-2" });
         this.children = [
             {
-                element: buildNode("div", { className: "col-md-9 col-xl-8 col-xxl-7" }),
+                element: buildNode("div", { className: "col-auto" }),
                 children: [
                     {
-                        element: buildNode("div", { className: "row justify-content-between" }),
+                        element: buildNode("i", { className: "bi bi-shuffle fs-4 cursor", dataset: { bsToggle: "tooltip", bsPlacement: "top", bsOriginalTitle: "Random" } }),
+                        children: null
+                    }
+                ]
+            },
+            {
+                element: buildNode("div", { className: "col-auto" }),
+                children: [
+                    {
+                        element: buildNode("i", { className: "bi bi-check2-all fs-4 cursor", dataset: { bsToggle: "tooltip", bsPlacement: "top", bsOriginalTitle: "Select All" } }),
+                        children: null
+                    }
+                ]
+            },
+            {
+                element: buildNode("div", { className: "col-auto" }),
+                children: [
+                    {
+                        element: buildNode("span", { dataset: { bsToggle: "tooltip", bsPlacement: "top", bsOriginalTitle: "Quiz Settings" } }),
                         children: [
                             {
-                                element: buildNode("div", { className: "col-11 col-sm-8 d-flex" }),
+                                element: buildNode("i", { className: "bi bi-gear fs-4 cursor", dataset: { bsToggle: "modal", bsTarget: "#quiz-settings" } }),
+                                children: null
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+class SettingsModal {
+    constructor() {
+
+        const handler = (e) => {
+            e.target.previousElementSibling.textContent = `${e.target.value} Questions`;
+        }
+
+        this.element = buildNode("div", { className: "modal fade", id: "quiz-settings", tabIndex: -1,  });
+        this.children = [
+            {
+                element: buildNode("div", { className: "modal-dialog" }),
+                children: [
+                    {
+                        element: buildNode("div", { className: "modal-content" }),
+                        children: [
+                            {
+                                element: buildNode("div", { className: "modal-header" }),
                                 children: [
                                     {
-                                        element: buildNode("input", { id: "amount", type: "range", className: "form-range", min: "6", max: "20", value: "9", oninput: (e) => e.target.nextElementSibling.textContent = `${e.target.value} Questions` }),
+                                        element: buildNode("h5", { className: "modal-title", textContent: "How many Questions?" }),
                                         children: null
                                     },
                                     {
-                                        element: buildNode("label", { htmlFor: "amount", className: "form-label ms-3", style: { whiteSpace: "nowrap", minWidth: "100px" }, textContent: "9 Questions" }),
+                                        element: buildNode("button", { className: "btn-close", type: "button", dataset: { bsDismiss: "modal" } }),
                                         children: null
                                     }
                                 ]
                             },
                             {
-                                element: buildNode("div", { className: "col-12 col-sm-4 d-flex justify-content-end pb-3" }),
+                                element: buildNode("div", { className: "modal-body" }),
                                 children: [
-                                    new Switch({ type: "Random" }),
-                                    new Switch ({ type: "All" })
+                                    {
+                                        element: buildNode("div", { className: "container-fluid" }),
+                                        children: [
+                                            {
+                                                element: buildNode("label", { htmlFor: "amount", className: "form-label", textContent: "9 Questions" }),
+                                                children: null
+                                            },
+                                            {
+                                                element: buildNode("input", { type: "range", className: "form-range", id: "amount", min: "6", max: "20", value: "9", oninput: handler }),
+                                                children: null
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                element: buildNode("div", { className: "modal-footer" }),
+                                children: [
+                                    {
+                                        element: buildNode("button", { type: "button", className: "btn btn-outline-dark", dataset: { bsDismiss: "modal" }, textContent: "Close" }),
+                                        children: null
+                                    }
                                 ]
                             }
                         ]
@@ -1017,7 +1083,7 @@ class UIForSettings {
         this.mainElement = document.querySelector("#main");
         this._selectionMenuElement = new SelectionMenu();
 
-        //this.render(this.mainElement, this._selectionMenuElement);
+        this.render(this.mainElement, this._selectionMenuElement);
 
         // this.selectionElement.addEventListener("click", (event) => {
         //     if (event.target !== this.selectionElement && !event.target.classList.contains("col-sm-12")) {

@@ -35,11 +35,11 @@
 
         <div id="main" class="flex-grow-1 d-flex flex-column px-0">
 
-            <div id="selection-menu" class="container">
+            <div id="selection-menu" class="container d-none">
 
                 <!-- Welcome Paragraph -->
 
-                <div class="row mb-4 mt-5 m-xxl-5 justify-content-center">
+                <div class="row mb-4 mt-5 justify-content-center">
                     <div class="col-12">
                         <h5 class="text-center">
                             Welcome to Triviability! Choose your Categorie(s) and Click the Button below to Start your
@@ -52,13 +52,21 @@
                 <!-- Selection Element -->
 
                 <div id="category-selection" class="row mt-3 justify-content-center">
-                    <div class="col-md-9 col-xl-8 col-xxl-7" style="position: relative;">
+                    <div class="col-md-9 col-xl-8 col-xxl-7">
                         <div class="row justify-content-end py-2">
                             <div class="col-auto">
+                                <i class="bi bi-shuffle fs-4 cursor" data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Random"></i>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-check2-all fs-4 cursor" data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Select All"></i>
+                            </div>
+                            <div class="col-auto">
                                 <span data-bs-toggle="tooltip" data-bs-placement="top" title="Quiz Settings">
-                                    <i class="bi bi-gear fs-4 cursor" data-bs-toggle="modal" data-bs-target="#settings"></i>
+                                    <i class="bi bi-gear fs-4 cursor" data-bs-toggle="modal"
+                                        data-bs-target="#settings"></i>
                                 </span>
-                                
                             </div>
                         </div>
                         <div class="row justify-content-center gy-4">
@@ -163,26 +171,26 @@
                 </div>
 
                 <div class="modal fade" id="settings" tabindex="-1" aria-labelledby="settingsLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
+                    <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="settingsLabel">Quiz Settings</h5>
+                                <h5 class="modal-title" id="settingsLabel">How many Questions?</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
 
                                 <div class="container-fluid">
-                                    <div class="row justify-content-center mt-2 py-3">
+                                    <!-- <div class="row justify-content-center mt-2 py-3">
 
-                                        <div class="col-8 text-center">
-                                            <label for="amount" class="form-label ms-3" style="white-space: nowrap;">9
-                                                Questions</label>
-                                            <input type="range" class="form-range" id="amount" min="6" max="20"
-                                                value="6" oninput="this.previousElementSibling.textContent = this.value + ' Questions'">
+                                        <div class="col-8 text-center"> -->
+                                    <label for="amount" class="form-label">9
+                                        Questions</label>
+                                    <input type="range" class="form-range" id="amount" min="6" max="20" value="9"
+                                        oninput="this.previousElementSibling.textContent = this.value + ' Questions'">
 
-                                        </div>
-                                        <div class="col-8 d-flex justify-content-end mt-5">
+                                </div>
+                                <!-- <div class="col-8 d-flex justify-content-end mt-5">
                                             <div class="form-check form-check-inline form-switch pb-3">
                                                 <input class="form-check-input" type="checkbox" id="random">
                                                 <label class="form-check-label no-select" for="random">Random</label>
@@ -191,12 +199,12 @@
                                                 <input class="form-check-input" type="checkbox" id="all">
                                                 <label class="form-check-label no-select" for="all">All</label>
                                             </div>
-                                        </div>
+                                        </div> -->
 
 
 
-                                    </div>
-                                </div>
+                                <!-- </div>
+                                </div> -->
 
                             </div>
                             <div class="modal-footer">
@@ -211,13 +219,15 @@
 
                 <div class="row justify-content-center mt-2 py-3 d-none">
                     <div class="col-md-9 col-xl-8 col-xxl-7">
-                        
+
 
                         <div class="row justify-content-between">
                             <div class="col-11 col-sm-8 d-flex">
-                                
-                                <input type="range" class="form-range" id="amount" min="6" max="20" value="9" oninput="this.nextElementSibling.textContent = this.value + ' Questions'">
-                                <label for="amount" class="form-label ms-3 mb-0" style="white-space: nowrap;">9 Questions</label>
+
+                                <input type="range" class="form-range" id="amount" min="6" max="20" value="9"
+                                    oninput="this.nextElementSibling.textContent = this.value + ' Questions'">
+                                <label for="amount" class="form-label ms-3 mb-0" style="white-space: nowrap;">9
+                                    Questions</label>
                             </div>
                             <div class="col-12 col-sm-4 d-flex justify-content-end">
                                 <!-- <div class="form-check form-check-inline form-switch pb-3">
