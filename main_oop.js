@@ -1,15 +1,17 @@
-// Settings
-
 class Settings {
     constructor() {
         this._categories = [];
         this.originalQuestions;
-        this._allCategories = ["Science", "History", "Geography", "Film & TV", "Arts & Literature", "Music", "Sport & Leisure", "General Knowledge", "Society & Culture"];
         this.ui = new UIForSettings();
     }
 
+    static allCategories = ["Science", "History", "Geography", "Film & TV", "Arts & Literature", "Music", "Sport & Leisure", "General Knowledge", "Society & Culture"];
+
     set categories(selected) {
         this._categories = selected;
+        selected.forEach((cat) => {
+
+        })
     }
 
     get categories() {
@@ -20,7 +22,7 @@ class Settings {
         return this._allCategories;
     }
 
-    toggleSelection = (element, category) => {
+    toggleSelectio = (element, category) => {
         category = this.toUnderscore(category);
         if (element.classList.contains("category-highlight")) {
             element.classList.add("selected");
@@ -30,6 +32,19 @@ class Settings {
             element.classList.remove("selected");
             element.classList.add("category-highlight");
             this._categories.splice(this._categories.indexOf(category), 1);
+        }
+    }
+
+    toggleSelection = (element, category) => {
+        category = this.toUnderscore(category);
+        if (this._categories.includes(category)) {
+            element.classList.remove("selected");
+            element.classList.add("category-highlight");
+            this._categories.splice(this._categories.indexOf(category), 1);
+        } else {
+            element.classList.add("selected");
+            element.classList.remove("category-highlight");
+            this._categories.push(category);
         }
     }
 
@@ -68,7 +83,52 @@ class Settings {
 
 }
 
-const settings = new Settings();
+class UIForSettings {
+    constructor() {
+        this.mainElement = document.querySelector("#main");
+        this._selectionMenuElement = new SelectionMenu();
+
+        this.render(this.mainElement, this._selectionMenuElement);
+    }
+
+    set selectionMenuElement(menuComp) {
+        this._selectionMenuElement = menuComp;
+        this.mainElement.innerHTML = "";
+        this.render(this.mainElement, this._selectionMenuElement);
+    }
+
+    // toggleSelection(element, category) {
+    //     if (element.classList.contains("category-highlight")) {
+    //         element.classList.add("selected");
+    //         element.classList.remove("category-highlight");
+    //         settings.categories = {
+    //             category: category,
+    //             request: "add"
+    //         };
+    //     } else if (element.classList.contains("selected")) {
+    //         element.classList.remove("selected");
+    //         element.classList.add("category-highlight");
+    //         settings.categories = {
+    //             category: category,
+    //             request: "remove"
+    //         }
+    //     }
+    // }
+
+    render(rootNode, startingNode) {
+
+        rootNode.append(startingNode.element);
+
+        if (startingNode.children) {
+            startingNode.children.forEach((child) => {
+                this.render(rootNode.lastElementChild, child);
+            })
+
+        }
+
+    }
+
+}
 
 class Stats {
     constructor({ questions, gamestate }) {
@@ -462,17 +522,21 @@ class Welcome {
     }
 }
 
+
+
 class Categories {
     constructor() {
 
-        const handler = (event) => {
-            const elements = event.composedPath();
-            const targetElement = elements.find(element => element.classList && element.classList.contains("category"));
-            const category = targetElement ? targetElement.firstElementChild.lastElementChild.innerText : null;
-            settings.toggleSelection(targetElement, category);
-        }
+        // const handler = (event) => {
+        //     if (!event.target.classList.contains("col-8") && !event.target.classList.contains("row")) {
+        //         const elements = event.composedPath();
+        //         const targetElement = elements.find(element => element.classList && element.classList.contains("category"));
+        //         const category = targetElement ? targetElement.firstElementChild.lastElementChild.innerText : null;
+        //         settings.toggleSelection(targetElement, category);
+        //     }
+        // }
 
-        const categories = settings.allCategories().map((category) => new Category(category));
+        const categories = Settings.allCategories.map((category) => new Category(category));
 
         this.element = buildNode("div", { id: "category-selection", className: "row mt-3 justify-content-center" });
         this.children = [
@@ -481,7 +545,7 @@ class Categories {
                 children: [
                     new ParamsButtons(),
                     {
-                        element: buildNode("div", { className: "row justify-content-center gy-4", onclick: handler }),
+                        element: buildNode("div", { className: "row justify-content-center gy-4" }),
                         children: [
                             ...categories
                         ]
@@ -495,12 +559,17 @@ class Categories {
 class Category {
     constructor(category) {
 
+        const handler = (e) => {
+            const category = e.currentTarget.firstElementChild.lastElementChild.textContent;
+            settings.toggleSelection(e.currentTarget, category);
+        }
+
         const cssCategory = category.toLowerCase().replace(/\s/g, "_").replace(/&/g, "and");
 
         this.element = buildNode("div", { className: "col-8 col-sm-6 col-lg-4" });
         this.children = [
             {
-                element: buildNode("div", { id: `cat-${cssCategory}`, className: `card category category-highlight cursor bg-${cssCategory}` }),
+                element: buildNode("div", { id: `cat-${cssCategory}`, className: `card category-highlight cursor bg-${cssCategory}`, onclick: handler }),
                 children: [
                     {
                         element: buildNode("div", { className: "card-body text-center" }),
@@ -536,7 +605,7 @@ class ParamsButtons {
 
         const handler = (e) => {
             if (e.target.classList.contains("bi-check2-all")) {
-                settings.categories = settings.allCategories().map((cat) => settings.toUnderscore(cat));
+                settings.categories = Settings.allCategories.map((cat) => settings.toUnderscore(cat));
             }
         }
 
@@ -1055,107 +1124,6 @@ class Quiz {
         }
     }
 }
-
-
-// UI Class: Handles UI Tasks
-
-class UIForSettings {
-    constructor() {
-        //this.selectionPage = document.querySelector("#selection-menu");
-        //this.selectionElement = document.querySelector("#category-selection");
-        //this.startButton = document.querySelector("#start-button");
-        this.mainElement = document.querySelector("#main");
-        this._selectionMenuElement = new SelectionMenu();
-
-        this.render(this.mainElement, this._selectionMenuElement);
-
-        // this.selectionElement.addEventListener("click", (event) => {
-        //     if (event.target !== this.selectionElement && !event.target.classList.contains("col-sm-12")) {
-        //         const elements = event.composedPath();
-        //         const targetElement = elements.find(element => element.classList.contains("category"));
-        //         const category = targetElement.firstElementChild.lastElementChild.innerText;
-        //         switch (category) {
-        //             case "Science":
-        //                 this.toggleSelection(targetElement, "science");
-        //                 break;
-        //             case "History":
-        //                 this.toggleSelection(targetElement, "history");
-        //                 break;
-        //             case "Geography":
-        //                 this.toggleSelection(targetElement, "geography");
-        //                 break;
-        //             case "Film & TV":
-        //                 this.toggleSelection(targetElement, "movies");
-        //                 break;
-        //             case "Art & Literature":
-        //                 this.toggleSelection(targetElement, "literature");
-        //                 break;
-        //             case "Music":
-        //                 this.toggleSelection(targetElement, "music");
-        //                 break;
-        //             case "Sport & Leisure":
-        //                 this.toggleSelection(targetElement, "sport_and_leisure");
-        //                 break;
-        //             case "General Knowledge":
-        //                 this.toggleSelection(targetElement, "general_knowledge");
-        //                 break;
-        //             case "Society & Culture":
-        //                 this.toggleSelection(targetElement, "society_and_culture");
-        //                 break;
-        //         }
-        //     }
-
-        // });
-
-        // this.startButton.addEventListener("click", () => {
-        //     if (settings.categories.length) {
-        //         settings.fetchQuestions();
-        //         //quiz.init(testQuestions);
-        //         this.selectionPage.style.display = "none";
-        //     }
-        // });
-
-    }
-
-    set selectionMenuElement(menuComp) {
-        this._selectionMenuElement = menuComp;
-        this.mainElement.innerHTML = "";
-        this.render(this.mainElement, this._selectionMenuElement);
-    }
-
-    // toggleSelection(element, category) {
-    //     if (element.classList.contains("category-highlight")) {
-    //         element.classList.add("selected");
-    //         element.classList.remove("category-highlight");
-    //         settings.categories = {
-    //             category: category,
-    //             request: "add"
-    //         };
-    //     } else if (element.classList.contains("selected")) {
-    //         element.classList.remove("selected");
-    //         element.classList.add("category-highlight");
-    //         settings.categories = {
-    //             category: category,
-    //             request: "remove"
-    //         }
-    //     }
-    // }
-
-    render(rootNode, startingNode) {
-
-        rootNode.append(startingNode.element);
-
-        if (startingNode.children) {
-            startingNode.children.forEach((child) => {
-                this.render(rootNode.lastElementChild, child);
-            })
-
-        }
-
-    }
-
-}
-
 
 function buildNode(tag, properties) {
     const element = document.createElement(tag);
@@ -1866,7 +1834,7 @@ class NextButton {
 
 
 // const ui = new UIForSettings;
-
+const settings = new Settings();
 const quiz = new Quiz();
 //const quizBox = new QuizBoxComponent()
 
