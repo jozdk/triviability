@@ -1,3 +1,75 @@
+// Settings
+
+class Settings {
+    constructor() {
+        this._categories = [];
+        this.originalQuestions;
+        this._allCategories = ["Science", "History", "Geography", "Film & TV", "Arts & Literature", "Music", "Sport & Leisure", "General Knowledge", "Society & Culture"];
+        this.ui = new UIForSettings();
+    }
+
+    set categories(selected) {
+        this._categories = selected;
+    }
+
+    get categories() {
+        return this._categories;
+    }
+
+    get allCategories() {
+        return this._allCategories;
+    }
+
+    toggleSelection = (element, category) => {
+        category = this.toUnderscore(category);
+        if (element.classList.contains("category-highlight")) {
+            element.classList.add("selected");
+            element.classList.remove("category-highlight");
+            this._categories.push(category);
+        } else if (element.classList.contains("selected")) {
+            element.classList.remove("selected");
+            element.classList.add("category-highlight");
+            this._categories.splice(this._categories.indexOf(category), 1);
+        }
+    }
+
+    reset() {
+        this._categories = [];
+    }
+
+    checkCategories() {
+        if (this._categories.length) {
+            return this._categories;
+        } else {
+            throw new Error("no categories selected");
+        }
+    }
+
+    async fetchQuestions() {
+        try {
+            const categories = this.checkCategories();
+            //const url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
+            const url = `https://the-trivia-api.com/questions?categories=${categories}&limit=10`
+            const result = await fetch(url);
+            const questions = await result.json();
+            this.originalQuestions = questions;
+            quiz.init(questions);
+        } catch (error) {
+            console.log(error.message);
+        }
+
+    }
+
+    toUnderscore(cat) {
+        if (cat === "Film & TV") cat = "movies";
+        if (cat === "Arts & Literature") cat = "literature";
+        return cat.toLowerCase().replace(/\s/g, "_").replace(/&/g, "and");
+    }
+
+}
+
+const settings = new Settings();
+
 class Stats {
     constructor({ questions, gamestate }) {
 
@@ -13,7 +85,6 @@ class Stats {
         else if (percentScore >= 40) emoji = "bi bi-emoji-neutral";
         else if (percentScore >= 25) emoji = "bi bi-emoji-smile-upside-down";
         else if (percentScore >= 0) emoji = "bi bi-emoji-dizzy";
-        console.log(Math.round(percentScore));
         const colors = questions.map(question => question.category.color).filter((cat, i, arr) => arr.indexOf(cat) === i);
         const times = questions.map(question => question.time);
         const timeTotal = times.reduce((acc, curr) => acc + curr) / 1000;
@@ -26,14 +97,12 @@ class Stats {
             categories[categories.indexOf(cat)] = { category: cat, percent: Math.round(categoryCount[cat] / amountTotal * 100) }
         });
         const catUnused = settings.categories.map(cat => {
-            let category = (cat[0].toUpperCase() + cat.slice(1))
-            .replace("and", "&")
-            .replace(/_/g, " ")
-            .replace(/(?<=\s)[a-z]/g, (match) => match.toUpperCase());
+            let category = cat
+                .replace("and", "&")
+                .replace(/_/g, " ")
+                .replace(/(?<=\s)[a-z]|^[a-z]/g, (match) => match.toUpperCase());
             if (category === "Movies") category = "Film & TV";
             if (category === "Literature") category = "Arts & Literature";
-            console.log(category);
-            console.log(!categories.find(cat => cat.category === category))
             return category;
         }).filter(category => !categories.find(cat => cat.category === category));
         console.log(catUnused);
@@ -374,11 +443,16 @@ class Welcome {
                 element: buildNode("div", { className: "col-12" }),
                 children: [
                     {
-                        element: buildNode("h5", { className: "text-center" }),
+                        element: buildNode("p", { className: "text-center lead" }),
                         children: [
                             {
-                                element: document.createTextNode("Welcome to Triviability! Choose your Categorie(s) and Click the Button below to Start your Quiz!"),
-                                children: null
+                                element: buildNode("strong"),
+                                children: [
+                                    {
+                                        element: document.createTextNode("Welcome to Triviability! Choose your Categorie(s) and Click the Button below to Start your Quiz!"),
+                                        children: null
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -391,63 +465,14 @@ class Welcome {
 class Categories {
     constructor() {
 
-        this.toggleSelection = (element, category) => {
-            if (element.classList.contains("category-highlight")) {
-                element.classList.add("selected");
-                element.classList.remove("category-highlight");
-                settings.categories = {
-                    category: category,
-                    request: "add"
-                };
-            } else if (element.classList.contains("selected")) {
-                element.classList.remove("selected");
-                element.classList.add("category-highlight");
-                settings.categories = {
-                    category: category,
-                    request: "remove"
-                }
-            }
-        }
-
         const handler = (event) => {
             const elements = event.composedPath();
             const targetElement = elements.find(element => element.classList && element.classList.contains("category"));
             const category = targetElement ? targetElement.firstElementChild.lastElementChild.innerText : null;
-            switch (category) {
-                case "Science":
-                    this.toggleSelection(targetElement, "science");
-                    break;
-                case "History":
-                    this.toggleSelection(targetElement, "history");
-                    break;
-                case "Geography":
-                    this.toggleSelection(targetElement, "geography");
-                    break;
-                case "Film & TV":
-                    this.toggleSelection(targetElement, "movies");
-                    break;
-                case "Arts & Literature":
-                    this.toggleSelection(targetElement, "literature");
-                    break;
-                case "Music":
-                    this.toggleSelection(targetElement, "music");
-                    break;
-                case "Sport & Leisure":
-                    this.toggleSelection(targetElement, "sport_and_leisure");
-                    break;
-                case "General Knowledge":
-                    this.toggleSelection(targetElement, "general_knowledge");
-                    break;
-                case "Society & Culture":
-                    this.toggleSelection(targetElement, "society_and_culture");
-                    break;
-            }
+            settings.toggleSelection(targetElement, category);
         }
 
-        const categories = ["Science", "History", "Geography", "Film & TV", "Arts & Literature", "Music", "Sport & Leisure", "General Knowledge", "Society & Culture"]
-            .map((category) => {
-                return new Category(category);
-            });
+        const categories = settings.allCategories().map((category) => new Category(category));
 
         this.element = buildNode("div", { id: "category-selection", className: "row mt-3 justify-content-center" });
         this.children = [
@@ -508,6 +533,13 @@ class Category {
 
 class ParamsButtons {
     constructor() {
+
+        const handler = (e) => {
+            if (e.target.classList.contains("bi-check2-all")) {
+                settings.categories = settings.allCategories().map((cat) => settings.toUnderscore(cat));
+            }
+        }
+
         this.element = buildNode("div", { className: "row justify-content-end py-2" });
         this.children = [
             {
@@ -523,7 +555,7 @@ class ParamsButtons {
                 element: buildNode("div", { className: "col-auto" }),
                 children: [
                     {
-                        element: buildNode("i", { className: "bi bi-check2-all fs-4 cursor", dataset: { bsToggle: "tooltip", bsPlacement: "top", bsOriginalTitle: "Select All" } }),
+                        element: buildNode("i", { className: "bi bi-check2-all fs-4 cursor", dataset: { bsToggle: "tooltip", bsPlacement: "top", bsOriginalTitle: "Select All" }, onclick: handler }),
                         children: null
                     }
                 ]
@@ -553,7 +585,7 @@ class SettingsModal {
             e.target.previousElementSibling.textContent = `${e.target.value} Questions`;
         }
 
-        this.element = buildNode("div", { className: "modal fade", id: "quiz-settings", tabIndex: -1,  });
+        this.element = buildNode("div", { className: "modal fade", id: "quiz-settings", tabIndex: -1, });
         this.children = [
             {
                 element: buildNode("div", { className: "modal-dialog" }),
@@ -612,7 +644,7 @@ class SettingsModal {
 class Switch {
     constructor({ type }) {
 
-        const handler = (e) => {      
+        const handler = (e) => {
             if (e.target.checked === true) {
                 if (e.target.parentElement.nextElementSibling) {
                     e.target.parentElement.nextElementSibling.firstElementChild.checked = false;
@@ -667,54 +699,6 @@ class StartButton {
     }
 }
 
-// Settings
-
-class Settings {
-    constructor() {
-        this._categories = [];
-        this.originalQuestions;
-        this.ui = new UIForSettings(); 
-    }
-
-    set categories(selected) {
-        if (selected.request === "add") {
-            this._categories.push(selected.category);
-        } else if (selected.request === "remove") {
-            this._categories = this._categories.filter(cat => cat !== selected.category);
-        }
-    }
-
-    get categories() {
-        return this._categories;
-    }
-
-    reset() {
-        this._categories = [];
-    }
-
-    checkCategories() {
-        if (this._categories.length) {
-            return this._categories;
-        } else {
-            throw new Error("no categories selected");
-        }
-    }
-
-    async fetchQuestions() {
-        try {
-            const categories = this.checkCategories();
-            //const url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
-            const url = `https://the-trivia-api.com/questions?categories=${categories}&limit=10`
-            const result = await fetch(url);
-            const questions = await result.json();
-            this.originalQuestions = questions;
-            quiz.init(questions);
-        } catch (error) {
-            console.log(error.message);
-        }
-
-    }
-}
 
 
 // Question Class: Represents a Question
@@ -1882,7 +1866,7 @@ class NextButton {
 
 
 // const ui = new UIForSettings;
-const settings = new Settings();
+
 const quiz = new Quiz();
 //const quizBox = new QuizBoxComponent()
 
