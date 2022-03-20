@@ -2,49 +2,61 @@ class Settings {
     constructor() {
         this._categories = [];
         this.originalQuestions;
-        this.ui = new UIForSettings();
+        this.ui = new UIForSettings(this._categories);
     }
 
     static allCategories = ["Science", "History", "Geography", "Film & TV", "Arts & Literature", "Music", "Sport & Leisure", "General Knowledge", "Society & Culture"];
-
-    set categories(selected) {
-        this._categories = selected;
-        selected.forEach((cat) => {
-
-        })
-    }
 
     get categories() {
         return this._categories;
     }
 
-    get allCategories() {
-        return this._allCategories;
+    // toggleSelection0 = (element, category) => {
+    //     category = toUnderscore(category);
+    //     if (this._categories.includes(category)) {
+    //         element.classList.remove("selected");
+    //         element.classList.add("category-highlight");
+    //         this._categories.splice(this._categories.indexOf(category), 1);
+    //     } else {
+    //         element.classList.add("selected");
+    //         element.classList.remove("category-highlight");
+    //         this._categories.push(category);
+    //     }
+    // }
+
+    toggleSelection = (category) => {
+        category = toUnderscore(category);
+        if (this._categories.includes(category)) this._categories.splice(this._categories.indexOf(category), 1);
+        else this._categories.push(category);
+        this.ui.selectionMenuElement = new SelectionMenu({ selected: this._categories });
     }
 
-    toggleSelectio = (element, category) => {
-        category = this.toUnderscore(category);
-        if (element.classList.contains("category-highlight")) {
-            element.classList.add("selected");
-            element.classList.remove("category-highlight");
-            this._categories.push(category);
-        } else if (element.classList.contains("selected")) {
-            element.classList.remove("selected");
-            element.classList.add("category-highlight");
-            this._categories.splice(this._categories.indexOf(category), 1);
+    selectAll() {
+        if (this._categories.length !== Settings.allCategories.length) {
+            this._categories = Settings.allCategories.map((cat) => toUnderscore(cat));
+            this._categories.forEach((cat) => {
+                if (cat === "movies") cat = "film_and_tv";
+                if (cat === "literature") cat = "arts_and_literature";
+                document.getElementById(`category-${cat}`).classList.add("selected");
+                document.getElementById(`category-${cat}`).classList.remove("category-highlight")
+            });
+        } else {
+            this._categories.forEach(cat => {
+                if (cat === "movies") cat = "film_and_tv";
+                if (cat === "literature") cat = "arts_and_literature";
+                document.getElementById(`category-${cat}`).classList.add("category-highlight");
+                document.getElementById(`category-${cat}`).classList.remove("selected")
+            });
+            this._categories = [];
         }
     }
 
-    toggleSelection = (element, category) => {
-        category = this.toUnderscore(category);
-        if (this._categories.includes(category)) {
-            element.classList.remove("selected");
-            element.classList.add("category-highlight");
-            this._categories.splice(this._categories.indexOf(category), 1);
-        } else {
-            element.classList.add("selected");
-            element.classList.remove("category-highlight");
-            this._categories.push(category);
+    random() {
+        this._categories = [];
+        const pool = Settings.allCategories.map(cat => toUnderscore(cat));
+        const amount = Math.floor(Math.random() * (Settings.allCategories.length - 1) + 1);
+        while (this._categories.length < amount) {
+            this._categories.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
         }
     }
 
@@ -75,43 +87,36 @@ class Settings {
 
     }
 
-    toUnderscore(cat) {
-        if (cat === "Film & TV") cat = "movies";
-        if (cat === "Arts & Literature") cat = "literature";
-        return cat.toLowerCase().replace(/\s/g, "_").replace(/&/g, "and");
-    }
-
 }
 
 class UIForSettings {
-    constructor() {
+    constructor(selected) {
         this.mainElement = document.querySelector("#main");
-        this._selectionMenuElement = new SelectionMenu();
+        this._selectionMenuElement = new SelectionMenu({ selected });
 
         this.render(this.mainElement, this._selectionMenuElement);
     }
 
     set selectionMenuElement(menuComp) {
+        console.log("...rendering selection menu")
         this._selectionMenuElement = menuComp;
         this.mainElement.innerHTML = "";
         this.render(this.mainElement, this._selectionMenuElement);
+    }
+
+    get selectionMenuElement() {
+        return this._selectionMenuElement;
     }
 
     // toggleSelection(element, category) {
     //     if (element.classList.contains("category-highlight")) {
     //         element.classList.add("selected");
     //         element.classList.remove("category-highlight");
-    //         settings.categories = {
-    //             category: category,
-    //             request: "add"
-    //         };
+    //         settings.categories = category;
     //     } else if (element.classList.contains("selected")) {
     //         element.classList.remove("selected");
     //         element.classList.add("category-highlight");
-    //         settings.categories = {
-    //             category: category,
-    //             request: "remove"
-    //         }
+    //         settings.categories = category;      
     //     }
     // }
 
@@ -484,14 +489,14 @@ class DataCell {
 }
 
 class SelectionMenu {
-    constructor() {
+    constructor({ selected }) {
         this.element = buildNode("div", { id: "selection-menu", className: "container" });
         this.children = [
             new Welcome(),
-            new Categories(),
+            new Categories({ selected }),
             new SettingsModal(),
             new StartButton()
-        ]
+        ];
     }
 }
 
@@ -522,10 +527,8 @@ class Welcome {
     }
 }
 
-
-
 class Categories {
-    constructor() {
+    constructor({ selected }) {
 
         // const handler = (event) => {
         //     if (!event.target.classList.contains("col-8") && !event.target.classList.contains("row")) {
@@ -536,7 +539,9 @@ class Categories {
         //     }
         // }
 
-        const categories = Settings.allCategories.map((category) => new Category(category));
+        const categories = Settings.allCategories.map((category) => {
+            return new Category({ category, selected: selected.includes(toUnderscore(category)) })
+        });
 
         this.element = buildNode("div", { id: "category-selection", className: "row mt-3 justify-content-center" });
         this.children = [
@@ -557,19 +562,19 @@ class Categories {
 }
 
 class Category {
-    constructor(category) {
+    constructor({ category, selected }) {
 
         const handler = (e) => {
             const category = e.currentTarget.firstElementChild.lastElementChild.textContent;
-            settings.toggleSelection(e.currentTarget, category);
+            settings.toggleSelection(category);
         }
 
-        const cssCategory = category.toLowerCase().replace(/\s/g, "_").replace(/&/g, "and");
+        const cat = toUnderscore(category);
 
         this.element = buildNode("div", { className: "col-8 col-sm-6 col-lg-4" });
         this.children = [
             {
-                element: buildNode("div", { id: `cat-${cssCategory}`, className: `card category-highlight cursor bg-${cssCategory}`, onclick: handler }),
+                element: buildNode("div", { id: `category-${cat}`, className: `card cursor bg-${cat}${selected ? " selected" : " category-highlight"}`, onclick: handler }),
                 children: [
                     {
                         element: buildNode("div", { className: "card-body text-center" }),
@@ -605,7 +610,10 @@ class ParamsButtons {
 
         const handler = (e) => {
             if (e.target.classList.contains("bi-check2-all")) {
-                settings.categories = Settings.allCategories.map((cat) => settings.toUnderscore(cat));
+                settings.selectAll();
+            }
+            if (e.target.classList.contains("bi-shuffle")) {
+                settings.random();
             }
         }
 
@@ -615,7 +623,7 @@ class ParamsButtons {
                 element: buildNode("div", { className: "col-auto" }),
                 children: [
                     {
-                        element: buildNode("i", { className: "bi bi-shuffle fs-4 cursor", dataset: { bsToggle: "tooltip", bsPlacement: "top", bsOriginalTitle: "Random" } }),
+                        element: buildNode("i", { className: "bi bi-shuffle fs-4 cursor", dataset: { bsToggle: "tooltip", bsPlacement: "top", bsOriginalTitle: "Random" }, onclick: handler }),
                         children: null
                     }
                 ]
@@ -776,7 +784,7 @@ class Question {
     constructor(question) {
         this.category = {
             title: question.category,
-            color: question.category.toLowerCase().replace(/\s/g, "_").replace(/&/g, "and")
+            color: toUnderscore(question.category)
         };
         this.type = question.type;
         this.question = question.category === "Film & TV" ? question.question.replace(/featued/gm, "featured") : question.question;
@@ -1075,7 +1083,21 @@ function buildNode(tag, properties) {
     return element;
 }
 
+function toUnderscore(cat) {
+    if (cat === "Film & TV") cat = "movies";
+    if (cat === "Arts & Literature") cat = "literature";
+    return cat.toLowerCase().replace(/\s/g, "_").replace(/&/g, "and");
+}
 
+function capitalize(cat) {
+    let category = cat
+        .replace("and", "&")
+        .replace(/_/g, " ")
+        .replace(/(?<=\s)[a-z]|^[a-z]/g, (match) => match.toUpperCase());
+    if (category === "Movies") category = "Film & TV";
+    if (category === "Literature") category = "Arts & Literature";
+    return category;
+}
 
 class QuizComponent {
     constructor({ question, gamestate, timer }) {
