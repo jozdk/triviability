@@ -1,6 +1,7 @@
 class Settings {
     constructor() {
         this._categories = [];
+        this._amount = 9;
         this.originalQuestions;
         this.ui = new UIForSettings(this._categories);
     }
@@ -9,6 +10,14 @@ class Settings {
 
     get categories() {
         return this._categories;
+    }
+
+    get amount() {
+        return this._amount;
+    }
+
+    set amount(number) {
+        this._amount = number;
     }
 
     toggleSelection = (category) => {
@@ -50,7 +59,8 @@ class Settings {
         try {
             const categories = this.checkCategories();
             //const url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
-            const url = `https://the-trivia-api.com/questions?categories=${categories}&limit=10`
+            const url = `https://the-trivia-api.com/questions?categories=${categories}&limit=${this._amount + 1}`;
+            console.log(url);
             const result = await fetch(url);
             const questions = await result.json();
             this.originalQuestions = questions;
@@ -68,7 +78,7 @@ class UIForSettings {
         this.mainElement = document.querySelector("#main");
         this._selectionMenuElement = new SelectionMenu({ selected });
 
-        this.render(this.mainElement, this._selectionMenuElement);
+        //this.render(this.mainElement, this._selectionMenuElement);
     }
 
     set selectionMenuElement(menuComp) {
@@ -632,6 +642,7 @@ class SettingsModal {
 
         const handler = (e) => {
             e.target.previousElementSibling.textContent = `${e.target.value} Questions`;
+            settings.amount = parseInt(e.target.value);
         }
 
         this.element = buildNode("div", { className: "modal fade", id: "quiz-settings", tabIndex: -1, });
@@ -1071,6 +1082,17 @@ function capitalize(cat) {
     return category;
 }
 
+function resultIcon(value) {
+    switch (value) {
+        case "unanswered":
+            return "circle";
+        case "correct":
+            return "check-circle";
+        case "wrong":
+            return "x-circle";
+    }
+}
+
 class QuizComponent {
     constructor({ question, gamestate, timer }) {
         this.root = {
@@ -1106,8 +1128,8 @@ class InfoRail {
                     {
                         element: buildNode("div", { className: "d-none d-md-flex col-md-12 col-xl-10 col-xxl-9 bg-light rounded-lg flex-column" }),
                         children: [
-                            new InfoHeader({ category: question.category, answered: gamestate.answered }),
-                            new Timer({ category: question.category, timer }),
+                            new InfoHeader({ category: question.category, answered: gamestate.answered, total: gamestate.board.length }),
+                            new Timer({ category: question.category, timer, amount: gamestate.board.length }),
                             new Score({ points: gamestate.points, board: gamestate.board })
                         ]
                     }
@@ -1119,8 +1141,8 @@ class InfoRail {
 
 
 class InfoHeader {
-    constructor({ category, answered }) {
-        this.element = buildNode("div", { className: "row mb-1 p-3" });
+    constructor({ category, answered, total }) {
+        this.element = buildNode("div", { className: "row p-3" });
         this.children = [
             {
                 element: buildNode("div", { className: `col rounded-lg p-2 bg-${category.color}` }),
@@ -1129,7 +1151,7 @@ class InfoHeader {
                         element: buildNode("p", { className: "px-0 my-2 text-center small-font" }),
                         children: [
                             {
-                                element: document.createTextNode(`QUESTION ${answered + 1} of 9`),
+                                element: document.createTextNode(`QUESTION ${answered + 1} of ${total}`),
                                 children: null
                             }
                         ]
@@ -1141,9 +1163,9 @@ class InfoHeader {
 }
 
 class Timer {
-    constructor({ category, timer }) {
+    constructor({ category, timer, amount }) {
 
-        this.element = buildNode("div", { id: "timer-component", className: "row py-3" });
+        this.element = buildNode("div", { id: "timer-component", className: `row ${amount <= 12 ? "py-3" : "pb-3 pt-2"}` });
         this.children = [
             {
                 element: buildNode("div", { className: "col text-center d-flex flex-column align-items-center" }),
@@ -1307,11 +1329,11 @@ class Time {
 class Score {
     constructor({ points, board }) {
 
-        const boardFields = board.map(field => {
-            return new BoardField({ field });
+        const boardFields = board.map((field, i, arr) => {
+            return new BoardField({ field, length: arr.length });
         });
 
-        this.element = buildNode("div", { id: "score-component", className: "row mb-1 py-3 px-lg-4 px-md-1 text-center" });
+        this.element = buildNode("div", { id: "score-component", className: "row py-3 px-lg-4 px-md-1 text-center" });
         this.children = [
             {
                 element: buildNode("div", { className: "col-12" }),
@@ -1331,7 +1353,7 @@ class Score {
                 element: buildNode("div", { className: "col-12" }),
                 children: [
                     {
-                        element: buildNode("h3", { className: "py-3" }),
+                        element: buildNode("h3", { className: "py-3 mb-0" }),
                         children: [
                             {
                                 element: document.createTextNode(points),
@@ -1347,11 +1369,23 @@ class Score {
 }
 
 class BoardField {
-    constructor({ field }) {
-        this.element = buildNode("div", { className: "col-4 px-0" });
+    constructor({ field, length }) {
+
+        const icon = (value) => {
+            switch (value) {
+                case "unanswered":
+                    return "circle";
+                case "correct":
+                    return "check-circle";
+                case "wrong":
+                    return "x-circle";
+            }
+        }
+
+        this.element = buildNode("div", { className: length < 13 ? "col-4 px-0" : "col-3 px-1" });
         this.children = [
             {
-                element: buildNode("i", { className: `fs-3 bi bi-${resultIcon(field)}-fill board-${field}` }),
+                element: buildNode("i", { className: `bi bi-${icon(field)}-fill board-${field} fs-${length < 13 ? "3" : "4"}` }),
                 children: null
             }
         ]
@@ -1573,7 +1607,7 @@ class Answer {
 class Controls {
     constructor({ result, gamestate }) {
 
-        const text = gamestate.board[8] !== "unanswered" ? "View Results" : "Next Question";
+        const text = gamestate.board[settings.amount - 1] !== "unanswered" ? "View Results" : "Next Question";
 
         this.element = buildNode("div", { className: "row justify-content-center mt-3" });
         this.children = [
@@ -1825,25 +1859,16 @@ function depthFirstTraversalTest(rootNode, startingNode) {
 // }).root);
 
 
-function resultIcon(value) {
-    switch (value) {
-        case "unanswered":
-            return "circle";
-        case "correct":
-            return "check-circle";
-        case "wrong":
-            return "x-circle";
-    }
-}
 
 
 
-const testQuestions = [{ "category": "Geography", "correctAnswer": "Africa", "id": 6696, "incorrectAnswers": ["South America", "Oceania", "Europe", "Asia", "North America"], "question": "Togo is located on which continent?", "type": "Multiple Choice" }, { "category": "Music", "correctAnswer": "Sudan", "id": 6549, "incorrectAnswers": ["South Sudan", "Egypt", "Republic of the Congo", "Equatorial Guinea", "Gabon", "Benin", "Democratic Republic of the Congo", "Eritrea", "Uganda", "Togo", "São Tomé and Príncipe", "Rwanda", "Tunisia", "Malta"], "question": "Which of these countries borders Chad?", "type": "Multiple Choice" }, { "category": "Arts & Literature", "correctAnswer": "Asia", "id": 22872, "incorrectAnswers": ["Europe", "Africa", "North America", "South America"], "question": "Which is the Earth's largest continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "South America", "id": 6683, "incorrectAnswers": ["Oceania", "Europe", "Asia", "Africa", "North America"], "question": "Suriname is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Spain", "id": 5713, "incorrectAnswers": ["Portugal", "Andorra", "Mali", "Tunisia", "France", "Monaco", "Senegal", "Burkina Faso", "Switzerland", "The Gambia", "Malta", "Ireland", "Italy", "Belgium", "Luxembourg", "Liechtenstein", "Niger"], "question": "Morocco shares a land border with which of these countries?", "type": "Multiple Choice" }, { "category": "History", "correctAnswer": "Tripoli", "id": 19272, "incorrectAnswers": ["Benghazi", "Tunis", "Alexandria"], "question": "What is the capital of Libya?", "type": "Multiple Choice" }, { "category": "History", "correctAnswer": "Europe", "id": 6685, "incorrectAnswers": ["South America", "Oceania", "Asia", "Africa", "North America"], "question": "Andorra is located on which continent?", "type": "Multiple Choice" }, { "category": "Arts & Literature", "correctAnswer": "East Timor", "id": 5609, "incorrectAnswers": ["Solomon Islands", "Vanuatu", "Palau", "Brunei", "Nauru", "Federated States of Micronesia", "Fiji", "Philippines", "Malaysia", "Singapore", "Tuvalu", "Kiribati", "Marshall Islands", "Cambodia", "Vietnam", "Thailand"], "question": "Which of these countries borders Australia?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Austria", "id": 19550, "incorrectAnswers": ["Croatia", "San Marino", "Bosnia and Herzegovina", "Romania", "Poland"], "question": "Which country borders Italy, Switzerland, Germany, Czech Republic, Hungary, Slovenia, and Liechtenstein?", "type": "Multiple Choice" }];
+
+const testQuestionsA = [{ "category": "Geography", "correctAnswer": "Africa", "id": 6696, "incorrectAnswers": ["South America", "Oceania", "Europe", "Asia", "North America"], "question": "Togo is located on which continent?", "type": "Multiple Choice" }, { "category": "Music", "correctAnswer": "Sudan", "id": 6549, "incorrectAnswers": ["South Sudan", "Egypt", "Republic of the Congo", "Equatorial Guinea", "Gabon", "Benin", "Democratic Republic of the Congo", "Eritrea", "Uganda", "Togo", "São Tomé and Príncipe", "Rwanda", "Tunisia", "Malta"], "question": "Which of these countries borders Chad?", "type": "Multiple Choice" }, { "category": "Arts & Literature", "correctAnswer": "Asia", "id": 22872, "incorrectAnswers": ["Europe", "Africa", "North America", "South America"], "question": "Which is the Earth's largest continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "South America", "id": 6683, "incorrectAnswers": ["Oceania", "Europe", "Asia", "Africa", "North America"], "question": "Suriname is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Spain", "id": 5713, "incorrectAnswers": ["Portugal", "Andorra", "Mali", "Tunisia", "France", "Monaco", "Senegal", "Burkina Faso", "Switzerland", "The Gambia", "Malta", "Ireland", "Italy", "Belgium", "Luxembourg", "Liechtenstein", "Niger"], "question": "Morocco shares a land border with which of these countries?", "type": "Multiple Choice" }, { "category": "History", "correctAnswer": "Tripoli", "id": 19272, "incorrectAnswers": ["Benghazi", "Tunis", "Alexandria"], "question": "What is the capital of Libya?", "type": "Multiple Choice" }, { "category": "History", "correctAnswer": "Europe", "id": 6685, "incorrectAnswers": ["South America", "Oceania", "Asia", "Africa", "North America"], "question": "Andorra is located on which continent?", "type": "Multiple Choice" }, { "category": "Arts & Literature", "correctAnswer": "East Timor", "id": 5609, "incorrectAnswers": ["Solomon Islands", "Vanuatu", "Palau", "Brunei", "Nauru", "Federated States of Micronesia", "Fiji", "Philippines", "Malaysia", "Singapore", "Tuvalu", "Kiribati", "Marshall Islands", "Cambodia", "Vietnam", "Thailand"], "question": "Which of these countries borders Australia?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Austria", "id": 19550, "incorrectAnswers": ["Croatia", "San Marino", "Bosnia and Herzegovina", "Romania", "Poland"], "question": "Which country borders Italy, Switzerland, Germany, Czech Republic, Hungary, Slovenia, and Liechtenstein?", "type": "Multiple Choice" }];
 
 
 const testQuestionsB = [{ "category": "Science", "id": "622a1c3a7cc59eab6f95106f", "correctAnswer": "Dynamite", "incorrectAnswers": ["The combustion engine", "Plastic", "The printing press"], "question": "What Did Alfred Nobel Invent Before Initiating His Nobel Peace Prize Award Scheme?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950553", "correctAnswer": "the relationship between electric phenomena and bodily processes", "incorrectAnswers": ["animals", "the practice of escaping from restraints or other traps", "plant diseases"], "question": "What is Electrophysiology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950504", "correctAnswer": "the signification and application of words", "incorrectAnswers": ["statistics such as births, deaths, income, or the incidence of disease, which illustrate the changing structure of human populations", "crayfish", "butterflies and moths"], "question": "What is Lexicology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "unknown", "correctAnswer": "4", "incorrectAnswers": ["2", "3", "1"], "question": "How Many Chambers Are There In Your Heart?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f9510b3", "correctAnswer": "Jupiter", "incorrectAnswers": ["Venus", "Neptune", "Saturn"], "question": "Name the largest planet in the solar system.", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950559", "correctAnswer": "interactions among organisms and the water cycle", "incorrectAnswers": ["a variant of physiognomy", "the structure of cells", "the effect of evolution on ethology"], "question": "What is Ecohydrology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f950fd4", "correctAnswer": "Asbestos", "incorrectAnswers": ["Bleach", "Ethanol", "Methadone"], "question": "Which substance takes its name from the Greek for `not flammable'?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f950fd8", "correctAnswer": "Kidney", "incorrectAnswers": ["Liver", "Lung"], "question": "Which vital organ does the adjective renal refer to?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950544", "correctAnswer": "race", "incorrectAnswers": ["parasites", "in ethics, duty", "rocks"], "question": "What is Ethnology the study of?", "tags": [], "type": "Multiple Choice" }];
 
-const testQuestionsScience = [
+const testQuestionsC = [
     {
         "category": "Science",
         "id": "622a1c397cc59eab6f950c2d",
@@ -1973,10 +1998,158 @@ const testQuestionsScience = [
         "question": "Which English-American psychedelic rock band released the album 'Are You Experienced'?",
         "tags": [],
         "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c377cc59eab6f95052a",
+        "correctAnswer": "gross and disgusting things",
+        "incorrectAnswers": [
+            "crayfish",
+            "plant nutrition and growth in relation to soil conditions",
+            "periodic biological phenomena such as flowering, migration, breeding, etc"
+        ],
+        "question": "What is Grossology the study of?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c377cc59eab6f950487",
+        "correctAnswer": "the study or exploration of caves",
+        "incorrectAnswers": [
+            "how to encrypt and decrypt secret messages",
+            "methods",
+            "methods"
+        ],
+        "question": "What is Speleology the study of?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c3a7cc59eab6f9510c2",
+        "correctAnswer": "Flax",
+        "incorrectAnswers": [
+            "Sunflower",
+            "Hemp",
+            "Wheat"
+        ],
+        "question": "Linen is obtained from the fibers of what plant?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c3a7cc59eab6f95108e",
+        "correctAnswer": "Alchemy",
+        "incorrectAnswers": [
+            "Magic",
+            "Aurentalism",
+            "Mystic Metallurgy"
+        ],
+        "question": "The ancient attempt to transmute base metals into gold was called ________.",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c3a7cc59eab6f950fee",
+        "correctAnswer": "Coypu",
+        "incorrectAnswers": [
+            "Beaver",
+            "Rat",
+            "Capybara"
+        ],
+        "question": "Which Large Rodent Is Also Known As Nutria?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c3a7cc59eab6f951003",
+        "correctAnswer": "Black Widow",
+        "incorrectAnswers": [
+            "Tarantula",
+            "Jumping Spider",
+            "Crab Spider"
+        ],
+        "question": "Which Spider Devours Its Partner After Mating?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c3a7cc59eab6f95103c",
+        "correctAnswer": "Ra",
+        "incorrectAnswers": [
+            "Rd",
+            "Gi",
+            "Rm"
+        ],
+        "question": "What is the chemical symbol for radium?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c3a7cc59eab6f950ffc",
+        "correctAnswer": "Cirrhosis",
+        "incorrectAnswers": [
+            "Hepatitis",
+            "Scurvy",
+            "Meningitis"
+        ],
+        "question": "Which Disease Of The Liver Is Associated With Alcoholism?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c3a7cc59eab6f950fc4",
+        "correctAnswer": "James Watt",
+        "incorrectAnswers": [
+            "Benjamin Franklin",
+            "Eli Whitney",
+            "Marcus Steam"
+        ],
+        "question": "Who Invented The Steam Engine?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c377cc59eab6f95056b",
+        "correctAnswer": "how to encrypt and decrypt secret messages",
+        "incorrectAnswers": [
+            "animal diseases",
+            "sacred texts",
+            "feces"
+        ],
+        "question": "What is Cryptology the study of?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Science",
+        "id": "622a1c377cc59eab6f950540",
+        "correctAnswer": "writing systems",
+        "incorrectAnswers": [
+            "the field of dermatological anatomical pathology",
+            "the atmosphere",
+            "existence"
+        ],
+        "question": "What is Grammatology the study of?",
+        "tags": [],
+        "type": "Multiple Choice"
     }
 ]
 
-//quiz.init(testQuestionsScience);
+const testQuestionsD = [];
+for (let i = 0; i <= 18; i++) {
+    testQuestionsD.push(testQuestionsC[i]);
+}
+
+quiz.init(testQuestionsD);
 
 const secondHalf = document.querySelector(".second-half-js");
 const firstHalf = document.querySelector(".first-half-js");
