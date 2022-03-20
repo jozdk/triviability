@@ -11,19 +11,6 @@ class Settings {
         return this._categories;
     }
 
-    // toggleSelection0 = (element, category) => {
-    //     category = toUnderscore(category);
-    //     if (this._categories.includes(category)) {
-    //         element.classList.remove("selected");
-    //         element.classList.add("category-highlight");
-    //         this._categories.splice(this._categories.indexOf(category), 1);
-    //     } else {
-    //         element.classList.add("selected");
-    //         element.classList.remove("category-highlight");
-    //         this._categories.push(category);
-    //     }
-    // }
-
     toggleSelection = (category) => {
         category = toUnderscore(category);
         if (this._categories.includes(category)) this._categories.splice(this._categories.indexOf(category), 1);
@@ -32,32 +19,19 @@ class Settings {
     }
 
     selectAll() {
-        if (this._categories.length !== Settings.allCategories.length) {
-            this._categories = Settings.allCategories.map((cat) => toUnderscore(cat));
-            this._categories.forEach((cat) => {
-                if (cat === "movies") cat = "film_and_tv";
-                if (cat === "literature") cat = "arts_and_literature";
-                document.getElementById(`category-${cat}`).classList.add("selected");
-                document.getElementById(`category-${cat}`).classList.remove("category-highlight")
-            });
-        } else {
-            this._categories.forEach(cat => {
-                if (cat === "movies") cat = "film_and_tv";
-                if (cat === "literature") cat = "arts_and_literature";
-                document.getElementById(`category-${cat}`).classList.add("category-highlight");
-                document.getElementById(`category-${cat}`).classList.remove("selected")
-            });
-            this._categories = [];
-        }
+        if (this._categories.length !== Settings.allCategories.length) this._categories = Settings.allCategories.map((cat) => toUnderscore(cat));
+        else this._categories = [];
+        this.ui.selectionMenuElement = new SelectionMenu({ selected: this._categories });
     }
 
-    random() {
+    selectRandom() {
         this._categories = [];
         const pool = Settings.allCategories.map(cat => toUnderscore(cat));
         const amount = Math.floor(Math.random() * (Settings.allCategories.length - 1) + 1);
         while (this._categories.length < amount) {
             this._categories.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
         }
+        this.ui.selectionMenuElement = new SelectionMenu({ selected: this._categories });
     }
 
     reset() {
@@ -98,7 +72,6 @@ class UIForSettings {
     }
 
     set selectionMenuElement(menuComp) {
-        console.log("...rendering selection menu")
         this._selectionMenuElement = menuComp;
         this.mainElement.innerHTML = "";
         this.render(this.mainElement, this._selectionMenuElement);
@@ -170,7 +143,6 @@ class Stats {
             if (category === "Literature") category = "Arts & Literature";
             return category;
         }).filter(category => !categories.find(cat => cat.category === category));
-        console.log(catUnused);
 
         // Create Element
         this.element = buildNode("div", { id: "stats-element", className: "container" });
@@ -311,7 +283,7 @@ class ControlsB {
         const catHandler = () => {
             quiz.reset();
             settings.reset();
-            settings.ui.selectionMenuElement = new SelectionMenu();
+            settings.ui.selectionMenuElement = new SelectionMenu({ selected: settings.categories });
         }
 
         const playHandler = () => {
@@ -390,7 +362,7 @@ class StatsBox {
             }
         })
 
-        const hexColors = { "science": "#03FCBA", "history": "#FFF75C", "geography": "#D47AE8", "film_and_tv": "#EA3452", "arts_and_literature": "#71FEFA", "music": "#FFA552", "sport_and_leisure": "#D2FF96", "general_knowledge": "#C4AF9A", "society_and_culture": "#FF579F" };
+        const hexColors = { "science": "#03FCBA", "history": "#FFF75C", "geography": "#D47AE8", "movies": "#EA3452", "literature": "#71FEFA", "music": "#FFA552", "sport_and_leisure": "#D2FF96", "general_knowledge": "#C4AF9A", "society_and_culture": "#FF579F" };
 
         this.element = buildNode("div", { className: "col-auto mt-5" });
         this.children = [
@@ -613,7 +585,7 @@ class ParamsButtons {
                 settings.selectAll();
             }
             if (e.target.classList.contains("bi-shuffle")) {
-                settings.random();
+                settings.selectRandom();
             }
         }
 
@@ -623,7 +595,7 @@ class ParamsButtons {
                 element: buildNode("div", { className: "col-auto" }),
                 children: [
                     {
-                        element: buildNode("i", { className: "bi bi-shuffle fs-4 cursor", dataset: { bsToggle: "tooltip", bsPlacement: "top", bsOriginalTitle: "Random" }, onclick: handler }),
+                        element: buildNode("i", { className: "bi bi-shuffle fs-4 cursor", onclick: handler }),
                         children: null
                     }
                 ]
@@ -632,7 +604,7 @@ class ParamsButtons {
                 element: buildNode("div", { className: "col-auto" }),
                 children: [
                     {
-                        element: buildNode("i", { className: "bi bi-check2-all fs-4 cursor", dataset: { bsToggle: "tooltip", bsPlacement: "top", bsOriginalTitle: "Select All" }, onclick: handler }),
+                        element: buildNode("i", { className: "bi bi-check2-all fs-4 cursor", onclick: handler }),
                         children: null
                     }
                 ]
@@ -641,7 +613,7 @@ class ParamsButtons {
                 element: buildNode("div", { className: "col-auto" }),
                 children: [
                     {
-                        element: buildNode("span", { dataset: { bsToggle: "tooltip", bsPlacement: "top", bsOriginalTitle: "Quiz Settings" } }),
+                        element: buildNode("span"),
                         children: [
                             {
                                 element: buildNode("i", { className: "bi bi-gear fs-4 cursor", dataset: { bsToggle: "modal", bsTarget: "#quiz-settings" } }),
@@ -1634,7 +1606,7 @@ class BackButtonB {
         const handler = () => {
             quiz.reset();
             settings.reset();
-            settings.ui.selectionMenuElement = new SelectionMenu();
+            settings.ui.selectionMenuElement = new SelectionMenu({ selected: settings.categories });
         }
 
         this.element = buildNode("div", { className: "col-auto pe-0 ps-1 ps-sm-2" });
@@ -1669,7 +1641,7 @@ class BackButton {
             // settings.ui.selectionMenuElement = new SelectionMenu();
             quiz.reset();
             settings.reset();
-            settings.ui.selectionMenuElement = new SelectionMenu();
+            settings.ui.selectionMenuElement = new SelectionMenu({ selected: settings.categories });
         }
 
         this.element = buildNode("div", { className: "col-5 col-md-3 col-lg-2" });
