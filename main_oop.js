@@ -52,7 +52,7 @@ class Settings {
         if (this._categories.length) {
             return this._categories;
         } else {
-            throw new Error("no categories selected");
+            throw new Error("No categories selected");
         }
     }
 
@@ -76,7 +76,26 @@ class Settings {
     }
 
     url(categories, amount) {
-        return `https://the-trivia-api.com/questions?categories=${categories}&limit=${amount + 1}`
+        return `https://the-trivia-api.com/questions?categories=${categories}&limit=${amount}`
+    }
+
+    getAmountPerCategory() {
+        const numOfCategories = this._categories.length;
+        const numOfQuestions = this._amount;
+        const amountPerCat = {};
+        const loops = 0;
+        if (numOfCategories === 1) return { [this._categories[0]]: this._amount };
+        else {
+            while (Object.keys(amountPerCat).reduce((total, cat) => total + amountPerCat[cat], 0) !== this._amount && loops < 10000) {
+                if (numOfCategories <= numOfQuestions) {
+                    this._categories.forEach((cat) => amountPerCat[cat] = Math.floor(Math.random() * Math.ceil(this._amount / this._categories.length) + 1));
+                } else {
+                    this._categories.forEach((cat) => amountPerCat[cat] = Math.round(Math.random()));
+                }
+                loops++;
+            }
+            return amountPerCat;          
+        }
     }
 
     async fetchQuestions() {
@@ -84,21 +103,20 @@ class Settings {
             const categories = this.checkCategories();
             //const url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
             //const url = `https://the-trivia-api.com/questions?categories=${categories}&limit=${this._amount + 1}`;
-            const url = this.url(categories, this._amount);
-            console.log(url);
+            const url = this.url(categories, this._amount + 1);
             let result = await fetch(url);
             this.originalQuestions = await result.json();
             const duplicates = this.findDuplicates();
             if (duplicates.length) {
-                console.log(`Found ${duplicates.length} duplicate(s).`);
+                console.log(`Found ${duplicates.length} duplicate(s)`);
 
                 for (let dup of duplicates) {
                     const index = this.originalQuestions.findIndex((question) => question.id === dup);
                     const category = toUnderscore(this.originalQuestions[index].category);
-                    result = await fetch(this.url(category, 0));
+                    result = await fetch(this.url(category, 1));
                     const newQuestion = await result.json();
                     this.originalQuestions.splice(index, 1, newQuestion[0]);
-                    console.log(`Exchanged duplicate at index ${index} with a new question from category ${category}.`);
+                    console.log(`Exchanged duplicate at index ${index} with a new question from category ${category}`);
                 }
 
             }
