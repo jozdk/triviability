@@ -45,6 +45,7 @@ class Settings {
 
     reset() {
         this._categories = [];
+        this.amount = 9;
     }
 
     checkCategories() {
@@ -55,16 +56,53 @@ class Settings {
         }
     }
 
+    findDuplicates() {
+        const count = {};
+        const duplicates = [];
+        const questions = this.originalQuestions.map((question) => question.id);
+        questions.forEach((qn) => {
+            if (count[qn]) {
+                count[qn] += 1;
+                return;
+            }
+            count[qn] = 1;
+        });
+        for (let qn in count) {
+            if (count[qn] >= 2) {
+                duplicates.push(qn);
+            }
+        }
+        return duplicates;
+    }
+
+    url(categories, amount) {
+        return `https://the-trivia-api.com/questions?categories=${categories}&limit=${amount + 1}`
+    }
+
     async fetchQuestions() {
         try {
             const categories = this.checkCategories();
             //const url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
-            const url = `https://the-trivia-api.com/questions?categories=${categories}&limit=${this._amount + 1}`;
+            //const url = `https://the-trivia-api.com/questions?categories=${categories}&limit=${this._amount + 1}`;
+            const url = this.url(categories, this._amount);
             console.log(url);
-            const result = await fetch(url);
-            const questions = await result.json();
-            this.originalQuestions = questions;
-            quiz.init(questions);
+            let result = await fetch(url);
+            this.originalQuestions = await result.json();
+            const duplicates = this.findDuplicates();
+            if (duplicates.length) {
+                console.log(`Found ${duplicates.length} duplicate(s).`);
+
+                for (let dup of duplicates) {
+                    const index = this.originalQuestions.findIndex((question) => question.id === dup);
+                    const category = toUnderscore(this.originalQuestions[index].category);
+                    result = await fetch(this.url(category, 0));
+                    const newQuestion = await result.json();
+                    this.originalQuestions.splice(index, 1, newQuestion[0]);
+                    console.log(`Exchanged duplicate at index ${index} with a new question from category ${category}.`);
+                }
+
+            }
+            quiz.init(this.originalQuestions);
         } catch (error) {
             console.log(error.message);
         }
@@ -78,7 +116,7 @@ class UIForSettings {
         this.mainElement = document.querySelector("#main");
         this._selectionMenuElement = new SelectionMenu({ selected });
 
-        //this.render(this.mainElement, this._selectionMenuElement);
+        this.render(this.mainElement, this._selectionMenuElement);
     }
 
     set selectionMenuElement(menuComp) {
@@ -222,7 +260,7 @@ class Stats {
                         stats: [
                             [{ element: buildNode("span", { className: "border border-dark p-1 me-1 small-font", textContent: "50:50" }) }, gamestate.jokers.fifty ? "No" : "Yes"],
                             [{ element: buildNode("i", { className: "bi bi-arrow-left-right me-1" }) }, gamestate.jokers.switch ? "No" : "Yes"],
-                            [{ element: buildNode("i", { className: "bi bi-search me-1" }) }, gamestate.jokers.time ? "No" : "Yes"]
+                            [{ element: buildNode("i", { className: "bi bi-search me-1" }) }, gamestate.jokers.lookup ? "No" : "Yes"]
                         ]
                     })
                 ]
@@ -977,12 +1015,11 @@ class Quiz {
     }
 
     advance() {
-        // if (this._questions[this._gamestate.answered].result === "unanswered") {
-
-        // }
-        this.resetTimer();
-        this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
-        this.startTimer();
+        if (this._questions[this._gamestate.answered]) {
+            this.resetTimer();
+            this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
+            this.startTimer();
+        }
     }
 
     reset() {
@@ -1103,7 +1140,7 @@ class QuizComponent {
                     children: [
                         new InfoRail({ question, gamestate, timer }),
                         {
-                            element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-8 col-xxl-7 mt-5" }),
+                            element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-8 col-xxl-7 mt-5 d-flex flex-column" }),
                             children: [
                                 new QuestionComponent({ question, jokers: gamestate.jokers }),
                                 new Answers({ question })
@@ -1120,13 +1157,13 @@ class QuizComponent {
 
 class InfoRail {
     constructor({ question, gamestate, timer }) {
-        this.element = buildNode("div", { className: "col-md-2 d-flex me-2 mt-5" });
+        this.element = buildNode("div", { id: "info-rail-component", className: "col-md-2 d-flex me-2 mt-5" });
         this.children = [
             {
                 element: buildNode("div", { className: "row justify-content-end" }),
                 children: [
                     {
-                        element: buildNode("div", { className: "d-none d-md-flex col-md-12 col-xl-10 col-xxl-9 bg-light rounded-lg flex-column" }),
+                        element: buildNode("div", { className: "d-none d-md-block col-md-12 col-xl-10 col-xxl-9 bg-light rounded-lg" }),
                         children: [
                             new InfoHeader({ category: question.category, answered: gamestate.answered, total: gamestate.board.length }),
                             new Timer({ category: question.category, timer, amount: gamestate.board.length }),
@@ -1148,14 +1185,17 @@ class InfoHeader {
                 element: buildNode("div", { className: `col rounded-lg p-2 bg-${category.color}` }),
                 children: [
                     {
-                        element: buildNode("p", { className: "px-0 my-2 text-center small-font" }),
+                        element: buildNode("p", { className: "px-0 my-2 text-center" }),
                         children: [
                             {
-                                element: document.createTextNode(`QUESTION ${answered + 1} of ${total}`),
+                                element: document.createTextNode(`${answered + 1} / ${total}`),
                                 children: null
                             }
                         ]
-                    }
+                    },
+                    // {
+                    //     element: buildNode("p", { className: "px-0 my-2 text-center small-font d-lg-none", textContent: `${answered + 1} of ${total}` })
+                    // }
                 ]
             }
         ]
@@ -1333,7 +1373,7 @@ class Score {
             return new BoardField({ field, length: arr.length });
         });
 
-        this.element = buildNode("div", { id: "score-component", className: "row py-3 px-lg-4 px-md-1 text-center" });
+        this.element = buildNode("div", { id: "score-component", className: `row mb-1 py-3 px-lg-${board.length <= 12 ? "4" : "3"} px-md-2 text-center` });
         this.children = [
             {
                 element: buildNode("div", { className: "col-12" }),
@@ -1382,10 +1422,10 @@ class BoardField {
             }
         }
 
-        this.element = buildNode("div", { className: length < 13 ? "col-4 px-0" : "col-3 px-1" });
+        this.element = buildNode("div", { className: length < 13 ? "col-4 px-0" : "col-3 px-0" });
         this.children = [
             {
-                element: buildNode("i", { className: `bi bi-${icon(field)}-fill board-${field} fs-${length < 13 ? "3" : "4"}` }),
+                element: buildNode("i", { className: `bi bi-${icon(field)}-fill board-${field} fs-${length <= 12 ? "3" : "4"}` }),
                 children: null
             }
         ]
@@ -1394,7 +1434,7 @@ class BoardField {
 
 class QuestionComponent {
     constructor({ question, jokers }) {
-        this.element = buildNode("div", { id: "question-component", className: "row" });
+        this.element = buildNode("div", { id: "question-component", className: "row flex-grow-1" });
         this.children = [
             {
                 element: buildNode("div", { className: "col bg-light rounded-lg" }),
@@ -1416,7 +1456,7 @@ class QuestionHeader {
             quiz.useJoker(event.target.id);
         }
 
-        this.element = buildNode("div", { id: "question-header-component", className: "row mb-1 p-3" });
+        this.element = buildNode("div", { id: "question-header-component", className: "row p-3" });
         this.children = [
             {
                 element: buildNode("div", { className: `col-12 rounded-lg p-2 bg-${question.category.color}` }),
@@ -1428,7 +1468,7 @@ class QuestionHeader {
                                 element: buildNode("div", { className: "col-6 text-start" }),
                                 children: [
                                     {
-                                        element: buildNode("p", { className: "my-2 small-font" }),
+                                        element: buildNode("p", { className: "my-2" }),
                                         children: [
                                             {
                                                 element: document.createTextNode(question.category.title),
@@ -1607,7 +1647,7 @@ class Answer {
 class Controls {
     constructor({ result, gamestate }) {
 
-        const text = gamestate.board[settings.amount - 1] !== "unanswered" ? "View Results" : "Next Question";
+        const text = gamestate.board[gamestate.board.length - 1] !== "unanswered" ? "View Results" : "Next Question";
 
         this.element = buildNode("div", { className: "row justify-content-center mt-3" });
         this.children = [
@@ -1623,7 +1663,7 @@ class Controls {
                                 children: null
                             },
                             //new BackButtonB(),
-                            ...gamestate.board[8] !== "unanswered" ? [new AgainButton()] : [],
+                            ...gamestate.board[gamestate.board.length - 1] !== "unanswered" ? [new AgainButton()] : [],
                             //new AgainButton(),
                             new NextButton({ result: result, text: text })
                         ]
@@ -2130,6 +2170,22 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
+        "category": "Geography",
+        "id": "622a1c357cc59eab6f94fe1e",
+        "correctAnswer": "Reykjavik",
+        "incorrectAnswers": [
+            "Ontario",
+            "Moscow",
+            "Helsinki"
+        ],
+        "question": "What Is The World's Most Northerly Capital City?",
+        "tags": [],
+        "type": "Multiple Choice"
+    }
+]
+
+const substitutes = [
+    {
         "category": "Science",
         "id": "622a1c377cc59eab6f950540",
         "correctAnswer": "writing systems",
@@ -2141,15 +2197,86 @@ const testQuestionsC = [
         "question": "What is Grammatology the study of?",
         "tags": [],
         "type": "Multiple Choice"
+    },
+    {
+        "category": "Geography",
+        "id": "622a1c387cc59eab6f950ab5",
+        "correctAnswer": "Ukraine",
+        "incorrectAnswers": [
+            "Kyrgyzstan",
+            "Tajikistan",
+            "Uzbekistan"
+        ],
+        "question": "Which of these countries borders Russia?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Geography",
+        "id": "622a1c357cc59eab6f94fe1e",
+        "correctAnswer": "Reykjavik",
+        "incorrectAnswers": [
+            "Ontario",
+            "Moscow",
+            "Helsinki"
+        ],
+        "question": "What Is The World's Most Northerly Capital City?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
+        "category": "Geography",
+        "id": "622a1c387cc59eab6f95097d",
+        "correctAnswer": "Kuwait",
+        "incorrectAnswers": [
+            "Eritrea",
+            "Israel",
+            "Djibouti"
+        ],
+        "question": "Which of these countries borders Saudi Arabia?",
+        "tags": [],
+        "type": "Multiple Choice"
     }
 ]
 
+// function findDuplicates(arr) {
+//     const count = {};
+//     const duplicates = [];
+//     const questions = arr.map((question) => question.id);
+//     questions.forEach((qn) => {
+//         if (count[qn]) {
+//             count[qn] += 1;
+//             return;
+//         }
+//         count[qn] = 1;
+//     });
+//     for (let qn in count) {
+//         if (count[qn] >= 2) {
+//             duplicates.push(qn);
+//         }
+//     }
+//     return duplicates;
+// }
+
+// function substituteQuestions(questions, duplicates) {
+//     if (duplicates.length) {
+
+//         for (let i = 0; i < duplicates.length; i++) {
+//             const index = questions.findIndex((question) => question.id === duplicates[i]);
+//             const newQuestion = [substitutes[i]];
+//             questions.splice(index, 1, newQuestion[0]);
+//             console.log(`Substituted question at index ${index} with new question: "${newQuestion[0].question}"`);
+//         }
+
+//     }
+// }
+
 const testQuestionsD = [];
-for (let i = 0; i <= 18; i++) {
+for (let i = 0; i < 20; i++) {
     testQuestionsD.push(testQuestionsC[i]);
 }
 
-quiz.init(testQuestionsD);
+//quiz.init(testQuestionsD);
 
 const secondHalf = document.querySelector(".second-half-js");
 const firstHalf = document.querySelector(".first-half-js");
