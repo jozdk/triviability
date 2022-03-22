@@ -123,6 +123,7 @@ class Settings {
             console.log(amountPerCat);
             console.log(urls);
             this.originalQuestions = [];
+            this.ui.spinnerElement = new Spinner();
             for (let url of urls) {
                 const result = await fetch(url);
                 this.originalQuestions.push(...await result.json());
@@ -822,8 +823,8 @@ class StartButton {
             if (settings.categories.length) {
                 settings.fetchQuestions();
                 //quiz.init(testQuestions);
-                document.querySelector("#main").innerHTML = "";
-                settings.ui.spinnerElement = new Spinner();
+                //document.querySelector("#main").innerHTML = "";
+                //settings.ui.spinnerElement = new Spinner();
             }
         }
 
