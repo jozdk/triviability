@@ -95,7 +95,7 @@ class Settings {
     }
 
     shuffleQuestions() {
-        for (let i = this.originalQuestions.length - 1; i > 0 ; i--) {
+        for (let i = this.originalQuestions.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             const temp = this.originalQuestions[i];
             this.originalQuestions[i] = this.originalQuestions[j];
@@ -112,7 +112,7 @@ class Settings {
 
             const amountPerCat = this.getAmountPerCategory();
             const categories = Object.keys(amountPerCat);
-            const shortestCat = categories.find((cat) => amountPerCat[cat] === Math.min(...categories.map(cat => amountPerCat[cat])));
+            const shortestCat = categories.find((cat) => amountPerCat[cat] === Math.min(...categories.map((cat) => amountPerCat[cat])));
             console.log(shortestCat);
             //const random = Math.floor(Math.random() * categories.length);
             const urls = categories.map((cat, index) => {
@@ -242,6 +242,8 @@ class Stats {
             return category;
         }).filter(category => !categories.find(cat => cat.category === category));
 
+        const props = { className: "fw-bold" };
+
         // Create Element
         this.element = buildNode("div", { id: "stats-element", className: "container" });
         this.children = [
@@ -251,46 +253,52 @@ class Stats {
                     new StatsBox({
                         title: "General",
                         colors: colors,
-                        stats: [
-                            ["Correct", `${correct} of ${amountTotal} = ${percent}%`],
+                        table: [
+                            [{ data: "Number of Questions" }, { data: amountTotal, props }],
+                            [{ data: "Correct" }, { data: `${correct} of ${amountTotal} = ${percent}%`, props }],
                             [
-                                "Score",
-                                [
-                                    {
-                                        element: buildNode("span", { textContent: gamestate.points }),
-                                        children: null
-                                    },
-                                    {
-                                        element: buildNode("i", { className: `${emoji} ms-2` }),
-                                        children: null
-                                    }
-                                ]
+                                { data: "Score" },
+                                {
+                                    data: [
+                                        {
+                                            element: buildNode("span", { textContent: gamestate.points }),
+                                            children: null
+                                        },
+                                        {
+                                            element: buildNode("i", { className: `${emoji} ms-2` }),
+                                            children: null
+                                        }
+                                    ],
+                                    props
+                                }
                             ],
                             [
-                                "Categories",
-                                [
-                                    {
-                                        element: buildNode("ul", { className: "list-group list-group-flush", style: { listStyle: "none" } }),
-                                        children: [
-                                            ...categories.map((cat) => {
-                                                return {
-                                                    element: buildNode("li", { textContent: `${cat.category} (${cat.percent}%)` }),
-                                                    children: null
-                                                };
-                                            })]
-                                    },
-                                    {
-                                        element: buildNode("ul", { className: "list-group list-group-flush", style: { color: "darkgrey", listStyle: "none" } }),
-                                        children: [
-                                            ...catUnused.map(cat => {
-                                                return {
-                                                    element: buildNode("li", { textContent: cat }),
-                                                    children: null
-                                                }
-                                            })
-                                        ]
-                                    }
-                                ]
+                                { data: "Categories" },
+                                {
+                                    data: [
+                                        {
+                                            element: buildNode("ul", { className: "list-group list-group-flush", style: { listStyle: "none" } }),
+                                            children: [
+                                                ...categories.map((cat) => {
+                                                    return {
+                                                        element: buildNode("li", { textContent: `${cat.category} (${cat.percent}%)` }),
+                                                        children: null
+                                                    };
+                                                })]
+                                        },
+                                        {
+                                            element: buildNode("ul", { className: "list-group list-group-flush", style: { color: "darkgrey", listStyle: "none" } }),
+                                            children: [
+                                                ...catUnused.map(cat => {
+                                                    return {
+                                                        element: buildNode("li", { textContent: cat }),
+                                                        children: null
+                                                    }
+                                                })
+                                            ]
+                                        }
+                                    ], props
+                                }
 
                             ]
                         ]
@@ -298,19 +306,19 @@ class Stats {
                     new StatsBox({
                         title: "Time",
                         colors: colors,
-                        stats: [
-                            ["Time (total)", timeTotal],
-                            ["⌀ time per answer", average],
-                            ["Fastest correct answer", fastest]
+                        table: [
+                            [{ data: "Time (total)" }, { data: timeTotal, props }],
+                            [{ data: "⌀ time per answer" }, { data: average, props }],
+                            [{ data: "Fastest correct answer" }, { data: fastest, props }]
                         ]
                     }),
                     new StatsBox({
                         title: "Jokers",
                         colors: colors,
-                        stats: [
-                            [{ element: buildNode("span", { className: "border border-dark p-1 me-1 small-font", textContent: "50:50" }) }, gamestate.jokers.fifty ? "No" : "Yes"],
-                            [{ element: buildNode("i", { className: "bi bi-arrow-left-right me-1" }) }, gamestate.jokers.switch ? "No" : "Yes"],
-                            [{ element: buildNode("i", { className: "bi bi-search me-1" }) }, gamestate.jokers.lookup ? "No" : "Yes"]
+                        table: [
+                            [{ data: new FiftyIcon({ className: "me-1" }) }, { data: gamestate.jokers.fifty ? "No" : "Yes", props }],
+                            [{ data: new SwitchIcon({ className: "me-1" }) }, { data: gamestate.jokers.switch ? "No" : "Yes", props }],
+                            [{ data: new LookupIcon({ className: "me-1" }) }, { data: gamestate.jokers.lookup ? "No" : "Yes", props }]
                         ]
                     })
                 ]
@@ -322,27 +330,74 @@ class Stats {
     }
 }
 
+class FiftyIcon {
+    constructor({ className, style }) {
+        this.element = buildNode("span", { className: "border border-dark p-1", textContent: "50:50" });
+        this.children = null;
+
+        if (className) this.element.className += " " + className;
+        if (style) Object.keys(style).forEach(styleProp => this.element.style[styleProp] = style[styleProp]);
+    }
+}
+
+class SwitchIcon {
+    constructor({ className, style }) {
+        this.element = buildNode("i", { className: "bi bi-arrow-left-right" });
+        this.children = null;
+
+        if (className) this.element.className += " " + className;
+        if (style) Object.keys(style).forEach(styleProp => this.element.style[styleProp] = style[styleProp]);
+    }
+}
+
+class LookupIcon {
+    constructor({ className, style }) {
+        this.element = buildNode("i", { className: "bi bi-search" });
+        this.children = null;
+
+        if (className) this.element.className += " " + className;
+        if (style) Object.keys(style).forEach(styleProp => this.element.style[styleProp] = style[styleProp]);
+    }
+}
+
 class Overview {
     constructor({ questions }) {
 
-        const tableHead = ["No", "Question", "Your Answer", "Seconds", "Points", "Category"];
-
-        const tableData = questions.map((question, index) => {
-            return [index + 1, question.question, new AnswersList({ question }), question.time / 1000, question.points, question.category.title];
-        });
-
-        const props = questions.map((question) => {
-            return {
-                0: { className: `bg-${question.category.color}` }
-            }
+        const tableHead = ["No", "Question", "Your Answer", "Seconds", "Points", "Category"].map((header) => {
+            return { data: header, props: { style: { fontWeight: "bold" } } };
         })
+
+        // Map every question to one table row
+        const table = questions.map((question, index) => {
+            const joker = () => {
+                const style = { position: "absolute", bottom: "5px", right: "15px" };
+                if (question.fifty) return new FiftyIcon({ className: "small-font", style });
+                if (question.switch) return new SwitchIcon({ className: "fs-5", style });
+                if (question.lookup) return new LookupIcon({ className: "fs-5", style });
+            }
+            return [
+                { data: index + 1, props: { className: `bg-${question.category.color}` } },
+                { data: question.question },
+                { data: [new AnswersList({ question }), ...joker() ? [joker()] : []], props: { style: { position: "relative" } } },
+                { data: question.time / 1000 },
+                { data: question.points },
+                { data: question.category.title }
+            ];
+        })
+
+        // const props = questions.map((question) => {
+        //     return {
+        //         0: { className: `bg-${question.category.color}` }
+        //     }
+        // })
 
         this.element = buildNode("div", { className: "row justify-content-center mt-5" });
         this.children = [
             {
                 element: buildNode("div", { className: "col-11 col-md-10 col-xxl-9" }),
                 children: [
-                    new Table({ tableData: tableData, props: props, tableHead: tableHead })
+                    //new Table({ tableData: tableData, props: props, tableHead: tableHead })
+                    new Table({ table, tableHead })
                 ]
             }
         ];
@@ -364,7 +419,7 @@ class AnswersList {
             };
         }
 
-        const listElements = question.multipleChoice.map(answer => {
+        const listElements = question.multipleChoice.map((answer) => {
             return ListElement(answer);
         })
 
@@ -452,13 +507,13 @@ class ControlsB {
 }
 
 class StatsBox {
-    constructor({ colors, title, stats }) {
+    constructor({ colors, title, table }) {
 
-        const props = stats.map(row => {
-            return {
-                1: { className: "fw-bold" }
-            }
-        })
+        // const props = stats.map(row => {
+        //     return {
+        //         1: { className: "fw-bold" }
+        //     }
+        // })
 
         const hexColors = { "science": "#03FCBA", "history": "#FFF75C", "geography": "#D47AE8", "movies": "#EA3452", "literature": "#71FEFA", "music": "#FFA552", "sport_and_leisure": "#D2FF96", "general_knowledge": "#C4AF9A", "society_and_culture": "#FF579F" };
 
@@ -484,7 +539,7 @@ class StatsBox {
                     {
                         element: buildNode("div", { className: "card-body" }),
                         children: [
-                            new Table({ tableData: stats, props: props })
+                            new Table({ table })
                         ]
                     }
                 ]
@@ -494,17 +549,17 @@ class StatsBox {
 }
 
 class Table {
-    constructor({ tableData, props, tableHead }) {
+    constructor({ table, tableHead }) {
 
-        const headProps = {};
-        if (tableHead) {
-            tableHead.forEach((header, index) => {
-                headProps[index] = { style: { fontWeight: "bold" } }
-            })
-        }
+        // const headProps = {};
+        // if (tableHead) {
+        //     tableHead.forEach((header, index) => {
+        //         headProps[index] = { style: { fontWeight: "bold" } }
+        //     })
+        // }
 
-        const tableRows = tableData.map((row, index) => {
-            return new TableRow({ row, props: props[index] });
+        const tableRows = table.map((row) => {
+            return new TableRow({ row });
         })
 
         this.element = buildNode("table", { className: "table" });
@@ -513,7 +568,7 @@ class Table {
                 {
                     element: buildNode("thead"),
                     children: [
-                        new TableRow({ row: tableHead, props: headProps })
+                        new TableRow({ row: tableHead })
                     ]
                 }] : [],
             {
@@ -528,22 +583,16 @@ class Table {
 }
 
 class TableRow {
-    constructor({ row, props }) {
+    constructor({ row, prop }) {
 
         const tableCells = row.map((datum, index) => {
-            return new DataCell({ datum, props: props[index] ? props[index] : null });
+            return new DataCell({ datum: datum, props: props[index] ? props[index] : null });
         })
 
         this.element = buildNode("tr");
         this.children = [
             ...tableCells
         ]
-    }
-}
-
-class HeaderCell {
-    constructor({ header, props }) {
-
     }
 }
 
@@ -789,32 +838,32 @@ class SettingsModal {
     }
 }
 
-class Switch {
-    constructor({ type }) {
+// class Switch {
+//     constructor({ type }) {
 
-        const handler = (e) => {
-            if (e.target.checked === true) {
-                if (e.target.parentElement.nextElementSibling) {
-                    e.target.parentElement.nextElementSibling.firstElementChild.checked = false;
-                } else {
-                    e.target.parentElement.previousElementSibling.firstElementChild.checked = false;
-                }
-            }
-        }
+//         const handler = (e) => {
+//             if (e.target.checked === true) {
+//                 if (e.target.parentElement.nextElementSibling) {
+//                     e.target.parentElement.nextElementSibling.firstElementChild.checked = false;
+//                 } else {
+//                     e.target.parentElement.previousElementSibling.firstElementChild.checked = false;
+//                 }
+//             }
+//         }
 
-        this.element = buildNode("div", { className: "form-check form-check-inline form-switch" });
-        this.children = [
-            {
-                element: buildNode("input", { className: "form-check-input", type: "checkbox", id: type.toLowerCase(), oninput: handler }),
-                children: null
-            },
-            {
-                element: buildNode("label", { htmlFor: type.toLowerCase(), className: "form-check-label no-select", textContent: type }),
-                children: null
-            }
-        ]
-    }
-}
+//         this.element = buildNode("div", { className: "form-check form-check-inline form-switch" });
+//         this.children = [
+//             {
+//                 element: buildNode("input", { className: "form-check-input", type: "checkbox", id: type.toLowerCase(), oninput: handler }),
+//                 children: null
+//             },
+//             {
+//                 element: buildNode("label", { htmlFor: type.toLowerCase(), className: "form-check-label no-select", textContent: type }),
+//                 children: null
+//             }
+//         ]
+//     }
+// }
 
 class StartButton {
     constructor() {
@@ -823,8 +872,6 @@ class StartButton {
             if (settings.categories.length) {
                 settings.fetchQuestions();
                 //quiz.init(testQuestions);
-                //document.querySelector("#main").innerHTML = "";
-                //settings.ui.spinnerElement = new Spinner();
             }
         }
 
