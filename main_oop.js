@@ -1,9 +1,9 @@
 class Settings {
     constructor() {
         this._categories = [];
-        this._amount = 9;
-        this.originalQuestions;
-        this.ui = new UIForSettings(this._categories);
+        this._amount = 12;
+        this.originalQuestions = [];
+        this.ui = new UIForSettings(this._categories, this.amount);
     }
 
     static allCategories = ["Science", "History", "Geography", "Film & TV", "Arts & Literature", "Music", "Sport & Leisure", "General Knowledge", "Society & Culture"];
@@ -24,13 +24,13 @@ class Settings {
         category = toUnderscore(category);
         if (this._categories.includes(category)) this._categories.splice(this._categories.indexOf(category), 1);
         else this._categories.push(category);
-        this.ui.selectionMenuElement = new SelectionMenu({ selected: this._categories });
+        this.ui.selectionMenuElement = new SelectionMenu({ selected: this._categories, amount: this._amount });
     }
 
     selectAll() {
         if (this._categories.length !== Settings.allCategories.length) this._categories = Settings.allCategories.map((cat) => toUnderscore(cat));
         else this._categories = [];
-        this.ui.selectionMenuElement = new SelectionMenu({ selected: this._categories });
+        this.ui.selectionMenuElement = new SelectionMenu({ selected: this._categories, amount: this._amount });
     }
 
     selectRandom() {
@@ -40,20 +40,13 @@ class Settings {
         while (this._categories.length < amount) {
             this._categories.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
         }
-        this.ui.selectionMenuElement = new SelectionMenu({ selected: this._categories });
+        this.ui.selectionMenuElement = new SelectionMenu({ selected: this._categories, amount: this._amount });
     }
 
     reset() {
+        this.originalQuestions = [];
         this._categories = [];
         this.amount = 9;
-    }
-
-    checkCategories() {
-        if (this._categories.length) {
-            return this._categories;
-        } else {
-            throw new Error("No categories selected");
-        }
     }
 
     findDuplicates() {
@@ -80,32 +73,62 @@ class Settings {
     }
 
     getAmountPerCategory() {
-        const numOfCategories = this._categories.length;
-        const numOfQuestions = this._amount;
+        if (this._categories.length === 0) {
+            throw new Error("No categories selected");
+        }
         const amountPerCat = {};
-        const loops = 0;
-        if (numOfCategories === 1) return { [this._categories[0]]: this._amount };
+        let loops = 0;
+        if (this._categories.length === 1) return { [this._categories[0]]: this._amount };
         else {
-            while (Object.keys(amountPerCat).reduce((total, cat) => total + amountPerCat[cat], 0) !== this._amount && loops < 10000) {
-                if (numOfCategories <= numOfQuestions) {
-                    this._categories.forEach((cat) => amountPerCat[cat] = Math.floor(Math.random() * Math.ceil(this._amount / this._categories.length) + 1));
+            while (Object.keys(amountPerCat).reduce((total, cat) => total + amountPerCat[cat], 0) !== this._amount && loops < 1000) {
+                if (this._categories.length <= this._amount) {
+                    // Max number of questions for each category is its equal share + 1 (+1 can be removed for a more balanced distribution); min number is 1
+                    this._categories.forEach((cat) => amountPerCat[cat] = Math.floor(Math.random() * (this._amount / this._categories.length + 1)) + 1);
                 } else {
                     this._categories.forEach((cat) => amountPerCat[cat] = Math.round(Math.random()));
                 }
                 loops++;
             }
-            return amountPerCat;          
+            console.log(`${this._amount} questions / ${this._categories.length} categories. It took ${loops} loops`, amountPerCat);
+            return amountPerCat;
+        }
+    }
+
+    shuffleQuestions() {
+        for (let i = this.originalQuestions.length - 1; i > 0 ; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const temp = this.originalQuestions[i];
+            this.originalQuestions[i] = this.originalQuestions[j];
+            this.originalQuestions[j] = temp;
         }
     }
 
     async fetchQuestions() {
         try {
-            const categories = this.checkCategories();
-            //const url = `https://api.trivia.willfry.co.uk/questions?categories=${categories}&limit=9`;
-            //const url = `https://the-trivia-api.com/questions?categories=${categories}&limit=${this._amount + 1}`;
-            const url = this.url(categories, this._amount + 1);
-            let result = await fetch(url);
-            this.originalQuestions = await result.json();
+            // const categories = this.checkCategories();
+            // const url = this.url(categories, this._amount + 1);
+            // let result = await fetch(url);
+            // this.originalQuestions = await result.json();
+
+            const amountPerCat = this.getAmountPerCategory();
+            const categories = Object.keys(amountPerCat);
+            const shortestCat = categories.find((cat) => amountPerCat[cat] === Math.min(...categories.map(cat => amountPerCat[cat])));
+            console.log(shortestCat);
+            //const random = Math.floor(Math.random() * categories.length);
+            const urls = categories.map((cat, index) => {
+                if (cat === shortestCat) amountPerCat[cat] += 1;
+                //if (index === random) amountPerCat[cat] += 1;
+                return this.url(cat, amountPerCat[cat]);
+            })
+            console.log(amountPerCat);
+            console.log(urls);
+            this.originalQuestions = [];
+            for (let url of urls) {
+                const result = await fetch(url);
+                this.originalQuestions.push(...await result.json());
+                console.log("Fetch request has been made");
+            }
+
             const duplicates = this.findDuplicates();
             if (duplicates.length) {
                 console.log(`Found ${duplicates.length} duplicate(s)`);
@@ -120,6 +143,7 @@ class Settings {
                 }
 
             }
+            this.shuffleQuestions();
             quiz.init(this.originalQuestions);
         } catch (error) {
             console.log(error.message);
@@ -130,9 +154,10 @@ class Settings {
 }
 
 class UIForSettings {
-    constructor(selected) {
+    constructor(selected, amount) {
         this.mainElement = document.querySelector("#main");
-        this._selectionMenuElement = new SelectionMenu({ selected });
+        this._selectionMenuElement = new SelectionMenu({ selected, amount });
+        this._spinnerElement;
 
         this.render(this.mainElement, this._selectionMenuElement);
     }
@@ -143,9 +168,15 @@ class UIForSettings {
         this.render(this.mainElement, this._selectionMenuElement);
     }
 
-    get selectionMenuElement() {
-        return this._selectionMenuElement;
+    set spinnerElement(spinnerComp) {
+        this._spinnerElement = spinnerComp;
+        this.mainElement.innerHTML = "";
+        this.render(this.mainElement, this._spinnerElement);
     }
+
+    // get selectionMenuElement() {
+    //     return this._selectionMenuElement;
+    // }
 
     // toggleSelection(element, category) {
     //     if (element.classList.contains("category-highlight")) {
@@ -349,7 +380,7 @@ class ControlsB {
         const catHandler = () => {
             quiz.reset();
             settings.reset();
-            settings.ui.selectionMenuElement = new SelectionMenu({ selected: settings.categories });
+            settings.ui.selectionMenuElement = new SelectionMenu({ selected: settings.categories, amount: settings.amount });
         }
 
         const playHandler = () => {
@@ -527,12 +558,12 @@ class DataCell {
 }
 
 class SelectionMenu {
-    constructor({ selected }) {
+    constructor({ selected, amount }) {
         this.element = buildNode("div", { id: "selection-menu", className: "container" });
         this.children = [
             new Welcome(),
             new Categories({ selected }),
-            new SettingsModal(),
+            new SettingsModal({ amount }),
             new StartButton()
         ];
     }
@@ -694,7 +725,7 @@ class ParamsButtons {
 }
 
 class SettingsModal {
-    constructor() {
+    constructor({ amount }) {
 
         const handler = (e) => {
             e.target.previousElementSibling.textContent = `${e.target.value} Questions`;
@@ -729,11 +760,11 @@ class SettingsModal {
                                         element: buildNode("div", { className: "container-fluid" }),
                                         children: [
                                             {
-                                                element: buildNode("label", { htmlFor: "amount", className: "form-label", textContent: "9 Questions" }),
+                                                element: buildNode("label", { htmlFor: "amount", className: "form-label", textContent: `${amount} Questions` }),
                                                 children: null
                                             },
                                             {
-                                                element: buildNode("input", { type: "range", className: "form-range", id: "amount", min: "6", max: "20", value: "9", oninput: handler }),
+                                                element: buildNode("input", { type: "range", className: "form-range", id: "amount", min: "6", max: "20", value: amount, oninput: handler }),
                                                 children: null
                                             }
                                         ]
@@ -792,6 +823,7 @@ class StartButton {
                 settings.fetchQuestions();
                 //quiz.init(testQuestions);
                 document.querySelector("#main").innerHTML = "";
+                settings.ui.spinnerElement = new Spinner();
             }
         }
 
@@ -808,6 +840,23 @@ class StartButton {
                                 children: null
                             }
                         ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+class Spinner {
+    constructor() {
+        this.element = buildNode("div", { className: "flex-grow-1 d-flex justify-content-center align-items-center" });
+        this.children = [
+            {
+                element: buildNode("div", { className: "spinner-border" }),
+                children: [
+                    {
+                        element: buildNode("span", { className: "visually-hidden", textContent: "Loading..." }),
+                        children: null
                     }
                 ]
             }
@@ -1698,7 +1747,7 @@ class BackButtonB {
         const handler = () => {
             quiz.reset();
             settings.reset();
-            settings.ui.selectionMenuElement = new SelectionMenu({ selected: settings.categories });
+            settings.ui.selectionMenuElement = new SelectionMenu({ selected: settings.categories, amount: settings.amount });
         }
 
         this.element = buildNode("div", { className: "col-auto pe-0 ps-1 ps-sm-2" });
@@ -1733,7 +1782,7 @@ class BackButton {
             // settings.ui.selectionMenuElement = new SelectionMenu();
             quiz.reset();
             settings.reset();
-            settings.ui.selectionMenuElement = new SelectionMenu({ selected: settings.categories });
+            settings.ui.selectionMenuElement = new SelectionMenu({ selected: settings.categories, amount: settings.amount });
         }
 
         this.element = buildNode("div", { className: "col-5 col-md-3 col-lg-2" });
