@@ -160,7 +160,7 @@ class UIForSettings {
         this._selectionMenuElement = new SelectionMenu({ selected, amount });
         this._spinnerElement;
 
-        this.render(this.mainElement, this._selectionMenuElement);
+        //this.render(this.mainElement, this._selectionMenuElement);
     }
 
     set selectionMenuElement(menuComp) {
@@ -332,7 +332,7 @@ class Stats {
 
 class FiftyIcon {
     constructor({ className, style }) {
-        this.element = buildNode("span", { className: "border border-dark p-1", textContent: "50:50" });
+        this.element = buildNode("span", { className: "border border-dark p-1 no-select", textContent: "50:50" });
         this.children = null;
 
         if (className) this.element.className += " " + className;
@@ -369,27 +369,25 @@ class Overview {
 
         // Map every question to one table row
         const table = questions.map((question, index) => {
-            const joker = () => {
-                const style = { position: "absolute", bottom: "5px", right: "15px" };
-                if (question.fifty) return new FiftyIcon({ className: "small-font", style });
-                if (question.switch) return new SwitchIcon({ className: "fs-5", style });
-                if (question.lookup) return new LookupIcon({ className: "fs-5", style });
+            const joker = () => {     
+                return {
+                    element: buildNode("div", { style: { position: "absolute", bottom: "5px", right: "15px" } }),
+                    children: [
+                        ...question.lookup ? [new LookupIcon({ className: "fs-5 mx-1" })] : [],
+                        ...question.switched ? [new SwitchIcon({ className: "fs-5 mx-1" })] : [],
+                        ...question.fifty ? [new FiftyIcon({ className: "mx-1 small-font" })] : []
+                    ]
+                }
             }
             return [
                 { data: index + 1, props: { className: `bg-${question.category.color}` } },
-                { data: question.question },
-                { data: [new AnswersList({ question }), ...joker() ? [joker()] : []], props: { style: { position: "relative" } } },
+                { data: [{ element: buildNode("span", { textContent: question.question }) }, ...joker() ? [joker()] : []], props: { style: { position: "relative" } } },
+                { data: [new AnswersList({ question })] },
                 { data: question.time / 1000 },
                 { data: question.points },
                 { data: question.category.title }
             ];
         })
-
-        // const props = questions.map((question) => {
-        //     return {
-        //         0: { className: `bg-${question.category.color}` }
-        //     }
-        // })
 
         this.element = buildNode("div", { className: "row justify-content-center mt-5" });
         this.children = [
@@ -583,10 +581,10 @@ class Table {
 }
 
 class TableRow {
-    constructor({ row, prop }) {
+    constructor({ row }) {
 
-        const tableCells = row.map((datum, index) => {
-            return new DataCell({ datum: datum, props: props[index] ? props[index] : null });
+        const tableCells = row.map((cell) => {
+            return new DataCell({ data: cell.data, props: cell.props ? cell.props : null });
         })
 
         this.element = buildNode("tr");
@@ -597,12 +595,12 @@ class TableRow {
 }
 
 class DataCell {
-    constructor({ datum, props }) {
+    constructor({ data, props }) {
         this.element = buildNode("td", props);
         this.children = [
-            ...datum !== Object(datum) ? [{ element: document.createTextNode(`${datum}`), children: null }] : [],
-            ...typeof datum === "object" && !Array.isArray(datum) ? [datum] : [],
-            ...Array.isArray(datum) ? [...datum] : []
+            ...data !== Object(data) ? [{ element: document.createTextNode(`${data}`), children: null }] : [],
+            ...typeof data === "object" && !Array.isArray(data) ? [data] : [],
+            ...Array.isArray(data) ? [...data] : []
         ]
     }
 }
@@ -1243,6 +1241,22 @@ function resultIcon(value) {
         case "wrong":
             return "x-circle";
     }
+}
+
+// ???
+function buildComponent(Component, props) {
+    const component = new Component();
+    if (props) {
+        if (props.className) {
+            component.element.className += " " + props.className;
+        }
+        if (props.style) {
+            Object.keys(props.style).forEach((styleProp) => {
+                component.element.style[styleProp] = props.style[styleProp];
+            })
+        }
+    }
+    return component;
 }
 
 class QuizComponent {
@@ -2387,11 +2401,11 @@ const substitutes = [
 // }
 
 const testQuestionsD = [];
-for (let i = 0; i < 20; i++) {
+for (let i = 0; i < 4; i++) {
     testQuestionsD.push(testQuestionsC[i]);
 }
 
-//quiz.init(testQuestionsD);
+quiz.init(testQuestionsD);
 
 const secondHalf = document.querySelector(".second-half-js");
 const firstHalf = document.querySelector(".first-half-js");
