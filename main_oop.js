@@ -105,31 +105,31 @@ class Settings {
 
     async fetchQuestions() {
         try {
-            const categories = this._categories;
-            const url = this.url(categories, this._amount + 1);
-            this.ui.spinnerElement = new Spinner();
-            let result = await fetch(url);
-            this.originalQuestions = await result.json();
-
-            // const amountPerCat = this.getAmountPerCategory();
-            // const categories = Object.keys(amountPerCat);
-            // const shortestCat = categories.find((cat) => amountPerCat[cat] === Math.min(...categories.map((cat) => amountPerCat[cat])));
-            // console.log(shortestCat);
-            // //const random = Math.floor(Math.random() * categories.length);
-            // const urls = categories.map((cat, index) => {
-            //     if (cat === shortestCat) amountPerCat[cat] += 1;
-            //     //if (index === random) amountPerCat[cat] += 1;
-            //     return this.url(cat, amountPerCat[cat]);
-            // })
-            // console.log(amountPerCat);
-            // console.log(urls);
-            // this.originalQuestions = [];
+            // const categories = this._categories;
+            // const url = this.url(categories, this._amount + 1);
             // this.ui.spinnerElement = new Spinner();
-            // for (let url of urls) {
-            //     const result = await fetch(url);
-            //     this.originalQuestions.push(...await result.json());
-            //     console.log("Fetch request has been made");
-            // }
+            // let result = await fetch(url);
+            // this.originalQuestions = await result.json();
+
+            const amountPerCat = this.getAmountPerCategory();
+            const categories = Object.keys(amountPerCat);
+            const shortestCat = categories.find((cat) => amountPerCat[cat] === Math.min(...categories.map((cat) => amountPerCat[cat])));
+            console.log(shortestCat);
+            //const random = Math.floor(Math.random() * categories.length);
+            const urls = categories.map((cat, index) => {
+                if (cat === shortestCat) amountPerCat[cat] += 1;
+                //if (index === random) amountPerCat[cat] += 1;
+                return this.url(cat, amountPerCat[cat]);
+            })
+            console.log(amountPerCat);
+            console.log(urls);
+            this.originalQuestions = [];
+            this.ui.spinnerElement = new Spinner();
+            for (let url of urls) {
+                const result = await fetch(url);
+                this.originalQuestions.push(...await result.json());
+                console.log("Fetch request has been made");
+            }
 
             const duplicates = this.findDuplicates();
             if (duplicates.length) {
@@ -145,7 +145,7 @@ class Settings {
                 }
 
             }
-            //this.shuffleQuestions();
+            this.shuffleQuestions();
             quiz.init(this.originalQuestions);
         } catch (error) {
             console.log(error.message);
@@ -231,7 +231,13 @@ class Stats {
         questions.forEach((q) => categoryCount[q.category.title] = categoryCount[q.category.title] ? categoryCount[q.category.title] + 1 : 1);
         const categories = questions.map(question => question.category.title).filter((category, index, arr) => arr.indexOf(category) === index);
         Object.keys(categoryCount).forEach(cat => {
-            categories[categories.indexOf(cat)] = { category: cat, percent: Math.round(categoryCount[cat] / amountTotal * 100) }
+            categories[categories.indexOf(cat)] = { 
+                category: cat,
+                amount: categoryCount[cat],
+                percent: Math.round(categoryCount[cat] / amountTotal * 100),
+                correct: questions.filter(qn => qn.category.title === cat && qn.result === "correct").length,
+                correctPercent: questions.filter(qn => qn.category.title === cat && qn.result === "correct").length / questions.filter(qn => qn.category.title === cat).length * 100
+            }
         });
         const catUnused = settings.categories.map(cat => {
             let category = cat
@@ -243,6 +249,7 @@ class Stats {
             return category;
         }).filter(category => !categories.find(cat => cat.category === category));
 
+        // Props for StatsBox Tables
         const props = { className: "fw-bold" };
 
         // Create Element
@@ -255,7 +262,7 @@ class Stats {
                         title: "General",
                         colors: colors,
                         table: [
-                            [{ data: "Amount" }, { data: amountTotal, props }],
+                            [{ data: "Questions" }, { data: amountTotal, props }],
                             [{ data: "Correct" }, { data: `${correct} of ${amountTotal} = ${percent}%`, props }],
                             [
                                 { data: "Score" },
@@ -273,35 +280,35 @@ class Stats {
                                     props
                                 }
                             ],
-                            [
-                                { data: "Categories" },
-                                {
-                                    data: [
-                                        {
-                                            element: buildNode("ul", { className: "list-group list-group-flush", style: { listStyle: "none" } }),
-                                            children: [
-                                                ...categories.map((cat) => {
-                                                    return {
-                                                        element: buildNode("li", { textContent: `${cat.category} (${cat.percent}%)` }),
-                                                        children: null
-                                                    };
-                                                })]
-                                        },
-                                        {
-                                            element: buildNode("ul", { className: "list-group list-group-flush", style: { color: "darkgrey", listStyle: "none" } }),
-                                            children: [
-                                                ...catUnused.map(cat => {
-                                                    return {
-                                                        element: buildNode("li", { textContent: cat }),
-                                                        children: null
-                                                    }
-                                                })
-                                            ]
-                                        }
-                                    ], props
-                                }
+                            // [
+                            //     { data: "Categories" },
+                            //     {
+                            //         data: [
+                            //             {
+                            //                 element: buildNode("ul", { className: "list-group list-group-flush", style: { listStyle: "none" } }),
+                            //                 children: [
+                            //                     ...categories.map((cat) => {
+                            //                         return {
+                            //                             element: buildNode("li", { textContent: `${cat.category} (${cat.percent}%)` }),
+                            //                             children: null
+                            //                         };
+                            //                     })]
+                            //             },
+                            //             {
+                            //                 element: buildNode("ul", { className: "list-group list-group-flush", style: { color: "darkgrey", listStyle: "none" } }),
+                            //                 children: [
+                            //                     ...catUnused.map(cat => {
+                            //                         return {
+                            //                             element: buildNode("li", { textContent: cat }),
+                            //                             children: null
+                            //                         }
+                            //                     })
+                            //                 ]
+                            //             }
+                            //         ], props
+                            //     }
 
-                            ]
+                            // ]
                         ]
                     }),
                     new StatsBox({
@@ -321,6 +328,27 @@ class Stats {
                             [{ data: new SwitchIcon({ className: "me-1" }) }, { data: gamestate.jokers.switch ? "No" : "Yes", props }],
                             [{ data: new LookupIcon({ className: "me-1" }) }, { data: gamestate.jokers.lookup ? "No" : "Yes", props }]
                         ]
+                    }),
+                    new StatsBox({
+                        title: "Categories",
+                        colors: colors,
+                        table: {
+                            head: ["Category", "Questions", "%", "Correct", "%"].map((header) => {
+                                return { data: header, props: { className: `fw-bold` } }
+                            }),
+                            body: [
+                                ...categories.map((cat) => {
+                                    return [
+                                        { data: cat.category },
+                                        { data: cat.amount },
+                                        { data: `${cat.percent}%` },
+                                        { data: cat.correct },
+                                        { data: `${cat.correctPercent % 1 === 0 ? cat.correctPercent : cat.correctPercent.toFixed(2)}%` }
+                                    ]
+                                })
+                            ]
+                        }
+
                     })
                 ]
             },
@@ -514,12 +542,6 @@ class ControlsB {
 class StatsBox {
     constructor({ colors, title, table }) {
 
-        // const props = stats.map(row => {
-        //     return {
-        //         1: { className: "fw-bold" }
-        //     }
-        // })
-
         const hexColors = { "science": "#03FCBA", "history": "#FFF75C", "geography": "#D47AE8", "movies": "#EA3452", "literature": "#71FEFA", "music": "#FFA552", "sport_and_leisure": "#D2FF96", "general_knowledge": "#C4AF9A", "society_and_culture": "#FF579F" };
 
         this.element = buildNode("div", { className: "col-auto mt-5" });
@@ -544,7 +566,7 @@ class StatsBox {
                     {
                         element: buildNode("div", { className: "card-body" }),
                         children: [
-                            new Table({ tableBody: table })
+                            new Table({ tableBody: table.head ? table.body : table, tableHead: table.head ? table.head : null })
                         ]
                     }
                 ]
@@ -2051,7 +2073,7 @@ const testQuestionsB = [{ "category": "Science", "id": "622a1c3a7cc59eab6f95106f
 
 const testQuestionsC = [
     {
-        "category": "Science",
+        "category": "General Knowledge",
         "id": "622a1c397cc59eab6f950c2d",
         "correctAnswer": "ABBA",
         "incorrectAnswers": [
@@ -2064,7 +2086,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "History",
+        "category": "General Knowledge",
         "id": "622a1c387cc59eab6f950bcc",
         "correctAnswer": "Alice in Chains",
         "incorrectAnswers": [
@@ -2103,7 +2125,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "Music",
+        "category": "General Knowledge",
         "id": "622a1c347cc59eab6f94fb9f",
         "correctAnswer": "\"Hooked on a Feeling\" by B.J. Thomas",
         "incorrectAnswers": [
@@ -2413,7 +2435,7 @@ const substitutes = [
 // }
 
 const testQuestionsD = [];
-for (let i = 0; i < 5; i++) {
+for (let i = 12; i < 21; i++) {
     testQuestionsD.push(testQuestionsC[i]);
 }
 
