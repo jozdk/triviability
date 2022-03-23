@@ -161,7 +161,7 @@ class UIForSettings {
         this._selectionMenuElement = new SelectionMenu({ selected, amount });
         this._spinnerElement;
 
-        this.render(this.mainElement, this._selectionMenuElement);
+        //this.render(this.mainElement, this._selectionMenuElement);
     }
 
     set selectionMenuElement(menuComp) {
@@ -222,7 +222,7 @@ class Stats {
         else if (percentScore >= 40) emoji = "bi bi-emoji-neutral";
         else if (percentScore >= 25) emoji = "bi bi-emoji-smile-upside-down";
         else if (percentScore >= 0) emoji = "bi bi-emoji-dizzy";
-        const colors = questions.map(question => question.category.color).filter((cat, i, arr) => arr.indexOf(cat) === i);
+        const colors = shuffleArray(questions.map(question => question.category.color).filter((cat, i, arr) => arr.indexOf(cat) === i));
         const times = questions.map(question => question.time);
         const timeTotal = times.reduce((acc, curr) => acc + curr) / 1000;
         const average = (timeTotal / questions.length).toFixed(3);
@@ -252,6 +252,23 @@ class Stats {
         // Props for StatsBox Tables
         const props = { className: "fw-bold" };
 
+        const makeGradient = (statsBox) => {
+            if (colors.length >= 6) {
+                if (colors.length <= 7) {
+                    if (statsBox === "General") return colors.length === 6 ? colors.slice(0, 2) : colors.slice(0, 3);
+                    if (statsBox === "Time") return colors.length === 6 ? colors.slice(2, 4) : colors.slice(3, 5);
+                    if (statsBox === "Jokers") return colors.length === 6 ? colors.slice(4) : colors.slice(5);
+                }
+                if (colors.length <= 9) {
+                    if (statsBox === "General") return colors.slice(0, 3);
+                    if (statsBox === "Time") return colors.length === 8 ? colors.slice(3, 5) : colors.slice(3, 6);
+                    if (statsBox === "Jokers") return colors.length === 8 ? colors.slice(5) : colors.slice(6);
+                }
+            } else {
+                return colors;
+            }
+        }
+
         // Create Element
         this.element = buildNode("div", { id: "stats-element", className: "container" });
         this.children = [
@@ -260,7 +277,7 @@ class Stats {
                 children: [
                     new StatsBox({
                         title: "General",
-                        colors: colors,
+                        colors: makeGradient("General"),
                         table: [
                             [{ data: "Questions" }, { data: amountTotal, props }],
                             [{ data: "Correct" }, { data: `${correct} of ${amountTotal} = ${percent}%`, props }],
@@ -313,7 +330,7 @@ class Stats {
                     }),
                     new StatsBox({
                         title: "Time",
-                        colors: colors,
+                        colors: makeGradient("Time"),
                         table: [
                             [{ data: "Time (total)" }, { data: timeTotal, props }],
                             [{ data: "⌀ time per answer" }, { data: average, props }],
@@ -322,7 +339,7 @@ class Stats {
                     }),
                     new StatsBox({
                         title: "Jokers",
-                        colors: colors,
+                        colors: makeGradient("Jokers"),
                         table: [
                             [{ data: new FiftyIcon({ className: "me-1" }) }, { data: gamestate.jokers.fifty ? "No" : "Yes", props }],
                             [{ data: new SwitchIcon({ className: "me-1" }) }, { data: gamestate.jokers.switch ? "No" : "Yes", props }],
@@ -1293,6 +1310,16 @@ function buildComponent(Component, props) {
     return component;
 }
 
+function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+    return arr;
+}
+
 class QuizComponent {
     constructor({ question, gamestate, timer }) {
         this.root = {
@@ -2073,7 +2100,7 @@ const testQuestionsB = [{ "category": "Science", "id": "622a1c3a7cc59eab6f95106f
 
 const testQuestionsC = [
     {
-        "category": "General Knowledge",
+        "category": "Science",
         "id": "622a1c397cc59eab6f950c2d",
         "correctAnswer": "ABBA",
         "incorrectAnswers": [
@@ -2086,7 +2113,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "General Knowledge",
+        "category": "History",
         "id": "622a1c387cc59eab6f950bcc",
         "correctAnswer": "Alice in Chains",
         "incorrectAnswers": [
@@ -2099,7 +2126,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "General Knowledge",
+        "category": "Geography",
         "id": "622a1c357cc59eab6f94fc86",
         "correctAnswer": "Erinaceous",
         "incorrectAnswers": [
@@ -2112,7 +2139,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "General Knowledge",
+        "category": "Film & TV",
         "id": "622a1c357cc59eab6f94fc58",
         "correctAnswer": "Whippersnapper",
         "incorrectAnswers": [
@@ -2125,7 +2152,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "General Knowledge",
+        "category": "Arts & Literature",
         "id": "622a1c347cc59eab6f94fb9f",
         "correctAnswer": "\"Hooked on a Feeling\" by B.J. Thomas",
         "incorrectAnswers": [
@@ -2138,7 +2165,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "General Knowledge",
+        "category": "Music",
         "id": "622a1c367cc59eab6f9500cc",
         "correctAnswer": "Surfing",
         "incorrectAnswers": [
@@ -2149,9 +2176,9 @@ const testQuestionsC = [
         "question": "Green Room, Crystal Cathedral & Walking The Dog are all terms from what?",
         "tags": [],
         "type": "Multiple Choice"
-    },
+    },// 6
     {
-        "category": "Music",
+        "category": "Sport & Leisure",
         "id": "622a1c397cc59eab6f950bff",
         "correctAnswer": "Muse",
         "incorrectAnswers": [
@@ -2164,7 +2191,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "Music",
+        "category": "General Knowledge",
         "id": "622a1c357cc59eab6f94fe8b",
         "correctAnswer": "Rihanna",
         "incorrectAnswers": [
@@ -2177,7 +2204,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "Music",
+        "category": "Society & Culture",
         "id": "622a1c397cc59eab6f950db6",
         "correctAnswer": "The Rolling Stones",
         "incorrectAnswers": [
@@ -2188,7 +2215,7 @@ const testQuestionsC = [
         "question": "Which band includes 'Keith Richards'?",
         "tags": [],
         "type": "Multiple Choice"
-    },
+    }, // 9
     {
         "category": "Music",
         "id": "622a1c387cc59eab6f950b8a",
@@ -2435,11 +2462,11 @@ const substitutes = [
 // }
 
 const testQuestionsD = [];
-for (let i = 12; i < 21; i++) {
+for (let i = 0; i < 5; i++) {
     testQuestionsD.push(testQuestionsC[i]);
 }
 
-//quiz.init(testQuestionsD);
+quiz.init(testQuestionsD);
 
 const secondHalf = document.querySelector(".second-half-js");
 const firstHalf = document.querySelector(".first-half-js");
