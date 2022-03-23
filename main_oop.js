@@ -46,13 +46,13 @@ class Settings {
     reset() {
         this.originalQuestions = [];
         this._categories = [];
-        this.amount = 9;
+        this.amount = 12;
     }
 
     findDuplicates() {
         const count = {};
         const duplicates = [];
-        const questions = this.originalQuestions.map((question) => question.id);
+        const questions = this.originalQuestions.map((question) => question.question);
         questions.forEach((qn) => {
             if (count[qn]) {
                 count[qn] += 1;
@@ -105,37 +105,38 @@ class Settings {
 
     async fetchQuestions() {
         try {
-            // const categories = this.checkCategories();
-            // const url = this.url(categories, this._amount + 1);
-            // let result = await fetch(url);
-            // this.originalQuestions = await result.json();
-
-            const amountPerCat = this.getAmountPerCategory();
-            const categories = Object.keys(amountPerCat);
-            const shortestCat = categories.find((cat) => amountPerCat[cat] === Math.min(...categories.map((cat) => amountPerCat[cat])));
-            console.log(shortestCat);
-            //const random = Math.floor(Math.random() * categories.length);
-            const urls = categories.map((cat, index) => {
-                if (cat === shortestCat) amountPerCat[cat] += 1;
-                //if (index === random) amountPerCat[cat] += 1;
-                return this.url(cat, amountPerCat[cat]);
-            })
-            console.log(amountPerCat);
-            console.log(urls);
-            this.originalQuestions = [];
+            const categories = this._categories;
+            const url = this.url(categories, this._amount + 1);
             this.ui.spinnerElement = new Spinner();
-            for (let url of urls) {
-                const result = await fetch(url);
-                this.originalQuestions.push(...await result.json());
-                console.log("Fetch request has been made");
-            }
+            let result = await fetch(url);
+            this.originalQuestions = await result.json();
+
+            // const amountPerCat = this.getAmountPerCategory();
+            // const categories = Object.keys(amountPerCat);
+            // const shortestCat = categories.find((cat) => amountPerCat[cat] === Math.min(...categories.map((cat) => amountPerCat[cat])));
+            // console.log(shortestCat);
+            // //const random = Math.floor(Math.random() * categories.length);
+            // const urls = categories.map((cat, index) => {
+            //     if (cat === shortestCat) amountPerCat[cat] += 1;
+            //     //if (index === random) amountPerCat[cat] += 1;
+            //     return this.url(cat, amountPerCat[cat]);
+            // })
+            // console.log(amountPerCat);
+            // console.log(urls);
+            // this.originalQuestions = [];
+            // this.ui.spinnerElement = new Spinner();
+            // for (let url of urls) {
+            //     const result = await fetch(url);
+            //     this.originalQuestions.push(...await result.json());
+            //     console.log("Fetch request has been made");
+            // }
 
             const duplicates = this.findDuplicates();
             if (duplicates.length) {
                 console.log(`Found ${duplicates.length} duplicate(s)`);
 
                 for (let dup of duplicates) {
-                    const index = this.originalQuestions.findIndex((question) => question.id === dup);
+                    const index = this.originalQuestions.findIndex((question) => question.question === dup);
                     const category = toUnderscore(this.originalQuestions[index].category);
                     result = await fetch(this.url(category, 1));
                     const newQuestion = await result.json();
@@ -144,7 +145,7 @@ class Settings {
                 }
 
             }
-            this.shuffleQuestions();
+            //this.shuffleQuestions();
             quiz.init(this.originalQuestions);
         } catch (error) {
             console.log(error.message);
@@ -160,7 +161,7 @@ class UIForSettings {
         this._selectionMenuElement = new SelectionMenu({ selected, amount });
         this._spinnerElement;
 
-        //this.render(this.mainElement, this._selectionMenuElement);
+        this.render(this.mainElement, this._selectionMenuElement);
     }
 
     set selectionMenuElement(menuComp) {
@@ -207,7 +208,7 @@ class UIForSettings {
 }
 
 class Stats {
-    constructor({ questions, gamestate }) {
+    constructor({ questions, gamestate, discarded }) {
 
         // Calculate stats
         const amountTotal = questions.length;
@@ -254,7 +255,7 @@ class Stats {
                         title: "General",
                         colors: colors,
                         table: [
-                            [{ data: "Number of Questions" }, { data: amountTotal, props }],
+                            [{ data: "Amount" }, { data: amountTotal, props }],
                             [{ data: "Correct" }, { data: `${correct} of ${amountTotal} = ${percent}%`, props }],
                             [
                                 { data: "Score" },
@@ -324,7 +325,7 @@ class Stats {
                 ]
             },
             new ControlsB(),
-            new Overview({ questions }),
+            new Overview({ questions, discarded }),
             new ControlsB()
         ]
     }
@@ -361,41 +362,47 @@ class LookupIcon {
 }
 
 class Overview {
-    constructor({ questions }) {
+    constructor({ questions, discarded }) {
+
+        const joker = (question) => {
+            return {
+                element: buildNode("div", { style: { position: "absolute", bottom: "5px", right: "15px" } }),
+                children: [
+                    ...question.lookup ? [new LookupIcon({ className: "fs-5 mx-2" })] : [],
+                    ...question.switched ? [new SwitchIcon({ className: "fs-5 mx-2" })] : [],
+                    ...question.fifty ? [new FiftyIcon({ className: "mx-2 small-font" })] : [],
+                    ...question.switch ? [{ element: buildNode("i", { className: "bi bi-trash fs-5" }) }] : []
+                ]
+            }
+        }
+
+        const row = (question, index) => {
+            return [
+                { data: index, props: { className: `bg-${question.category.color} text-center` } },
+                { data: [{ element: buildNode("span", { textContent: question.question }) }, ...question.lookup || question.fifty || question.switched || question.switch ? [joker(question)] : []], props: { style: { position: "relative" } } },
+                { data: [new AnswersList({ question })] },
+                { data: question.time / 1000 },
+                { data: question.points === 0 ? "-" : question.points },
+                { data: question.category.title }
+            ];
+        }
 
         const tableHead = ["No", "Question", "Your Answer", "Seconds", "Points", "Category"].map((header) => {
             return { data: header, props: { style: { fontWeight: "bold" } } };
         })
 
-        // Map every question to one table row
-        const table = questions.map((question, index) => {
-            const joker = () => {     
-                return {
-                    element: buildNode("div", { style: { position: "absolute", bottom: "5px", right: "15px" } }),
-                    children: [
-                        ...question.lookup ? [new LookupIcon({ className: "fs-5 mx-1" })] : [],
-                        ...question.switched ? [new SwitchIcon({ className: "fs-5 mx-1" })] : [],
-                        ...question.fifty ? [new FiftyIcon({ className: "mx-1 small-font" })] : []
-                    ]
-                }
-            }
-            return [
-                { data: index + 1, props: { className: `bg-${question.category.color}` } },
-                { data: [{ element: buildNode("span", { textContent: question.question }) }, ...joker() ? [joker()] : []], props: { style: { position: "relative" } } },
-                { data: [new AnswersList({ question })] },
-                { data: question.time / 1000 },
-                { data: question.points },
-                { data: question.category.title }
-            ];
+        const tableBody = questions.map((question, index) => {
+            return row(question, index + 1);
         })
+
+        const tableFoot = discarded ? row(discarded, "-") : null;
 
         this.element = buildNode("div", { className: "row justify-content-center mt-5" });
         this.children = [
             {
                 element: buildNode("div", { className: "col-11 col-md-10 col-xxl-9" }),
                 children: [
-                    //new Table({ tableData: tableData, props: props, tableHead: tableHead })
-                    new Table({ table, tableHead })
+                    new Table({ tableHead, tableBody, tableFoot })
                 ]
             }
         ];
@@ -537,7 +544,7 @@ class StatsBox {
                     {
                         element: buildNode("div", { className: "card-body" }),
                         children: [
-                            new Table({ table })
+                            new Table({ tableBody: table })
                         ]
                     }
                 ]
@@ -547,20 +554,13 @@ class StatsBox {
 }
 
 class Table {
-    constructor({ table, tableHead }) {
+    constructor({ tableHead, tableBody, tableFoot }) {
 
-        // const headProps = {};
-        // if (tableHead) {
-        //     tableHead.forEach((header, index) => {
-        //         headProps[index] = { style: { fontWeight: "bold" } }
-        //     })
-        // }
-
-        const tableRows = table.map((row) => {
+        const tableRows = tableBody.map((row) => {
             return new TableRow({ row });
         })
 
-        this.element = buildNode("table", { className: "table" });
+        this.element = buildNode("table", { className: "table table-responsive-md" });
         this.children = [
             ...tableHead ? [
                 {
@@ -568,14 +568,22 @@ class Table {
                     children: [
                         new TableRow({ row: tableHead })
                     ]
-                }] : [],
+                }
+            ] : [],
             {
                 element: buildNode("tbody"),
                 children: [
                     ...tableRows
                 ]
-            }
-
+            },
+            ...tableFoot ? [
+                {
+                    element: buildNode("tbody", { className: "opacity-50" }),
+                    children: [
+                        new TableRow({ row: tableFoot })
+                    ]
+                }
+            ] : []
         ]
     }
 }
@@ -898,7 +906,7 @@ class Spinner {
         this.element = buildNode("div", { className: "flex-grow-1 d-flex justify-content-center align-items-center" });
         this.children = [
             {
-                element: buildNode("div", { className: "spinner-border" }),
+                element: buildNode("div", { className: "spinner-border", style: { width: "3rem", height: "3rem" } }),
                 children: [
                     {
                         element: buildNode("span", { className: "visually-hidden", textContent: "Loading..." }),
@@ -928,7 +936,7 @@ class Question {
         this.userAnswer;
         this.result = "unanswered";
         this.time = 0;
-        this.points;
+        this.points = 0;
     }
 
     makeMultipleChoice() {
@@ -1037,6 +1045,7 @@ class Quiz {
         };
         this.ui = {};
         this._extraQuestion;
+        this._discardedQuestion;
     }
 
     init(questions) {
@@ -1138,6 +1147,7 @@ class Quiz {
     reset() {
         this.resetTimer();
         this._questions = [];
+        this._discardedQuestion = null;
         this._gamestate.answered = 0;
         this._gamestate.points = 0;
         this._gamestate.board = [];
@@ -1150,7 +1160,7 @@ class Quiz {
     // would be responsible for their own rendering then
     showResults() {
         document.querySelector("#main").innerHTML = "";
-        this.ui.render(document.querySelector("#main"), new Stats({ questions: this._questions, gamestate: this._gamestate }));
+        this.ui.render(document.querySelector("#main"), new Stats({ questions: this._questions, gamestate: this._gamestate, discarded: this._discardedQuestion }));
     }
 
     useJoker(joker) {
@@ -1174,10 +1184,12 @@ class Quiz {
             this.startTimer();
         } else if (joker === "switch" && this._gamestate.jokers.switch) {
             clearInterval(this.timer.timeInterval);
+            this._questions[this._gamestate.answered].time = Date.now() - this.timer.start;
             this._gamestate.jokers.switch = false;
             this._questions[this._gamestate.answered].switch = true;
             this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
             setTimeout(() => {
+                this._discardedQuestion = this._questions[this._gamestate.answered];
                 this._questions[this._gamestate.answered] = this._extraQuestion;
                 this._questions[this._gamestate.answered].switched = true;
                 this.timer.elapsed = 0;
@@ -2401,11 +2413,11 @@ const substitutes = [
 // }
 
 const testQuestionsD = [];
-for (let i = 0; i < 4; i++) {
+for (let i = 0; i < 5; i++) {
     testQuestionsD.push(testQuestionsC[i]);
 }
 
-quiz.init(testQuestionsD);
+//quiz.init(testQuestionsD);
 
 const secondHalf = document.querySelector(".second-half-js");
 const firstHalf = document.querySelector(".first-half-js");

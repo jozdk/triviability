@@ -293,8 +293,8 @@
 
             <!-- Spinner Element -->
 
-            <!-- <div class="flex-grow-1 d-flex justify-content-center align-items-center d-none">
-                <div class="spinner-border" role="status">
+            <!-- <div class="flex-grow-1 d-flex justify-content-center align-items-center">
+                <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div> -->
@@ -649,188 +649,226 @@
 
                 <div class="row justify-content-center mt-5">
                     <div class="col-11 col-md-10 col-xxl-9">
-                        <table class="table">
-                            <thead>
+                        <div class="table-responsive">
+
+
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Question</th>
+                                        <th>Your Answer</th>
+                                        <th>Seconds</th>
+                                        <th>Points</th>
+                                        <th>Category</th>
+                                    </tr>
+                                </thead>
                                 <tr>
-                                    <th>No</th>
-                                    <th>Question</th>
-                                    <th>Your Answer</th>
-                                    <th>Seconds</th>
-                                    <th>Points</th>
-                                    <th>Category</th>
+                                    <td class="bg-science">1</td>
+                                    <td style="position: relative;">
+                                        <div>
+                                            What is the boiling point of water in Farenheit?
+                                        </div>
+                                        <div style="position:absolute; bottom: 5px; right: 15px">
+                                            <i class="bi bi-arrow-left-right fs-5 mx-1"></i>
+                                            <span class="border border-dark p-1 mx-1 small-font no-select">50:50</span>
+                                            <i class="bi bi-search fs-5 mx-1"></i>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">100</li>
+                                            <li class="list-group-item" style="color:green;">212</li>
+                                            <li class="list-group-item">32</li>
+                                            <li class="list-group-item" style="color:darkred;">169</li>
+                                        </ul>
+                                    </td>
+                                    <td>6.212</td>
+                                    <td>17</td>
+                                    <td>Arts & Literature</td>
                                 </tr>
-                            </thead>
-                            <tr>
-                                <td class="bg-science">1</td>
-                                <td style="position: relative;">
-                                    <div>
-                                        What is the boiling point of water in Farenheit?
-                                    </div>
-                                    <div style="position:absolute; bottom: 5px; right: 15px">
-                                        <i class="bi bi-arrow-left-right fs-5 mx-1"></i>
-                                        <span class="border border-dark p-1 mx-1 small-font">50:50</span>
-                                        <i class="bi bi-search fs-5 mx-1"></i>
-                                    </div>   
-                                </td>
-                                <td>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">100</li>
-                                        <li class="list-group-item" style="color:green;">212</li>
-                                        <li class="list-group-item">32</li>
-                                        <li class="list-group-item" style="color:darkred;">169</li>
-                                    </ul>
-                                </td>
-                                <td>6.212</td>
-                                <td>17</td>
-                                <td>Arts & Literature</td>
-                            </tr>
-                            <tr>
-                                <td class="bg-science">2</td>
-                                <td>                                    
-                                    What is Reflexology the study of?
-                                </td>
-                                <td>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item" style="color:green;">Alternative method of massage,
-                                            manipulative therapy|therapy or pressure on certain points of the sole of
-                                            the feet as a means of relieving nervous tension</li>
-                                        <li class="list-group-item">Feces</li>
-                                        <li class="list-group-item">Study of the mouth and its diseases</li>
-                                        <li class="list-group-item">Karyotypes</li>
-                                    </ul>
-                                </td>
-                                <td>8.127</td>
-                                <td>16</td>
-                                <td>Science</td>
-                            </tr>
-                            <tr>
-                                <td class="bg-history">3</td>
-                                <td>What is Economic geology the study of?</td>
-                                <td>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">Fossils of ancient life</li>
-                                        <li class="list-group-item">The study of cells</li>
-                                        <li class="list-group-item">Bryophytes</li>
-                                        <li class="list-group-item" style="color:green;">Is concerned with earth
-                                            materials that can be utilized for economic and/or industrial purposes</li>
-                                    </ul>
-                                </td>
-                                <td>5.127</td>
-                                <td>17</td>
-                                <td>Science</td>
-                            </tr>
-                            <tr>
-                                <td class="bg-movies">4</td>
-                                <td style="position:relative;">
-                                    What is Philology the study of?
-                                    <!-- <i style="position:absolute; bottom: 5px; right: 15px" class="bi bi-search fs-5"></i> -->
-                                </td>
-                                <td style="position: relative;">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">The larynx, or voice box; a branch of medicine</li>
-                                        <li class="list-group-item" style="color:green;">The historical study of
-                                            languages</li>
-                                        <li class="list-group-item">The preparation of books and manuscripts</li>
-                                        <li class="list-group-item">Crop circles</li>
-                                    </ul>
+                                <tr>
+                                    <td class="bg-science">2</td>
+                                    <td>
+                                        What is Reflexology the study of?
+                                    </td>
+                                    <td>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item" style="color:green;">Alternative method of
+                                                massage,
+                                                manipulative therapy|therapy or pressure on certain points of the sole
+                                                of
+                                                the feet as a means of relieving nervous tension</li>
+                                            <li class="list-group-item">Feces</li>
+                                            <li class="list-group-item">Study of the mouth and its diseases</li>
+                                            <li class="list-group-item">Karyotypes</li>
+                                        </ul>
+                                    </td>
+                                    <td>8.127</td>
+                                    <td>16</td>
+                                    <td>Science</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-history">3</td>
+                                    <td>What is Economic geology the study of?</td>
+                                    <td>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">Fossils of ancient life</li>
+                                            <li class="list-group-item">The study of cells</li>
+                                            <li class="list-group-item">Bryophytes</li>
+                                            <li class="list-group-item" style="color:green;">Is concerned with earth
+                                                materials that can be utilized for economic and/or industrial purposes
+                                            </li>
+                                        </ul>
+                                    </td>
+                                    <td>5.127</td>
+                                    <td>17</td>
+                                    <td>Science</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-movies">4</td>
+                                    <td style="position:relative;">
+                                        What is Philology the study of?
+                                        <!-- <i style="position:absolute; bottom: 5px; right: 15px" class="bi bi-search fs-5"></i> -->
+                                    </td>
+                                    <td style="position: relative;">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">The larynx, or voice box; a branch of medicine
+                                            </li>
+                                            <li class="list-group-item" style="color:green;">The historical study of
+                                                languages</li>
+                                            <li class="list-group-item">The preparation of books and manuscripts</li>
+                                            <li class="list-group-item">Crop circles</li>
+                                        </ul>
 
-                                    
 
-                                </td>
-                                <td>10.694</td>
-                                <td>15</td>
-                                <td>Science</td>
-                            </tr>
-                            <tr>
-                                <td class="bg-geography">5</td>
-                                <td>What is Eschatology the study of?</td>
-                                <td>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">Wounds and injuries caused by accidents or assaults
-                                            and their surgical treatment and repair</li>
-                                        <li class="list-group-item">Plants; botany</li>
-                                        <li class="list-group-item" style="color:green;">A branch of theology concerned
-                                            with the final events in the history of the world or of mankind</li>
-                                        <li class="list-group-item">Dreams</li>
-                                    </ul>
-                                </td>
-                                <td>8.694</td>
-                                <td>-</td>
-                                <td>Science</td>
-                            </tr>
-                            <tr>
-                                <td class="bg-science">6</td>
-                                <td style="position:relative;">
-                                    What is Semiology the study of?
-                                    <!-- <span class="border border-dark p-1 me-1 small-font" style="position: absolute; bottom: 10px; right: 15px">50:50</span> -->
-                                </td>
-                                <td style="position:relative;">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">Is concerned with earth materials that can be
-                                            utilized for economic and/or industrial purposes</li>
-                                        <li class="list-group-item">The practice of escaping from restraints or other
-                                            traps</li>
-                                        <li class="list-group-item">A branch of logic focusing on part-whole
-                                            relationships</li>
-                                        <li class="list-group-item" style="color:green;">Signs</li>
-                                    </ul>
-                                    
-                                </td>
-                                <td>9.784</td>
-                                <td>-</td>
-                                <td>Science</td>
-                            </tr>
-                            <tr>
-                                <td class="bg-history">7</td>
-                                <td>The shoebill __________, native to Africa, is often compared to a statue. The bird
-                                    will stand perfectly still for long periods waiting for fish to come to surface in
-                                    the water."</td>
-                                <td>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">Pelican</li>
-                                        <li class="list-group-item" style="color: darkred;">Flamingo</li>
-                                        <li class="list-group-item" style="color:green;">Stork</li>
-                                        <li class="list-group-item">Swan</li>
-                                    </ul>
-                                </td>
-                                <td>4.784</td>
-                                <td>18</td>
-                                <td>Science</td>
-                            </tr>
-                            <tr>
-                                <td class="bg-geography">8</td>
-                                <td>What is Homology the study of?</td>
-                                <td>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item" style="color:green;">Concept in anthropology,
-                                            biology, algebraic topology, and sociology, meaning 'likeness in structure'"
-                                        </li>
-                                        <li class="list-group-item">The structure, development, and abnormalities of the
-                                            teeth</li>
-                                        <li class="list-group-item">Vocal sounds</li>
-                                        <li class="list-group-item">Feces</li>
-                                    </ul>
-                                </td>
-                                <td>14.374</td>
-                                <td>13</td>
-                                <td>Science</td>
-                            </tr>
-                            <tr>
-                                <td class="bg-society_and_culture">9</td>
-                                <td>Which of these is a name for a male deer?</td>
-                                <td>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">Doe</li>
-                                        <li class="list-group-item">Colt</li>
-                                        <li class="list-group-item" style="color:green;">Buck</li>
-                                        <li class="list-group-item">A Johnny</li>
-                                    </ul>
-                                </td>
-                                <td>7.821</td>
-                                <td>16</td>
-                                <td>Science</td>
-                            </tr>
-                        </table>
+
+                                    </td>
+                                    <td>10.694</td>
+                                    <td>15</td>
+                                    <td>Science</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-geography">5</td>
+                                    <td>What is Eschatology the study of?</td>
+                                    <td>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">Wounds and injuries caused by accidents or
+                                                assaults
+                                                and their surgical treatment and repair</li>
+                                            <li class="list-group-item">Plants; botany</li>
+                                            <li class="list-group-item" style="color:green;">A branch of theology
+                                                concerned
+                                                with the final events in the history of the world or of mankind</li>
+                                            <li class="list-group-item">Dreams</li>
+                                        </ul>
+                                    </td>
+                                    <td>8.694</td>
+                                    <td>-</td>
+                                    <td>Science</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-science">6</td>
+                                    <td style="position:relative;">
+                                        What is Semiology the study of?
+                                        <!-- <span class="border border-dark p-1 me-1 small-font" style="position: absolute; bottom: 10px; right: 15px">50:50</span> -->
+                                    </td>
+                                    <td style="position:relative;">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">Is concerned with earth materials that can be
+                                                utilized for economic and/or industrial purposes</li>
+                                            <li class="list-group-item">The practice of escaping from restraints or
+                                                other
+                                                traps</li>
+                                            <li class="list-group-item">A branch of logic focusing on part-whole
+                                                relationships</li>
+                                            <li class="list-group-item" style="color:green;">Signs</li>
+                                        </ul>
+
+                                    </td>
+                                    <td>9.784</td>
+                                    <td>-</td>
+                                    <td>Science</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-history">7</td>
+                                    <td>The shoebill __________, native to Africa, is often compared to a statue. The
+                                        bird
+                                        will stand perfectly still for long periods waiting for fish to come to surface
+                                        in
+                                        the water."</td>
+                                    <td>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">Pelican</li>
+                                            <li class="list-group-item" style="color: darkred;">Flamingo</li>
+                                            <li class="list-group-item" style="color:green;">Stork</li>
+                                            <li class="list-group-item">Swan</li>
+                                        </ul>
+                                    </td>
+                                    <td>4.784</td>
+                                    <td>18</td>
+                                    <td>Science</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-geography">8</td>
+                                    <td>What is Homology the study of?</td>
+                                    <td>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item" style="color:green;">Concept in anthropology,
+                                                biology, algebraic topology, and sociology, meaning 'likeness in
+                                                structure'"
+                                            </li>
+                                            <li class="list-group-item">The structure, development, and abnormalities of
+                                                the
+                                                teeth</li>
+                                            <li class="list-group-item">Vocal sounds</li>
+                                            <li class="list-group-item">Feces</li>
+                                        </ul>
+                                    </td>
+                                    <td>14.374</td>
+                                    <td>13</td>
+                                    <td>Science</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-society_and_culture">9</td>
+                                    <td>Which of these is a name for a male deer?</td>
+                                    <td>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">Doe</li>
+                                            <li class="list-group-item">Colt</li>
+                                            <li class="list-group-item" style="color:green;">Buck</li>
+                                            <li class="list-group-item">A Johnny</li>
+                                        </ul>
+                                    </td>
+                                    <td>7.821</td>
+                                    <td>16</td>
+                                    <td>Science</td>
+                                </tr>
+
+                                <tfoot class="opacity-50">
+                                    <tr>
+                                        <td class="bg-geography">-</td>
+                                        <td class="position-relative">
+                                            <span>Which US state is often nicknamed 'The Evergreen State'?</span>
+                                            <div style="position:absolute; bottom: 5px; right: 15px">
+                                                <i class="bi bi-arrow-left-right fs-5 mx-1"></i>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item">Oregon</li>
+                                                <li class="list-group-item">Texas</li>
+                                                <li class="list-group-item" style="color:green;">Washington</li>
+                                                <li class="list-group-item">Wyoming</li>
+                                            </ul>
+                                        </td>
+                                        <td>11.542</td>
+                                        <td>-</td>
+                                        <td>Geography</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
