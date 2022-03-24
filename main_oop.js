@@ -138,7 +138,7 @@ class Settings {
                 for (let dup of duplicates) {
                     const index = this.originalQuestions.findIndex((question) => question.question === dup);
                     const category = toUnderscore(this.originalQuestions[index].category);
-                    result = await fetch(this.url(category, 1));
+                    const result = await fetch(this.url(category, 1));
                     const newQuestion = await result.json();
                     this.originalQuestions.splice(index, 1, newQuestion[0]);
                     console.log(`Exchanged duplicate at index ${index} with a new question from category ${category}`);
@@ -161,7 +161,7 @@ class UIForSettings {
         this._selectionMenuElement = new SelectionMenu({ selected, amount });
         this._spinnerElement;
 
-        //this.render(this.mainElement, this._selectionMenuElement);
+        this.render(this.mainElement, this._selectionMenuElement);
     }
 
     set selectionMenuElement(menuComp) {
@@ -223,15 +223,17 @@ class Stats {
         else if (percentScore >= 25) emoji = "bi bi-emoji-smile-upside-down";
         else if (percentScore >= 0) emoji = "bi bi-emoji-dizzy";
         const colors = shuffleArray(questions.map(question => question.category.color).filter((cat, i, arr) => arr.indexOf(cat) === i));
+        const timesCorrect = questions.filter(qn => qn.result === "correct").map(question => question.time);
         const times = questions.map(question => question.time);
         const timeTotal = times.reduce((acc, curr) => acc + curr) / 1000;
         const average = (timeTotal / questions.length).toFixed(3);
-        const fastest = Math.min(...times) / 1000;
+        const fastestCorrect = Math.min(...timesCorrect) / 1000;
+        // const slowest = Math.max(...times) / 1000;
         const categoryCount = {};
         questions.forEach((q) => categoryCount[q.category.title] = categoryCount[q.category.title] ? categoryCount[q.category.title] + 1 : 1);
         const categories = questions.map(question => question.category.title).filter((category, index, arr) => arr.indexOf(category) === index);
         Object.keys(categoryCount).forEach(cat => {
-            categories[categories.indexOf(cat)] = { 
+            categories[categories.indexOf(cat)] = {
                 category: cat,
                 amount: categoryCount[cat],
                 percent: Math.round(categoryCount[cat] / amountTotal * 100),
@@ -249,14 +251,16 @@ class Stats {
             return category;
         }).filter(category => !categories.find(cat => cat.category === category));
 
-        // Props for StatsBox Tables
-        const props = { className: "fw-bold" };
-
         const makeGradient = (statsBox) => {
-            if (colors.length >= 6) {
+            if (colors.length >= 4) {
+                if (colors.length <= 5) {
+                    if (statsBox === "General") return colors.slice(2);
+                    if (statsBox === "Time") return colors.slice(0, 2);
+                    if (statsBox === "Jokers") return colors.length === 4 ? colors.slice(1, 3) : colors.slice(1, 4)
+                }
                 if (colors.length <= 7) {
-                    if (statsBox === "General") return colors.length === 6 ? colors.slice(0, 2) : colors.slice(0, 3);
-                    if (statsBox === "Time") return colors.length === 6 ? colors.slice(2, 4) : colors.slice(3, 5);
+                    if (statsBox === "General") return colors.slice(0, 2);
+                    if (statsBox === "Time") return colors.length === 6 ? colors.slice(2, 4) : colors.slice(2, 5);
                     if (statsBox === "Jokers") return colors.length === 6 ? colors.slice(4) : colors.slice(5);
                 }
                 if (colors.length <= 9) {
@@ -265,9 +269,12 @@ class Stats {
                     if (statsBox === "Jokers") return colors.length === 8 ? colors.slice(5) : colors.slice(6);
                 }
             } else {
-                return colors;
+                return shuffleArray(colors);
             }
         }
+
+        // Props for StatsBox Tables
+        const props = { className: "fw-bold" };
 
         // Create Element
         this.element = buildNode("div", { id: "stats-element", className: "container" });
@@ -297,6 +304,7 @@ class Stats {
                                     props
                                 }
                             ],
+                            ...categories.length === 1 ? [[{ data: "Category" }, { data: categories[0].category, props }]] : []
                             // [
                             //     { data: "Categories" },
                             //     {
@@ -324,7 +332,6 @@ class Stats {
                             //             }
                             //         ], props
                             //     }
-
                             // ]
                         ]
                     }),
@@ -334,7 +341,8 @@ class Stats {
                         table: [
                             [{ data: "Time (total)" }, { data: timeTotal, props }],
                             [{ data: "⌀ time per answer" }, { data: average, props }],
-                            [{ data: "Fastest correct answer" }, { data: fastest, props }]
+                            [{ data: "Fastest correct answer" }, { data: fastestCorrect, props }]
+                            // [{ data: "Slowest answer" }, { data: `${slowest} (${questions.find(qn => qn.time === slowest * 1000).result})`, props }]
                         ]
                     }),
                     new StatsBox({
@@ -346,27 +354,29 @@ class Stats {
                             [{ data: new LookupIcon({ className: "me-1" }) }, { data: gamestate.jokers.lookup ? "No" : "Yes", props }]
                         ]
                     }),
-                    new StatsBox({
-                        title: "Categories",
-                        colors: colors,
-                        table: {
-                            head: ["Category", "Questions", "%", "Correct", "%"].map((header) => {
-                                return { data: header, props: { className: `fw-bold` } }
-                            }),
-                            body: [
-                                ...categories.map((cat) => {
-                                    return [
-                                        { data: cat.category },
-                                        { data: cat.amount },
-                                        { data: `${cat.percent}%` },
-                                        { data: cat.correct },
-                                        { data: `${cat.correctPercent % 1 === 0 ? cat.correctPercent : cat.correctPercent.toFixed(2)}%` }
-                                    ]
-                                })
-                            ]
-                        }
+                    ...categories.length > 1 ? [
+                        new StatsBox({
+                            title: "Categories",
+                            colors: colors,
+                            table: {
+                                head: ["Category", "Questions", "%", "Correct", "%"].map((header) => {
+                                    return { data: header, props: { className: `fw-bold` } }
+                                }),
+                                body: [
+                                    ...categories.map((cat) => {
+                                        return [
+                                            { data: cat.category },
+                                            { data: cat.amount },
+                                            { data: `${cat.percent % 1 === 0 ? cat.percent : cat.percent.toFixed(2)}%` },
+                                            { data: cat.correct },
+                                            { data: `${cat.correctPercent % 1 === 0 ? cat.correctPercent : cat.correctPercent.toFixed(2)}%` }
+                                        ]
+                                    })
+                                ]
+                            }
 
-                    })
+                        })
+                    ] : []
                 ]
             },
             new ControlsB(),
@@ -424,8 +434,8 @@ class Overview {
         const row = (question, index) => {
             return [
                 { data: index, props: { className: `bg-${question.category.color} text-center` } },
-                { data: [{ element: buildNode("span", { textContent: question.question }) }, ...question.lookup || question.fifty || question.switched || question.switch ? [joker(question)] : []], props: { style: { position: "relative" } } },
-                { data: [new AnswersList({ question })] },
+                { data: [{ element: buildNode("span", { textContent: question.question }) }, ...question.lookup || question.fifty || question.switched || question.switch ? [joker(question)] : []], props: { style: { position: "relative", minWidth: "200px" } } },
+                { data: [new AnswersList({ question })], props: { style: { minWidth: "250px" } } },
                 { data: question.time / 1000 },
                 { data: question.points === 0 ? "-" : question.points },
                 { data: question.category.title }
@@ -561,13 +571,17 @@ class StatsBox {
 
         const hexColors = { "science": "#03FCBA", "history": "#FFF75C", "geography": "#D47AE8", "movies": "#EA3452", "literature": "#71FEFA", "music": "#FFA552", "sport_and_leisure": "#D2FF96", "general_knowledge": "#C4AF9A", "society_and_culture": "#FF579F" };
 
-        this.element = buildNode("div", { className: "col-auto mt-5" });
+        if (title === "Categories") {
+            shuffleArray(colors);
+        }
+
+        this.element = buildNode("div", { className: `${title === "Categories" ? "col-11 col-md-10 col-lg-8 col-xl-6" : "col-auto"} mt-5` });
         this.children = [
             {
                 element: buildNode("div", { className: "card p-3 bg-light rounded-lg", style: { minWidth: "300px" } }),
                 children: [
                     {
-                        element: buildNode("div", { className: `card-header rounded-lg${colors.length === 1 ? ` bg-${colors}` : ""}`, style: { backgroundImage: colors.length > 1 ? `linear-gradient(to right, ${colors.map(color => hexColors[color]).sort(() => 0.5 - Math.random())})` : "" } }),
+                        element: buildNode("div", { className: `card-header rounded-lg${colors.length === 1 ? ` bg-${colors}` : ""}`, style: { backgroundImage: colors.length > 1 ? `linear-gradient(to right, ${colors.map(color => hexColors[color])})` : "" } }),
                         children: [
                             {
                                 element: buildNode("span", { className: "fs-5" }),
@@ -599,30 +613,35 @@ class Table {
             return new TableRow({ row });
         })
 
-        this.element = buildNode("table", { className: "table table-responsive-md" });
+        this.element = buildNode("div", { className: "table-responsive" });
         this.children = [
-            ...tableHead ? [
-                {
-                    element: buildNode("thead"),
-                    children: [
-                        new TableRow({ row: tableHead })
-                    ]
-                }
-            ] : [],
             {
-                element: buildNode("tbody"),
+                element: buildNode("table", { className: "table" }),
                 children: [
-                    ...tableRows
+                    ...tableHead ? [
+                        {
+                            element: buildNode("thead"),
+                            children: [
+                                new TableRow({ row: tableHead })
+                            ]
+                        }
+                    ] : [],
+                    {
+                        element: buildNode("tbody"),
+                        children: [
+                            ...tableRows
+                        ]
+                    },
+                    ...tableFoot ? [
+                        {
+                            element: buildNode("tbody", { className: "opacity-50" }),
+                            children: [
+                                new TableRow({ row: tableFoot })
+                            ]
+                        }
+                    ] : []
                 ]
-            },
-            ...tableFoot ? [
-                {
-                    element: buildNode("tbody", { className: "opacity-50" }),
-                    children: [
-                        new TableRow({ row: tableFoot })
-                    ]
-                }
-            ] : []
+            }
         ]
     }
 }
@@ -747,7 +766,7 @@ class Category {
                                 element: buildNode("div", { className: "h1 mb-3" }),
                                 children: [
                                     {
-                                        element: buildNode("img", { src: "science.svg", alt: category, className: "w-50" }),
+                                        element: buildNode("img", { src: `images/${cat}.svg`, alt: category, className: "w-50" }),
                                         children: null
                                     }
                                 ]
@@ -988,7 +1007,7 @@ class Question {
             allWrongAnswers.splice(random, 1);
         }
 
-        const choices = [this.correctAnswer, ...randomWrongAnswers].sort(() => 0.5 - Math.random());
+        const choices = shuffleArray([this.correctAnswer, ...randomWrongAnswers]);
         return choices;
     }
 
@@ -1147,8 +1166,6 @@ class Quiz {
         clearInterval(this.timer.timeInterval);
 
         const exactTime = Date.now() - this.timer.start;
-
-        console.log(exactTime)
 
         // Update quiz values
         this._questions[this._gamestate.answered].userAnswer = answer;
@@ -2100,6 +2117,19 @@ const testQuestionsB = [{ "category": "Science", "id": "622a1c3a7cc59eab6f95106f
 
 const testQuestionsC = [
     {
+        "category": "Geography",
+        "id": "622a1c357cc59eab6f94fc86",
+        "correctAnswer": "Erinaceous",
+        "incorrectAnswers": [
+            "Sprunt",
+            "Whippersnapper",
+            "Frankenfood"
+        ],
+        "question": "Which word is defined as 'of, pertaining to, or resembling a hedgehog'?",
+        "tags": [],
+        "type": "Multiple Choice"
+    },
+    {
         "category": "Science",
         "id": "622a1c397cc59eab6f950c2d",
         "correctAnswer": "ABBA",
@@ -2462,11 +2492,11 @@ const substitutes = [
 // }
 
 const testQuestionsD = [];
-for (let i = 0; i < 5; i++) {
+for (let i = 0; i < 7; i++) {
     testQuestionsD.push(testQuestionsC[i]);
 }
 
-quiz.init(testQuestionsD);
+//quiz.init(testQuestionsD);
 
 const secondHalf = document.querySelector(".second-half-js");
 const firstHalf = document.querySelector(".first-half-js");
