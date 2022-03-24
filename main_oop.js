@@ -467,10 +467,13 @@ class Overview {
 class AnswersList {
     constructor({ question }) {
 
-        const ListElement = (answer) => {
+        const ListElement = (answer, index) => {
             let color;
             if (answer === question.correctAnswer) color = "green";
             else if (question.result === "wrong" && answer === question.userAnswer) color = "darkred";
+            else if (question.fifty) {
+                if (index === question.fifty.random1 || index === question.fifty.random2) color = "darkgrey";
+            }
             else color = "";
 
             return {
@@ -479,8 +482,8 @@ class AnswersList {
             };
         }
 
-        const listElements = question.multipleChoice.map((answer) => {
-            return ListElement(answer);
+        const listElements = question.multipleChoice.map((answer, index) => {
+            return ListElement(answer, index);
         })
 
         this.element = buildNode("ul", { className: "list-group list-group-flush" });
@@ -575,7 +578,7 @@ class StatsBox {
             shuffleArray(colors);
         }
 
-        this.element = buildNode("div", { className: `${title === "Categories" ? "col-11 col-md-10 col-lg-8 col-xl-6" : "col-auto"} mt-5` });
+        this.element = buildNode("div", { className: `${title === "Categories" ? "col-11 col-lg-8 col-xl-10 col-xxl-9" : "col-auto"} mt-5` });
         this.children = [
             {
                 element: buildNode("div", { className: "card p-3 bg-light rounded-lg", style: { minWidth: "300px" } }),
