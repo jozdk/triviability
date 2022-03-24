@@ -161,7 +161,7 @@ class UIForSettings {
         this._selectionMenuElement = new SelectionMenu({ selected, amount });
         this._spinnerElement;
 
-        this.render(this.mainElement, this._selectionMenuElement);
+        //this.render(this.mainElement, this._selectionMenuElement);
     }
 
     set selectionMenuElement(menuComp) {
@@ -273,6 +273,43 @@ class Stats {
             }
         }
 
+        const sortTable = (e) => {
+            if (e.target.previousElementSibling.textContent === "Questions") {
+                categories.sort((a, b) => a.amount > b.amount);
+                document.getElementById("categories-table").innerHTML = "";
+                quiz.ui.render(document.getElementById("categories-table"), new StatsBox({
+                    title: "Categories",
+                    colors: colors,
+                    table: {
+                        head: ["Category", "Questions", "%", "Correct", "%"].map((header) => {
+                            return { data: [
+                                {
+                                    element: buildNode("span", { textContent: header }),
+                                    children: null
+                                },
+                                {
+                                    element: buildNode("i", { className: "bi bi-chevron-up small-font align-top ms-2", onclick: sortTable }),
+                                    children: null
+                                }
+                            ], props: { className: `fw-bold` } }
+                        }),
+                        body: [
+                            ...categories.map((cat) => {
+                                return [
+                                    { data: cat.category },
+                                    { data: cat.amount },
+                                    { data: `${cat.percent % 1 === 0 ? cat.percent : cat.percent.toFixed(2)}%` },
+                                    { data: cat.correct },
+                                    { data: `${cat.correctPercent % 1 === 0 ? cat.correctPercent : cat.correctPercent.toFixed(2)}%` }
+                                ]
+                            })
+                        ]
+                    }
+
+                }))
+            }
+        }
+
         // Props for StatsBox Tables
         const props = { className: "fw-bold" };
 
@@ -349,9 +386,9 @@ class Stats {
                         title: "Jokers",
                         colors: makeGradient("Jokers"),
                         table: [
-                            [{ data: new FiftyIcon({ className: "me-1" }) }, { data: gamestate.jokers.fifty ? "No" : "Yes", props }],
-                            [{ data: new SwitchIcon({ className: "me-1" }) }, { data: gamestate.jokers.switch ? "No" : "Yes", props }],
-                            [{ data: new LookupIcon({ className: "me-1" }) }, { data: gamestate.jokers.lookup ? "No" : "Yes", props }]
+                            [{ data: new FiftyIcon({ className: "small-font" }) }, { data: gamestate.jokers.fifty ? "No" : "Yes", props }],
+                            [{ data: new SwitchIcon({}) }, { data: gamestate.jokers.switch ? "No" : "Yes", props }],
+                            [{ data: new LookupIcon({}) }, { data: gamestate.jokers.lookup ? "No" : "Yes", props }]
                         ]
                     }),
                     ...categories.length > 1 ? [
@@ -360,7 +397,16 @@ class Stats {
                             colors: colors,
                             table: {
                                 head: ["Category", "Questions", "%", "Correct", "%"].map((header) => {
-                                    return { data: header, props: { className: `fw-bold` } }
+                                    return { data: [
+                                        {
+                                            element: buildNode("span", { textContent: header }),
+                                            children: null
+                                        },
+                                        {
+                                            element: buildNode("i", { className: "bi bi-chevron-up small-font align-top ms-2", onclick: sortTable }),
+                                            children: null
+                                        }
+                                    ], props: { className: `fw-bold` } }
                                 }),
                                 body: [
                                     ...categories.map((cat) => {
@@ -578,7 +624,7 @@ class StatsBox {
             shuffleArray(colors);
         }
 
-        this.element = buildNode("div", { className: `${title === "Categories" ? "col-11 col-lg-8 col-xl-10 col-xxl-9" : "col-auto"} mt-5` });
+        this.element = buildNode("div", { id: title === "Categories" ? "categories-table" : "", className: `${title === "Categories" ? "col-11 col-lg-8 col-xl-10 col-xxl-9" : "col-auto"} mt-5` });
         this.children = [
             {
                 element: buildNode("div", { className: "card p-3 bg-light rounded-lg", style: { minWidth: "300px" } }),
@@ -2495,11 +2541,11 @@ const substitutes = [
 // }
 
 const testQuestionsD = [];
-for (let i = 0; i < 7; i++) {
+for (let i = 0; i < 5; i++) {
     testQuestionsD.push(testQuestionsC[i]);
 }
 
-//quiz.init(testQuestionsD);
+quiz.init(testQuestionsD);
 
 const secondHalf = document.querySelector(".second-half-js");
 const firstHalf = document.querySelector(".first-half-js");
