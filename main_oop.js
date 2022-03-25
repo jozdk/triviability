@@ -161,7 +161,7 @@ class UIForSettings {
         this._selectionMenuElement = new SelectionMenu({ selected, amount });
         this._spinnerElement;
 
-        //this.render(this.mainElement, this._selectionMenuElement);
+        this.render(this.mainElement, this._selectionMenuElement);
     }
 
     set selectionMenuElement(menuComp) {
@@ -227,18 +227,25 @@ class Stats {
         const times = questions.map(question => question.time);
         const timeTotal = times.reduce((acc, curr) => acc + curr) / 1000;
         const average = (timeTotal / questions.length).toFixed(3);
-        const fastestCorrect = Math.min(...timesCorrect) / 1000;
+        const fastestCorrect = timesCorrect.length ? Math.min(...timesCorrect) / 1000 : "-";
         // const slowest = Math.max(...times) / 1000;
         const categoryCount = {};
         questions.forEach((q) => categoryCount[q.category.title] = categoryCount[q.category.title] ? categoryCount[q.category.title] + 1 : 1);
         const categories = questions.map(question => question.category.title).filter((category, index, arr) => arr.indexOf(category) === index);
         Object.keys(categoryCount).forEach(cat => {
+            const amountCat = categoryCount[cat];
+            const share = Math.round(amountCat / amountTotal * 100);
+            const correctCat = questions.filter(qn => qn.category.title === cat && qn.result === "correct").length;
+            const timeTotalCat = questions.filter(qn => qn.category.title === cat).map(qn => qn.time).reduce((acc, curr) => acc + curr) / 1000;
+            const averagePoints = questions.filter(qn => qn.category.title === cat).map(qn => qn.points).reduce((acc, curr) => acc + curr) / amountCat;
             categories[categories.indexOf(cat)] = {
                 category: cat,
-                amount: categoryCount[cat],
-                percent: Math.round(categoryCount[cat] / amountTotal * 100),
-                correct: questions.filter(qn => qn.category.title === cat && qn.result === "correct").length,
-                correctPercent: questions.filter(qn => qn.category.title === cat && qn.result === "correct").length / questions.filter(qn => qn.category.title === cat).length * 100
+                amount: amountCat,
+                percent: share % 1 === 0 ? share : share.toFixed(2),
+                correct: correctCat,
+                correctPercent: (correctCat / amountCat * 100) % 1 === 0 ? (correctCat / amountCat * 100) : (correctCat / amountCat * 100).toFixed(2),
+                averageTime: (timeTotalCat / amountCat).toFixed(3),
+                points: averagePoints % 1 === 0 ? averagePoints : averagePoints.toFixed(2)
             }
         });
         const catUnused = settings.categories.map(cat => {
@@ -252,6 +259,7 @@ class Stats {
         }).filter(category => !categories.find(cat => cat.category === category));
 
         const makeGradient = (statsBox) => {
+            //if (statsBox === "Categories") return shuffleArray(colors);
             if (colors.length >= 4) {
                 if (colors.length <= 5) {
                     if (statsBox === "General") return colors.slice(2);
@@ -274,40 +282,63 @@ class Stats {
         }
 
         const sortTable = (e) => {
-            if (e.target.previousElementSibling.textContent === "Questions") {
-                categories.sort((a, b) => a.amount > b.amount);
-                document.getElementById("categories-table").innerHTML = "";
-                quiz.ui.render(document.getElementById("categories-table"), new StatsBox({
-                    title: "Categories",
-                    colors: colors,
-                    table: {
-                        head: ["Category", "Questions", "%", "Correct", "%"].map((header) => {
-                            return { data: [
-                                {
-                                    element: buildNode("span", { textContent: header }),
-                                    children: null
-                                },
-                                {
-                                    element: buildNode("i", { className: "bi bi-chevron-up small-font align-top ms-2", onclick: sortTable }),
-                                    children: null
-                                }
-                            ], props: { className: `fw-bold` } }
-                        }),
-                        body: [
-                            ...categories.map((cat) => {
-                                return [
-                                    { data: cat.category },
-                                    { data: cat.amount },
-                                    { data: `${cat.percent % 1 === 0 ? cat.percent : cat.percent.toFixed(2)}%` },
-                                    { data: cat.correct },
-                                    { data: `${cat.correctPercent % 1 === 0 ? cat.correctPercent : cat.correctPercent.toFixed(2)}%` }
-                                ]
-                            })
-                        ]
-                    }
-
-                }))
+            const parent = document.getElementById("categories-table");
+            const column = e.target.previousElementSibling.textContent;
+            const sortUp = e.target.classList.contains("bi-chevron-up") || e.target.classList.contains("bi-chevron-expand");
+            const chevron = sortUp ? "down" : "up";
+            let index;
+            if (column === "Category") {
+                sortUp ? categories.sort((a, b) => a.category < b.category ? -1 : 1) : categories.sort((a, b) => a.category > b.category ? -1 : 1);
+                index = 0;
+            } else if (column === "Questions") {
+                sortUp ? categories.sort((a, b) => b.amount - a.amount)  : categories.sort((a, b) => a.amount - b.amount);
+                index = 1;
+            } else if (column === "Questions (%)") {
+                sortUp ? categories.sort((a, b) => b.percent - a.percent) : categories.sort((a, b) => a.percent - b.percent);
+                index = 2;
+            } else if (column === "Correct") {
+                sortUp ? categories.sort((a, b) => b.correct - a.correct) : categories.sort((a, b) => a.correct - b.correct);
+                index = 3;
+            } else if (column === "Correct (%)") {
+                sortUp ? categories.sort((a, b) => b.correctPercent - a.correctPercent) : categories.sort((a, b) => a.correctPercent - b.correctPercent);
+                index = 4;
+            } else if (column === "⌀ time per answer") {
+                sortUp ? categories.sort((a, b) => a.averageTime - b.averageTime) : categories.sort((a, b) => b.averageTime - a.averageTime);
+                index = 5;
+            } else if (column === "Points ⌀") {
+                sortUp ? categories.sort((a, b) => b.points - a.points) : categories.sort((a, b) => a.points - b.points);
+                index = 6;
             }
+            parent.innerHTML = "";
+            quiz.ui.render(parent, new Table({
+                tableHead: ["Category", "Questions", "Questions (%)", "Correct", "Correct (%)", "⌀ time per answer", "Points ⌀"].map((header, i) => {
+                    return {
+                        data: [
+                            {
+                                element: buildNode("span", { textContent: header }),
+                                children: null
+                            },
+                            {
+                                element: buildNode("i", { className: `bi bi-chevron-${i === index ? chevron : "expand"} cursor small-font align-top ms-2`, onclick: sortTable }),
+                                children: null
+                            }
+                        ], props: { className: `fw-bold` }
+                    }
+                }),
+                tableBody: [
+                    ...categories.map((cat) => {
+                        return [
+                            { data: cat.category },
+                            { data: cat.amount },
+                            { data: `${cat.percent}%` },
+                            { data: cat.correct },
+                            { data: `${cat.correctPercent}%` },
+                            { data: cat.averageTime },
+                            { data: cat.points }
+                        ]
+                    })
+                ]
+            }));
         }
 
         // Props for StatsBox Tables
@@ -396,26 +427,30 @@ class Stats {
                             title: "Categories",
                             colors: colors,
                             table: {
-                                head: ["Category", "Questions", "%", "Correct", "%"].map((header) => {
-                                    return { data: [
-                                        {
-                                            element: buildNode("span", { textContent: header }),
-                                            children: null
-                                        },
-                                        {
-                                            element: buildNode("i", { className: "bi bi-chevron-up small-font align-top ms-2", onclick: sortTable }),
-                                            children: null
-                                        }
-                                    ], props: { className: `fw-bold` } }
+                                head: ["Category", "Questions", "Questions (%)", "Correct", "Correct (%)", "⌀ time per answer", "Points ⌀"].map((header) => {
+                                    return {
+                                        data: [
+                                            {
+                                                element: buildNode("span", { textContent: header }),
+                                                children: null
+                                            },
+                                            {
+                                                element: buildNode("i", { className: `bi bi-chevron-expand cursor small-font align-top ms-2`, onclick: sortTable }),
+                                                children: null
+                                            }
+                                        ], props: { className: `fw-bold` }
+                                    }
                                 }),
                                 body: [
                                     ...categories.map((cat) => {
                                         return [
                                             { data: cat.category },
                                             { data: cat.amount },
-                                            { data: `${cat.percent % 1 === 0 ? cat.percent : cat.percent.toFixed(2)}%` },
+                                            { data: `${cat.percent}%` },
                                             { data: cat.correct },
-                                            { data: `${cat.correctPercent % 1 === 0 ? cat.correctPercent : cat.correctPercent.toFixed(2)}%` }
+                                            { data: `${cat.correctPercent}%` },
+                                            { data: cat.averageTime },
+                                            { data: cat.points }
                                         ]
                                     })
                                 ]
@@ -624,7 +659,7 @@ class StatsBox {
             shuffleArray(colors);
         }
 
-        this.element = buildNode("div", { id: title === "Categories" ? "categories-table" : "", className: `${title === "Categories" ? "col-11 col-lg-8 col-xl-10 col-xxl-9" : "col-auto"} mt-5` });
+        this.element = buildNode("div", { className: `${title === "Categories" ? "col-auto" : "col-auto"} mt-5` });
         this.children = [
             {
                 element: buildNode("div", { className: "card p-3 bg-light rounded-lg", style: { minWidth: "300px" } }),
@@ -644,7 +679,7 @@ class StatsBox {
                         ]
                     },
                     {
-                        element: buildNode("div", { className: "card-body" }),
+                        element: buildNode("div", { id: title === "Categories" ? "categories-table" : "", className: "card-body" }),
                         children: [
                             new Table({ tableBody: table.head ? table.body : table, tableHead: table.head ? table.head : null })
                         ]
@@ -2166,19 +2201,6 @@ const testQuestionsB = [{ "category": "Science", "id": "622a1c3a7cc59eab6f95106f
 
 const testQuestionsC = [
     {
-        "category": "Geography",
-        "id": "622a1c357cc59eab6f94fc86",
-        "correctAnswer": "Erinaceous",
-        "incorrectAnswers": [
-            "Sprunt",
-            "Whippersnapper",
-            "Frankenfood"
-        ],
-        "question": "Which word is defined as 'of, pertaining to, or resembling a hedgehog'?",
-        "tags": [],
-        "type": "Multiple Choice"
-    },
-    {
         "category": "Science",
         "id": "622a1c397cc59eab6f950c2d",
         "correctAnswer": "ABBA",
@@ -2192,7 +2214,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "History",
+        "category": "Geography",
         "id": "622a1c387cc59eab6f950bcc",
         "correctAnswer": "Alice in Chains",
         "incorrectAnswers": [
@@ -2205,7 +2227,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "Geography",
+        "category": "Science",
         "id": "622a1c357cc59eab6f94fc86",
         "correctAnswer": "Erinaceous",
         "incorrectAnswers": [
@@ -2218,7 +2240,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "Film & TV",
+        "category": "Music",
         "id": "622a1c357cc59eab6f94fc58",
         "correctAnswer": "Whippersnapper",
         "incorrectAnswers": [
@@ -2244,7 +2266,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "Music",
+        "category": "Arts & Literature",
         "id": "622a1c367cc59eab6f9500cc",
         "correctAnswer": "Surfing",
         "incorrectAnswers": [
@@ -2257,7 +2279,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },// 6
     {
-        "category": "Sport & Leisure",
+        "category": "Arts & Literature",
         "id": "622a1c397cc59eab6f950bff",
         "correctAnswer": "Muse",
         "incorrectAnswers": [
@@ -2270,7 +2292,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "General Knowledge",
+        "category": "Arts & Literature",
         "id": "622a1c357cc59eab6f94fe8b",
         "correctAnswer": "Rihanna",
         "incorrectAnswers": [
@@ -2283,7 +2305,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "Society & Culture",
+        "category": "Arts & Literature",
         "id": "622a1c397cc59eab6f950db6",
         "correctAnswer": "The Rolling Stones",
         "incorrectAnswers": [
@@ -2541,11 +2563,11 @@ const substitutes = [
 // }
 
 const testQuestionsD = [];
-for (let i = 0; i < 5; i++) {
+for (let i = 0; i < 10; i++) {
     testQuestionsD.push(testQuestionsC[i]);
 }
 
-quiz.init(testQuestionsD);
+//quiz.init(testQuestionsD);
 
 const secondHalf = document.querySelector(".second-half-js");
 const firstHalf = document.querySelector(".first-half-js");
