@@ -113,7 +113,6 @@ class Settings {
                 return this.url(cat, amountPerCat[cat]);
             })
             console.log(amountPerCat);
-            console.log(urls);
             this.originalQuestions = [];
             this.ui.spinnerElement = new Spinner();
             for (let url of urls) {
@@ -790,19 +789,24 @@ class Modal {
                 element: buildNode("div", { className: `modal-dialog${size ? ` modal-${size}` : ""}${centered ? " modal-dialog-centered" : ""}` }),
                 children: [
                     {
-                        element: buildNode("div", { className: "modal-content" }),
+                        element: buildNode("div", { className: "modal-content rounded-lg" }),
                         children: [
                             {
-                                element: buildNode("div", { className: "modal-header", style: { backgroundImage: colors && colors.length > 1 ? `linear-gradient(to right, ${colors.map(color => hexColors[color])})` : "" } }),
+                                element: buildNode("div", { className: "modal-header border-0" }),
                                 children: [
                                     {
-                                        element: buildNode("h5", { className: "modal-title", textContent: title }),
-                                        children: null
-                                    },
-                                    {
-                                        element: buildNode("button", { className: "btn-close", type: "button", dataset: { bsDismiss: "modal" } }),
-                                        children: null
-                                    }
+                                        element: buildNode("div", { className: `rounded-lg d-flex align-items-center w-100 bg-dark${colors ? "" : " text-light"}`, style: { backgroundImage: colors && colors.length > 1 ? `linear-gradient(to right, ${colors.map(color => hexColors[color])})` : "", padding: "12px" } }),
+                                        children: [
+                                            {
+                                                element: buildNode("h5", { className: "modal-title", textContent: title }),
+                                                children: null
+                                            },
+                                            {
+                                                element: buildNode("button", { className: `btn-close${colors ? "" : " btn-close-white"}`, type: "button", dataset: { bsDismiss: "modal" } }),
+                                                children: null
+                                            }
+                                        ]
+                                    }                                  
                                 ]
                             },
                             {
@@ -1280,7 +1284,7 @@ class Category {
         this.element = buildNode("div", { className: "col-8 col-sm-6 col-lg-4" });
         this.children = [
             {
-                element: buildNode("div", { id: `category-${cat}`, className: `card cursor bg-${cat}${selected ? " selected" : " category-highlight"}`, onclick: handler }),
+                element: buildNode("div", { id: `category-${cat}`, className: `card rounded-lg cursor bg-${cat}${selected ? " selected" : " category-highlight"}`, onclick: handler }),
                 children: [
                     {
                         element: buildNode("div", { className: "card-body text-center" }),
@@ -1313,14 +1317,20 @@ class Category {
 
 class ParamsButtons {
     constructor() {
+        const selectAll = () => {
+            settings.selectAll();
+        }
 
-        const handler = (e) => {
-            if (e.target.classList.contains("bi-check2-all")) {
-                settings.selectAll();
-            }
-            if (e.target.classList.contains("bi-shuffle")) {
-                settings.selectRandom();
-            }
+        const selectRandom = () => {
+            settings.selectRandom();
+        }
+
+        const fill = (e) => { 
+            e.target.className += "-fill";
+        }
+
+        const unfill = (e) => {
+            e.target.className = e.target.className.slice(0, -5);
         }
 
         this.element = buildNode("div", { className: "row justify-content-end py-2" });
@@ -1329,7 +1339,7 @@ class ParamsButtons {
                 element: buildNode("div", { className: "col-auto" }),
                 children: [
                     {
-                        element: buildNode("i", { className: "bi bi-shuffle fs-4 cursor", onclick: handler }),
+                        element: buildNode("i", { className: "bi bi-shuffle fs-4 cursor", onclick: () => settings.selectRandom() }),
                         children: null
                     }
                 ]
@@ -1338,7 +1348,7 @@ class ParamsButtons {
                 element: buildNode("div", { className: "col-auto" }),
                 children: [
                     {
-                        element: buildNode("i", { className: "bi bi-check2-all fs-4 cursor", onclick: handler }),
+                        element: buildNode("i", { className: "bi bi-check2-all fs-4 cursor", onclick: () => settings.selectAll() }),
                         children: null
                     }
                 ]
@@ -1350,7 +1360,7 @@ class ParamsButtons {
                         element: buildNode("span"),
                         children: [
                             {
-                                element: buildNode("i", { className: "bi bi-gear fs-4 cursor", dataset: { bsToggle: "modal", bsTarget: "#advanced-settings-modal" } }),
+                                element: buildNode("i", { className: "bi fs-4 cursor bi-gear", dataset: { bsToggle: "modal", bsTarget: "#advanced-settings-modal" }, onmouseover: fill, onmouseout: unfill }),
                                 children: null
                             }
                         ]
@@ -1432,8 +1442,9 @@ class AdvancedSettings {
             e.target.previousElementSibling.textContent = `${e.target.value} Questions`;
             settings.amount = parseInt(e.target.value);
         }
-
-        return [
+        
+        this.element = buildNode("div", { id: "amount-range" });
+        this.children = [
             {
                 element: buildNode("label", { htmlFor: "amount", className: "form-label", textContent: `${amount} Questions` }),
                 children: null
@@ -3046,7 +3057,7 @@ for (let i = 0; i < 3; i++) {
     testQuestionsD.push(testQuestionsC[i]);
 }
 
-quiz.init(testQuestionsD);
+//quiz.init(testQuestionsD);
 
 const secondHalf = document.querySelector(".second-half-js");
 const firstHalf = document.querySelector(".first-half-js");
