@@ -251,117 +251,56 @@ a:link, a:visited {
     border-radius: 0 80px 80px 0;
 }
 
-/* @keyframes mymove {
-    
-    0% {
-        transform: rotate(0);
-        transform-origin: center left;
-    }
-    100% {
-        transform-origin: center left;
-        transform: rotate(180deg);
-    }   
-  } */
+.little-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+    background-color: #fff;
+}
 
-  .little-circle {
-      width: 30px;
-      height: 30px;
-      border-radius: 100%;
-      background-color: #fff;
-  }
+.board-correct {
+    color: green;
+}
 
-  .board-correct {
-      color: green;
-  }
+.board-wrong {
+    color: darkred;
+}
 
-  .board-wrong {
-      color: darkred;
-  }
+.board-unanswered {
+    color: #fff;
+}
 
-  .board-unanswered {
-      color: #fff;
-  }
+.joker-highlight:hover {
+background-color: rgba(255, 255, 255, 0.418);
+}
 
-  .joker-highlight:hover {
-    background-color: rgba(255, 255, 255, 0.418);
-  }
+/* .joker-used {
+filter: opacity(25%);
+} */
 
-  /* .joker-used {
-    filter: opacity(25%);
-  } */
+.small-font {
+    font-size: 14px;
+}
 
-  .small-font {
-      font-size: 14px;
-  }
+/* table {
+    width: 30%;
+}
 
-  /* table {
-      width: 30%;
-  }
-
-  tr, td {
-      padding: 10px;
-  } */
+tr, td {
+    padding: 10px;
+} */
 
 
-  .bg-gradient-a {
-    background-image: linear-gradient(to right, #03FCBA, #FFF75C, #D47AE8) !important;
-  }
+.bg-gradient-a {
+background-image: linear-gradient(to right, #03FCBA, #FFF75C, #D47AE8) !important;
+}
 
-  .bg-gradient-b {
-      background-image: linear-gradient(to right, #EA3452, #71FEFA, #FFA552) !important;
-  }
+.bg-gradient-b {
+    background-image: linear-gradient(to right, #EA3452, #71FEFA, #FFA552) !important;
+}
 
-  .bg-gradient-c {
-      background-image: linear-gradient(to right, #D2FF96, #C4AF9A, #FF579F) !important;
-  }
-
-  .nr-box {
-      height: 50px;
-      width: 50px;
-  }
-
-  .bg-science-light {
-      background-color: #03fcba8a !important;
-  }
-
-  .bg-history-light {
-      background-color: #fff75c8a !important;
-  }
-
-  .bg-geography-light {
-    background-color: #d47ae88f !important;
-  }
-
-  .bg-film_and_tv-light {
-      background-color: #ea34528a !important;
-  }
-
-  .bg-arts_and_literature-light {
-      background-color: #71fef98a !important;
-  }
-
-  .bg-music-light {
-      background-color: #ffa6528a !important;
-  }
-  
-  .bg-sport_and_leisure-light {
-      background-color: #d1ff968e !important;
-  }
-
-  .bg-general_knowledge-light {
-      background-color: #c4af9a85 !important;
-  }
-
-  .bg-society_and_culture-light {
-      background-color: #ff57a08c !important;
-  }
-
-  .bg-radial-gradient {
-      background-image: radial-gradient(#03FCBA, #03fcba36) !important;
-  }
-
-  .bg-radial-gradient-history {
-    background-image: radial-gradient(#FFF75C, #fff75c3b) !important;
+.bg-gradient-c {
+    background-image: linear-gradient(to right, #D2FF96, #C4AF9A, #FF579F) !important;
 }
 
 .no-select {
