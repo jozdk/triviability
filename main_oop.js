@@ -94,15 +94,6 @@ class Settings {
         }
     }
 
-    shuffleQuestions() {
-        for (let i = this.originalQuestions.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            const temp = this.originalQuestions[i];
-            this.originalQuestions[i] = this.originalQuestions[j];
-            this.originalQuestions[j] = temp;
-        }
-    }
-
     async fetchQuestions() {
         try {
             // const categories = this._categories;
@@ -145,7 +136,7 @@ class Settings {
                 }
 
             }
-            this.shuffleQuestions();
+            shuffleArray(this.originalQuestions);
             quiz.init(this.originalQuestions);
         } catch (error) {
             console.log(error.message);
@@ -161,7 +152,7 @@ class UIForSettings {
         this._selectionMenuElement = new SelectionMenu({ selected, amount });
         this._spinnerElement;
 
-        //this.render(this.mainElement, this._selectionMenuElement);
+        this.render(this.mainElement, this._selectionMenuElement);
     }
 
     set selectionMenuElement(menuComp) {
@@ -213,7 +204,7 @@ class UIForStats {
         this.statsElement = new StatsComp({ stats: this.stats, questions, discarded });
         this.categoriesTable = {};
 
-        this.render(this.mainElement, this.statsElement);
+        //this.render(this.mainElement, this.statsElement);
     }
     render(rootNode, startingNode) {
 
@@ -286,7 +277,7 @@ class Stats {
         }).filter(category => !categories.find(cat => cat.category === category));
 
         this.stats = {
-            general: { amountTotal, amountCorrect, percentCorrect, points: gamestate.points, emoji, categories },
+            general: { amountTotal, amountCorrect, percentCorrect, points: gamestate.points, emoji, categories, catUnused },
             time: { timeTotal, timeAverage, fastestCorrect },
             jokers: gamestate.jokers,
             categories: categories
@@ -307,7 +298,8 @@ class StatsComp {
                     new StatsBox({ title: "General", stats: general, colors }),
                     new StatsBox({ title: "Time", stats: time, colors }),
                     new StatsBox({ title: "Jokers", stats: jokers, colors }),
-                    ...categories.length > 1 ? [new StatsBox({ title: "Categories", stats: { categories }, colors })] : [],
+                    //...categories.length > 1 ? [new StatsBox({ title: "Categories", stats: { categories }, colors })] : [],
+                    ...categories.length > 1 ? [new Modal({ id: "categories-modal", title: "Categories", body: new CategoriesTable({ categories }), size: "xl", contentID: "categories-table", colors })] : [],
                     new ControlsB(),
                     new Overview({ questions, discarded }),
                     new ControlsB()
@@ -696,7 +688,7 @@ class StatsBox {
                         ]
                     },
                     {
-                        element: buildNode("div", { id: title === "Categories" ? "categories-table" : "", className: "card-body" }),
+                        element: buildNode("div", { className: "card-body" }),
                         children: [
                             ...title === "General" ? [new Table({
                                 tableBody: [
@@ -707,7 +699,7 @@ class StatsBox {
                                         {
                                             data: [
                                                 {
-                                                    element: buildNode("span", { textContent: stats.points }),
+                                                    element: buildNode("span", { textContent: stats.points === 0 ? "0" : stats.points }),
                                                     children: null
                                                 },
                                                 {
@@ -718,7 +710,51 @@ class StatsBox {
                                             props
                                         }
                                     ],
-                                    ...stats.categories.length === 1 ? [[{ data: "Category" }, { data: stats.categories[0].category, props }]] : []
+                                    [
+                                        { data: "Categories" },
+                                        {
+                                            data: stats.categories.length === 1 ? stats.categories[0].category : [
+                                                {
+                                                    element: buildNode("span", { textContent: stats.categories.length }),
+                                                    children: null
+                                                },
+                                                {
+                                                    element: buildNode("i", { className: "bi bi-arrows-angle-expand cursor", style: { position: "absolute", right: "0" }, dataset: { bsToggle: "modal", bsTarget: "#categories-modal" } }),
+                                                    children: null
+                                                }
+                                            ],
+                                            props: stats.categories.length === 1 ? props : { style: { position: "relative" }, className: props.className }
+                                        }
+                                    ]
+                                    // [
+                                    //     { data: "Categories" },
+                                    //     {
+                                    //         data: [
+                                    //             {
+                                    //                 element: buildNode("ul", { className: "list-group list-group-flush", style: { listStyle: "none" } }),
+                                    //                 children: [
+                                    //                     ...stats.categories.map((cat) => {
+                                    //                         return {
+                                    //                             element: buildNode("li", { textContent: `${cat.category} (${cat.percent}%)` }),
+                                    //                             children: null
+                                    //                         };
+                                    //                     })]
+                                    //             },
+                                    //             {
+                                    //                 element: buildNode("ul", { className: "list-group list-group-flush", style: { color: "darkgrey", listStyle: "none" } }),
+                                    //                 children: [
+                                    //                     ...stats.catUnused.map(cat => {
+                                    //                         return {
+                                    //                             element: buildNode("li", { textContent: cat }),
+                                    //                             children: null
+                                    //                         }
+                                    //                     })
+                                    //                 ]
+                                    //             }
+                                    //         ], props
+                                    //     }
+                                    // ]
+                                    //...stats.categories.length === 1 ? [[{ data: "Category" }, { data: stats.categories[0].category, props }]] : []
                                 ]
                             })] : [],
                             ...title === "Time" ? [new Table({
@@ -736,12 +772,131 @@ class StatsBox {
                                     [{ data: new LookupIcon({}) }, { data: stats.lookup ? "No" : "Yes", props }]
                                 ]
                             })] : [],
-                            ...title === "Categories" ? [categoriesTable()] : []
+                            //...title === "Categories" ? [categoriesTable()] : []
                         ]
                     }
                 ]
             }
         ]
+    }
+}
+
+// className parameter not needed atm, but we'll see
+class Modal {
+    constructor({ id, title, body, className, size, colors, centered, contentID }) {
+        this.element = buildNode("div", { className: `modal fade${className ? ` ${className}` : ""}`, id: id, tabIndex: -1, });
+        this.children = [
+            {
+                element: buildNode("div", { className: `modal-dialog${size ? ` modal-${size}` : ""}${centered ? " modal-dialog-centered" : ""}` }),
+                children: [
+                    {
+                        element: buildNode("div", { className: "modal-content" }),
+                        children: [
+                            {
+                                element: buildNode("div", { className: "modal-header", style: { backgroundImage: colors && colors.length > 1 ? `linear-gradient(to right, ${colors.map(color => hexColors[color])})` : "" } }),
+                                children: [
+                                    {
+                                        element: buildNode("h5", { className: "modal-title", textContent: title }),
+                                        children: null
+                                    },
+                                    {
+                                        element: buildNode("button", { className: "btn-close", type: "button", dataset: { bsDismiss: "modal" } }),
+                                        children: null
+                                    }
+                                ]
+                            },
+                            {
+                                element: buildNode("div", { className: "modal-body" }),
+                                children: [
+                                    {
+                                        element: buildNode("div", { id: contentID ? contentID : "", className: "container-fluid" }),
+                                        children: [
+                                            ...typeof body === "object" && !Array.isArray(body) ? [body] : [],
+                                            ...Array.isArray(body) ? [...body] : []
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                element: buildNode("div", { className: "modal-footer" }),
+                                children: [
+                                    {
+                                        element: buildNode("button", { type: "button", className: "btn btn-outline-dark", dataset: { bsDismiss: "modal" }, textContent: "Close" }),
+                                        children: null
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+class CategoriesTable {
+    constructor({ categories, index, chevron }) {
+        const sortCategories = (e) => {
+            //const parent = document.getElementById("categories-table");
+            const column = e.target.previousElementSibling.textContent;
+            const sortUp = e.target.classList.contains("bi-chevron-up") || e.target.classList.contains("bi-chevron-expand");
+            const chevron = sortUp ? "down" : "up";
+            let index;
+            if (column === "Category") {
+                sortUp ? categories.sort((a, b) => a.category < b.category ? -1 : 1) : categories.sort((a, b) => a.category > b.category ? -1 : 1);
+                index = 0;
+            } else if (column === "Questions") {
+                sortUp ? categories.sort((a, b) => b.amount - a.amount) : categories.sort((a, b) => a.amount - b.amount);
+                index = 1;
+            } else if (column === "Questions (%)") {
+                sortUp ? categories.sort((a, b) => b.percent - a.percent) : categories.sort((a, b) => a.percent - b.percent);
+                index = 2;
+            } else if (column === "Correct") {
+                sortUp ? categories.sort((a, b) => b.correct - a.correct) : categories.sort((a, b) => a.correct - b.correct);
+                index = 3;
+            } else if (column === "Correct (%)") {
+                sortUp ? categories.sort((a, b) => b.correctPercent - a.correctPercent) : categories.sort((a, b) => a.correctPercent - b.correctPercent);
+                index = 4;
+            } else if (column === "Time per answer ⌀") {
+                sortUp ? categories.sort((a, b) => a.averageTime - b.averageTime) : categories.sort((a, b) => b.averageTime - a.averageTime);
+                index = 5;
+            } else if (column === "Points ⌀") {
+                sortUp ? categories.sort((a, b) => b.points - a.points) : categories.sort((a, b) => a.points - b.points);
+                index = 6;
+            }
+            new CategoriesTable({ categories, index, chevron }).render();
+        }
+
+        return new Table({
+            tableHead: ["Category", "Questions", "Questions (%)", "Correct", "Correct (%)", "Time per answer ⌀", "Points ⌀"].map((header, i) => {
+                return {
+                    data: [
+                        {
+                            element: buildNode("span", { textContent: header }),
+                            children: null
+                        },
+                        {
+                            element: buildNode("i", { className: `bi bi-chevron-${i === index ? chevron : "expand"} cursor small-font align-top ms-2`, onclick: sortCategories }),
+                            children: null
+                        }
+                    ],
+                    props: { className: "fw-bold" }
+                }
+            }),
+            tableBody: [
+                ...categories.map((cat) => {
+                    return [
+                        { data: cat.category },
+                        { data: cat.amount },
+                        { data: `${cat.percent}%` },
+                        { data: cat.correct },
+                        { data: `${cat.correctPercent}%` },
+                        { data: cat.averageTime },
+                        { data: cat.points }
+                    ]
+                })
+            ]
+        });
     }
 }
 
@@ -1044,7 +1199,8 @@ class SelectionMenu {
         this.children = [
             new Welcome(),
             new Categories({ selected }),
-            new SettingsModal({ amount }),
+            //new SettingsModal({ amount }),
+            new Modal({ id: "advanced-settings-modal", title: "How Many Questions?", body: new AdvancedSettings({ amount }), centered: true }),
             new StartButton()
         ];
     }
@@ -1194,7 +1350,7 @@ class ParamsButtons {
                         element: buildNode("span"),
                         children: [
                             {
-                                element: buildNode("i", { className: "bi bi-gear fs-4 cursor", dataset: { bsToggle: "modal", bsTarget: "#quiz-settings" } }),
+                                element: buildNode("i", { className: "bi bi-gear fs-4 cursor", dataset: { bsToggle: "modal", bsTarget: "#advanced-settings-modal" } }),
                                 children: null
                             }
                         ]
@@ -1266,6 +1422,27 @@ class SettingsModal {
                 ]
             }
         ]
+    }
+}
+
+class AdvancedSettings {
+    constructor({ amount }) {
+
+        const handler = (e) => {
+            e.target.previousElementSibling.textContent = `${e.target.value} Questions`;
+            settings.amount = parseInt(e.target.value);
+        }
+
+        return [
+            {
+                element: buildNode("label", { htmlFor: "amount", className: "form-label", textContent: `${amount} Questions` }),
+                children: null
+            },
+            {
+                element: buildNode("input", { type: "range", className: "form-range", id: "amount", min: "6", max: "20", value: amount, oninput: handler }),
+                children: null
+            }
+        ];
     }
 }
 
@@ -1719,6 +1896,8 @@ function compileDOMTree(rootNode, startingNode) {
     }
 
 }
+
+const hexColors = { "science": "#03FCBA", "history": "#FFF75C", "geography": "#D47AE8", "movies": "#EA3452", "literature": "#71FEFA", "music": "#FFA552", "sport_and_leisure": "#D2FF96", "general_knowledge": "#C4AF9A", "society_and_culture": "#FF579F" };
 
 class QuizComponent {
     constructor({ question, gamestate, timer }) {
@@ -2527,7 +2706,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "Science",
+        "category": "History",
         "id": "622a1c357cc59eab6f94fc86",
         "correctAnswer": "Erinaceous",
         "incorrectAnswers": [
@@ -2540,7 +2719,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "Music",
+        "category": "Film & TV",
         "id": "622a1c357cc59eab6f94fc58",
         "correctAnswer": "Whippersnapper",
         "incorrectAnswers": [
@@ -2566,7 +2745,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "Arts & Literature",
+        "category": "Music",
         "id": "622a1c367cc59eab6f9500cc",
         "correctAnswer": "Surfing",
         "incorrectAnswers": [
@@ -2579,7 +2758,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },// 6
     {
-        "category": "Arts & Literature",
+        "category": "Sport & Leisure",
         "id": "622a1c397cc59eab6f950bff",
         "correctAnswer": "Muse",
         "incorrectAnswers": [
@@ -2592,7 +2771,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "Arts & Literature",
+        "category": "General Knowledge",
         "id": "622a1c357cc59eab6f94fe8b",
         "correctAnswer": "Rihanna",
         "incorrectAnswers": [
@@ -2605,7 +2784,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "Arts & Literature",
+        "category": "Society & Culture",
         "id": "622a1c397cc59eab6f950db6",
         "correctAnswer": "The Rolling Stones",
         "incorrectAnswers": [
@@ -2863,7 +3042,7 @@ const substitutes = [
 // }
 
 const testQuestionsD = [];
-for (let i = 0; i < 4; i++) {
+for (let i = 0; i < 3; i++) {
     testQuestionsD.push(testQuestionsC[i]);
 }
 
