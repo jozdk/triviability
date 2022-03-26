@@ -161,7 +161,7 @@ class UIForSettings {
         this._selectionMenuElement = new SelectionMenu({ selected, amount });
         this._spinnerElement;
 
-        this.render(this.mainElement, this._selectionMenuElement);
+        //this.render(this.mainElement, this._selectionMenuElement);
     }
 
     set selectionMenuElement(menuComp) {
@@ -210,7 +210,7 @@ class UIForSettings {
 class UIForStats {
     constructor() {
         this.mainElement = document.querySelector("#main");
-        this.statsElement = new StatsComp({ stats: this.stats, questions, discarded }),
+        this.statsElement = new StatsComp({ stats: this.stats, questions, discarded });
         this.categoriesTable = {};
 
         this.render(this.mainElement, this.statsElement);
@@ -232,7 +232,7 @@ class UIForStats {
 class Stats {
     init(questions, gamestate, discarded) {
         this.calculate(questions, gamestate);
-        this.ui = new StatsComp({ stats: this.stats, questions, discarded });
+        this.ui = new StatsComp({ stats: this.stats, questions, discarded, colors: this.colors });
         this.ui.render();
     }
 
@@ -286,27 +286,28 @@ class Stats {
         }).filter(category => !categories.find(cat => cat.category === category));
 
         this.stats = {
-            general: { amountTotal, amountCorrect, percentCorrect, points: gamestate.points },
+            general: { amountTotal, amountCorrect, percentCorrect, points: gamestate.points, emoji, categories },
             time: { timeTotal, timeAverage, fastestCorrect },
             jokers: gamestate.jokers,
             categories: categories
-        }
-        
+        };
+        this.colors = colors;
+
     }
 }
 
 class StatsComp {
-    constructor({ stats: { general, time, jokers, categories }, questions, discarded }) {
+    constructor({ stats: { general, time, jokers, categories }, questions, discarded, colors }) {
         this.parent = document.getElementById("main");
         this.element = buildNode("div", { id: "stats-element", className: "container" });
         this.children = [
             {
                 element: buildNode("div", { className: "row justify-content-center" }),
                 children: [
-                    new StatsBox({ title: "General", stats: general, colors: stats.colors }),
-                    new StatsBox({ title: "Time", stats: time, colors: stats.colors }),
-                    new StatsBox({ title: "Jokers", stats: jokers }),
-                    stats.categories > 1 ? [new StatsBox({ title: "Categories", stats: { categories }, colors: stats.colors })] : [],
+                    new StatsBox({ title: "General", stats: general, colors }),
+                    new StatsBox({ title: "Time", stats: time, colors }),
+                    new StatsBox({ title: "Jokers", stats: jokers, colors }),
+                    ...categories.length > 1 ? [new StatsBox({ title: "Categories", stats: { categories }, colors })] : [],
                     new ControlsB(),
                     new Overview({ questions, discarded }),
                     new ControlsB()
@@ -317,7 +318,7 @@ class StatsComp {
 
     render() {
         this.parent.innerHTML = "";
-        compileDOMTree(this.parent, this.element);
+        compileDOMTree(this.parent, this);
     }
 
 }
@@ -611,35 +612,38 @@ class StatsBox {
         };
 
         const sortCategories = (e) => {
-            const parent = document.getElementById("categories-table");
+            //const parent = document.getElementById("categories-table");
             const column = e.target.previousElementSibling.textContent;
             const sortUp = e.target.classList.contains("bi-chevron-up") || e.target.classList.contains("bi-chevron-expand");
             const chevron = sortUp ? "down" : "up";
             let index;
             if (column === "Category") {
-                sortUp ? categories.sort((a, b) => a.category < b.category ? -1 : 1) : categories.sort((a, b) => a.category > b.category ? -1 : 1);
+                sortUp ? stats.categories.sort((a, b) => a.category < b.category ? -1 : 1) : stats.categories.sort((a, b) => a.category > b.category ? -1 : 1);
                 index = 0;
             } else if (column === "Questions") {
-                sortUp ? categories.sort((a, b) => b.amount - a.amount) : categories.sort((a, b) => a.amount - b.amount);
+                sortUp ? stats.categories.sort((a, b) => b.amount - a.amount) : stats.categories.sort((a, b) => a.amount - b.amount);
                 index = 1;
             } else if (column === "Questions (%)") {
-                sortUp ? categories.sort((a, b) => b.percent - a.percent) : categories.sort((a, b) => a.percent - b.percent);
+                sortUp ? stats.categories.sort((a, b) => b.percent - a.percent) : stats.categories.sort((a, b) => a.percent - b.percent);
                 index = 2;
             } else if (column === "Correct") {
-                sortUp ? categories.sort((a, b) => b.correct - a.correct) : categories.sort((a, b) => a.correct - b.correct);
+                sortUp ? stats.categories.sort((a, b) => b.correct - a.correct) : stats.categories.sort((a, b) => a.correct - b.correct);
                 index = 3;
             } else if (column === "Correct (%)") {
-                sortUp ? categories.sort((a, b) => b.correctPercent - a.correctPercent) : categories.sort((a, b) => a.correctPercent - b.correctPercent);
+                sortUp ? stats.categories.sort((a, b) => b.correctPercent - a.correctPercent) : stats.categories.sort((a, b) => a.correctPercent - b.correctPercent);
                 index = 4;
             } else if (column === "⌀ time per answer") {
-                sortUp ? categories.sort((a, b) => a.averageTime - b.averageTime) : categories.sort((a, b) => b.averageTime - a.averageTime);
+                sortUp ? stats.categories.sort((a, b) => a.averageTime - b.averageTime) : stats.categories.sort((a, b) => b.averageTime - a.averageTime);
                 index = 5;
             } else if (column === "Points ⌀") {
-                sortUp ? categories.sort((a, b) => b.points - a.points) : categories.sort((a, b) => a.points - b.points);
+                sortUp ? stats.categories.sort((a, b) => b.points - a.points) : stats.categories.sort((a, b) => a.points - b.points);
                 index = 6;
             }
-            parent.innerHTML = "";
-            compileDOMTree(parent, new Table({
+            categoriesTable(index, chevron).render();
+        }
+
+        const categoriesTable = (index, chevron) => {
+            return new Table({
                 tableHead: ["Category", "Questions", "Questions (%)", "Correct", "Correct (%)", "⌀ time per answer", "Points ⌀"].map((header, i) => {
                     return {
                         data: [
@@ -648,14 +652,14 @@ class StatsBox {
                                 children: null
                             },
                             {
-                                element: buildNode("i", { className: `bi bi-chevron-${i === index ? chevron : "expand"} cursor small-font align-top ms-2`, onclick: sortTable }),
+                                element: buildNode("i", { className: `bi bi-chevron-${i === index ? chevron : "expand"} cursor small-font align-top ms-2`, onclick: sortCategories }),
                                 children: null
                             }
-                        ], props: { className: `fw-bold` }
+                        ], props
                     }
                 }),
                 tableBody: [
-                    ...categories.map((cat) => {
+                    ...stats.categories.map((cat) => {
                         return [
                             { data: cat.category },
                             { data: cat.amount },
@@ -667,38 +671,8 @@ class StatsBox {
                         ]
                     })
                 ]
-            }));
+            });
         }
-
-        const categoriesTable = title === "Categories" ? new Table({
-            tableHead: ["Category", "Questions", "Questions (%)", "Correct", "Correct (%)", "⌀ time per answer", "Points ⌀"].map((header) => {
-                return {
-                    data: [
-                        {
-                            element: buildNode("span", { textContent: header }),
-                            children: null
-                        },
-                        {
-                            element: buildNode("i", { className: `bi bi-chevron-expand cursor small-font align-top ms-2`, onclick: sortCategories }),
-                            children: null
-                        }
-                    ], props
-                }
-            }),
-            tableBody: [
-                ...stats.categories.map((cat) => {
-                    return [
-                        { data: cat.category },
-                        { data: cat.amount },
-                        { data: `${cat.percent}%` },
-                        { data: cat.correct },
-                        { data: `${cat.correctPercent}%` },
-                        { data: cat.averageTime },
-                        { data: cat.points }
-                    ]
-                })
-            ]
-        }) : null;
 
         const props = { className: "fw-bold" };
 
@@ -727,7 +701,7 @@ class StatsBox {
                             ...title === "General" ? [new Table({
                                 tableBody: [
                                     [{ data: "Questions" }, { data: stats.amountTotal, props }],
-                                    [{ data: "Correct" }, { data: `${stats.amountCorrect} = ${stats.percentCorrect}%`, props }],
+                                    [{ data: "Correct" }, { data: `${stats.amountCorrect} of ${stats.amountTotal} = ${stats.percentCorrect}%`, props }],
                                     [
                                         { data: "Score" },
                                         {
@@ -762,7 +736,7 @@ class StatsBox {
                                     [{ data: new LookupIcon({}) }, { data: stats.lookup ? "No" : "Yes", props }]
                                 ]
                             })] : [],
-                            ...categoriesTable ? [categoriesTable] : []
+                            ...title === "Categories" ? [categoriesTable()] : []
                         ]
                     }
                 ]
@@ -771,45 +745,45 @@ class StatsBox {
     }
 }
 
-class StatsBox {
-    constructor({ colors, title, table }) {
+// class StatsBox {
+//     constructor({ colors, title, table }) {
 
-        const hexColors = { "science": "#03FCBA", "history": "#FFF75C", "geography": "#D47AE8", "movies": "#EA3452", "literature": "#71FEFA", "music": "#FFA552", "sport_and_leisure": "#D2FF96", "general_knowledge": "#C4AF9A", "society_and_culture": "#FF579F" };
+//         const hexColors = { "science": "#03FCBA", "history": "#FFF75C", "geography": "#D47AE8", "movies": "#EA3452", "literature": "#71FEFA", "music": "#FFA552", "sport_and_leisure": "#D2FF96", "general_knowledge": "#C4AF9A", "society_and_culture": "#FF579F" };
 
-        if (title === "Categories") {
-            shuffleArray(colors);
-        }
+//         if (title === "Categories") {
+//             shuffleArray(colors);
+//         }
 
-        this.element = buildNode("div", { className: `${title === "Categories" ? "col-auto" : "col-auto"} mt-5` });
-        this.children = [
-            {
-                element: buildNode("div", { className: "card p-3 bg-light rounded-lg", style: { minWidth: "300px" } }),
-                children: [
-                    {
-                        element: buildNode("div", { className: `card-header rounded-lg${colors.length === 1 ? ` bg-${colors}` : ""}`, style: { backgroundImage: colors.length > 1 ? `linear-gradient(to right, ${colors.map(color => hexColors[color])})` : "" } }),
-                        children: [
-                            {
-                                element: buildNode("span", { className: "fs-5" }),
-                                children: [
-                                    {
-                                        element: document.createTextNode(title),
-                                        children: null
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        element: buildNode("div", { id: title === "Categories" ? "categories-table" : "", className: "card-body" }),
-                        children: [
-                            new Table({ tableBody: table.head ? table.body : table, tableHead: table.head ? table.head : null })
-                        ]
-                    }
-                ]
-            }
-        ]
-    }
-}
+//         this.element = buildNode("div", { className: `${title === "Categories" ? "col-auto" : "col-auto"} mt-5` });
+//         this.children = [
+//             {
+//                 element: buildNode("div", { className: "card p-3 bg-light rounded-lg", style: { minWidth: "300px" } }),
+//                 children: [
+//                     {
+//                         element: buildNode("div", { className: `card-header rounded-lg${colors.length === 1 ? ` bg-${colors}` : ""}`, style: { backgroundImage: colors.length > 1 ? `linear-gradient(to right, ${colors.map(color => hexColors[color])})` : "" } }),
+//                         children: [
+//                             {
+//                                 element: buildNode("span", { className: "fs-5" }),
+//                                 children: [
+//                                     {
+//                                         element: document.createTextNode(title),
+//                                         children: null
+//                                     }
+//                                 ]
+//                             }
+//                         ]
+//                     },
+//                     {
+//                         element: buildNode("div", { id: title === "Categories" ? "categories-table" : "", className: "card-body" }),
+//                         children: [
+//                             new Table({ tableBody: table.head ? table.body : table, tableHead: table.head ? table.head : null })
+//                         ]
+//                     }
+//                 ]
+//             }
+//         ]
+//     }
+// }
 
 class FiftyIcon {
     constructor({ className, style }) {
@@ -1031,11 +1005,11 @@ class Table {
                     ] : []
                 ]
             }
-        ]
+        ];
     }
     render() {
         this.parent.innerHTML = "";
-        compileDOMTree(this.parent, this.element);
+        compileDOMTree(this.parent, this);
     }
 }
 
@@ -1611,8 +1585,8 @@ class Quiz {
         // document.querySelector("#main").innerHTML = "";
         // this.ui.render(document.querySelector("#main"), new StatsComponent({ questions: this._questions, gamestate: this._gamestate, discarded: this._discardedQuestion }));
 
-        stats.calculate(this._questions, this._gamestate, this._discardedQuestion);
-        stats.render();
+        stats.init(this._questions, this._gamestate, this._discardedQuestion);
+
     }
 
     useJoker(joker) {
@@ -2889,11 +2863,11 @@ const substitutes = [
 // }
 
 const testQuestionsD = [];
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 4; i++) {
     testQuestionsD.push(testQuestionsC[i]);
 }
 
-//quiz.init(testQuestionsD);
+quiz.init(testQuestionsD);
 
 const secondHalf = document.querySelector(".second-half-js");
 const firstHalf = document.querySelector(".first-half-js");
