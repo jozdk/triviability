@@ -692,6 +692,22 @@ class StatsBox {
                             ...title === "General" ? [new Table({
                                 tableBody: [
                                     [{ data: "Questions" }, { data: stats.amountTotal, props }],
+                                    [
+                                        { data: "Categories" },
+                                        {
+                                            data: stats.categories.length === 1 ? stats.categories[0].category : [
+                                                {
+                                                    element: buildNode("span", { textContent: stats.categories.length }),
+                                                    children: null
+                                                },
+                                                {
+                                                    element: buildNode("i", { className: "bi bi-arrows-angle-expand cursor", style: { position: "absolute", right: "0" }, dataset: { bsToggle: "modal", bsTarget: "#categories-modal" } }),
+                                                    children: null
+                                                }
+                                            ],
+                                            props: stats.categories.length === 1 ? props : { style: { position: "relative" }, className: props.className }
+                                        }
+                                    ],
                                     [{ data: "Correct" }, { data: `${stats.amountCorrect} of ${stats.amountTotal} = ${stats.percentCorrect}%`, props }],
                                     [
                                         { data: "Score" },
@@ -708,23 +724,7 @@ class StatsBox {
                                             ],
                                             props
                                         }
-                                    ],
-                                    [
-                                        { data: "Categories" },
-                                        {
-                                            data: stats.categories.length === 1 ? stats.categories[0].category : [
-                                                {
-                                                    element: buildNode("span", { textContent: stats.categories.length }),
-                                                    children: null
-                                                },
-                                                {
-                                                    element: buildNode("i", { className: "bi bi-arrows-angle-expand cursor", style: { position: "absolute", right: "0" }, dataset: { bsToggle: "modal", bsTarget: "#categories-modal" } }),
-                                                    children: null
-                                                }
-                                            ],
-                                            props: stats.categories.length === 1 ? props : { style: { position: "relative" }, className: props.className }
-                                        }
-                                    ]
+                                    ]                                 
                                     // [
                                     //     { data: "Categories" },
                                     //     {
@@ -822,7 +822,7 @@ class Modal {
                                 ]
                             },
                             {
-                                element: buildNode("div", { className: "modal-footer" }),
+                                element: buildNode("div", { className: "modal-footer border-0" }),
                                 children: [
                                     {
                                         element: buildNode("button", { type: "button", className: "btn btn-outline-dark", dataset: { bsDismiss: "modal" }, textContent: "Close" }),
