@@ -150,7 +150,7 @@ class UIForSettings {
         this._selectionMenuElement = new SelectionMenu({ selected, amount });
         this._spinnerElement;
 
-        //this.render(this.mainElement, this._selectionMenuElement);
+        this.render(this.mainElement, this._selectionMenuElement);
     }
 
     set selectionMenuElement(menuComp) {
@@ -280,9 +280,9 @@ class StatsComponent {
                     new StatsBox({ title: "Time", stats: time, colors }),
                     new StatsBox({ title: "Jokers", stats: jokers, colors }),
                     ...categories.cat.length > 1 ? [new Modal({ id: "categories-modal", title: "Categories", body: new CategoriesTable({ categories: categories.cat, unused: categories.catUnused }), size: "xl", contentID: "categories-table", colors })] : [],
-                    new ControlsB(),
+                    new StatsControls(),
                     new Overview({ questions, discarded }),
-                    new ControlsB()
+                    new StatsControls()
                 ]
             }
         ]
@@ -644,21 +644,21 @@ class AnswersList {
     }
 }
 
-class ControlsB {
+class StatsControls {
     constructor() {
 
-        const catHandler = () => {
+        const toCategories = () => {
             quiz.reset();
             settings.reset();
             settings.ui.selectionMenuElement = new SelectionMenu({ selected: settings.categories, amount: settings.amount });
         }
 
-        const playHandler = () => {
+        const playAgain = () => {
             quiz.reset();
             settings.fetchQuestions();
         }
 
-        this.element = buildNode("div", { id: "controls-b", className: "row justify-content-center mt-5" });
+        this.element = buildNode("div", { id: "stats-controls", className: "row justify-content-center mt-5" });
         this.children = [
             {
                 element: buildNode("div", { className: "col-11 col-md-10 col-xxl-9" }),
@@ -669,47 +669,13 @@ class ControlsB {
                             {
                                 element: buildNode("div", { className: "col-auto" }),
                                 children: [
-                                    {
-                                        element: buildNode("button", { className: "btn btn-outline-dark", onclick: catHandler }),
-                                        children: [
-                                            {
-                                                element: buildNode("i", { className: "bi bi-grid-3x3-gap me-1" }),
-                                                children: null
-                                            },
-                                            {
-                                                element: buildNode("span", { className: "align-middle" }),
-                                                children: [
-                                                    {
-                                                        element: document.createTextNode("Categories"),
-                                                        children: null
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
+                                    new Button({ text: "Categories", icon: { type: "grid-3x3-gap", className: "me-1" }, spanClassName: "align-middle", handler: toCategories })
                                 ]
                             },
                             {
                                 element: buildNode("div", { className: "col-auto" }),
                                 children: [
-                                    {
-                                        element: buildNode("button", { className: "btn btn-outline-dark", onclick: playHandler }),
-                                        children: [
-                                            {
-                                                element: buildNode("i", { className: "bi bi-arrow-repeat me-1" }),
-                                                children: null
-                                            },
-                                            {
-                                                element: buildNode("span", { className: "align-middle" }),
-                                                children: [
-                                                    {
-                                                        element: document.createTextNode("Play Again"),
-                                                        children: null
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
+                                    new Button({ text: "Play Again", icon: { type: "arrow-repeat", className: "me-1" }, spanClassName: "align-middle", handler: playAgain })
                                 ]
                             }
                         ]
@@ -991,15 +957,7 @@ class StartButton {
             {
                 element: buildNode("div", { className: "col-md-9 col-xl-8 col-xxl-7" }),
                 children: [
-                    {
-                        element: buildNode("button", { id: "start-button", className: "btn btn-outline-dark w-100", onclick: handler }),
-                        children: [
-                            {
-                                element: document.createTextNode("Start Quiz!"),
-                                children: null
-                            }
-                        ]
-                    }
+                    new Button({ text: "Start Quiz!", className: "w-100", handler })
                 ]
             }
         ]
@@ -1754,111 +1712,7 @@ class Controls {
 
         const text = gamestate.board[gamestate.board.length - 1] !== "unanswered" ? "View Results" : "Next Question";
 
-        this.element = buildNode("div", { className: "row justify-content-center mt-3" });
-        this.children = [
-            new BackButton(),
-            {
-                element: buildNode("div", { className: "col-6 col-md-7 col-lg-8 col-xxl-7" }),
-                children: [
-                    {
-                        element: buildNode("div", { className: "row justify-content-end" }),
-                        children: [
-                            {
-                                element: buildNode("div", { className: "col-0 col-sm" }),
-                                children: null
-                            },
-                            ...gamestate.board[gamestate.board.length - 1] !== "unanswered" ? [new AgainButton()] : [],
-                            //new AgainButton(),
-                            new NextButton({ result: result, text: text })
-                        ]
-                    }
-                ]
-            }
-        ]
-    }
-}
-
-class BackButton {
-    constructor() {
-
-        const handler = () => {
-            // clearInterval(quiz.timer.timeInterval);
-            // settings.ui.selectionMenuElement = new SelectionMenu();
-            quiz.reset();
-            settings.reset();
-            settings.ui.selectionMenuElement = new SelectionMenu({ selected: settings.categories, amount: settings.amount });
-        }
-
-        this.element = buildNode("div", { className: "col-5 col-md-3 col-lg-2" });
-        this.children = [
-            {
-                element: buildNode("div", { className: "row justify-content-end" }),
-                children: [
-                    {
-                        element: buildNode("div", { className: "col-md-12 col-xl-10 col-xxl-9 px-0" }),
-                        children: [
-                            {
-                                element: buildNode("button", { className: "btn btn-outline-dark", onclick: handler }),
-                                children: [
-                                    {
-                                        element: buildNode("i", { className: "bi bi-arrow-left me-1" }),
-                                        children: null
-                                    },
-                                    {
-                                        element: buildNode("span"),
-                                        children: [
-                                            {
-                                                element: document.createTextNode("Categories"),
-                                                children: null
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
-        ];
-    }
-}
-
-class AgainButton {
-    constructor() {
-
-        const handler = () => {
-            quiz.reset();
-            settings.fetchQuestions();
-        }
-
-        this.element = buildNode("div", { className: "col-auto pe-0 ps-1 ps-sm-2" });
-        this.children = [
-            {
-                element: buildNode("button", { className: "btn btn-outline-dark", onclick: handler }),
-                children: [
-                    {
-                        element: buildNode("i", { className: "bi bi-arrow-repeat me-1" }),
-                        children: null
-                    },
-                    {
-                        element: buildNode("span"),
-                        children: [
-                            {
-                                element: document.createTextNode("Play Again"),
-                                children: null
-                            }
-                        ]
-                    }
-                ]
-            }
-        ];
-    }
-}
-
-class NextButton {
-    constructor({ result, text }) {
-
-        const handler = () => {
+        const next = () => {
             if (text === "Next Question") {
                 if (result === "unanswered") {
                     quiz.validate(null);
@@ -1871,30 +1725,89 @@ class NextButton {
             } else if (text === "View Results") {
                 quiz.showResults();
             }
-
         }
 
-        this.element = buildNode("div", { className: "col-auto pe-0 ps-1 ps-sm-2" });
+        const playAgain = () => {
+            quiz.reset();
+            settings.fetchQuestions();
+        }
+
+        const back = () => {
+            quiz.reset();
+            settings.reset();
+            settings.ui.selectionMenuElement = new SelectionMenu({ selected: settings.categories, amount: settings.amount });
+        }
+
+        this.element = buildNode("div", { className: "row justify-content-center mt-3" });
         this.children = [
             {
-                element: buildNode("button", { className: "btn btn-outline-dark", onclick: handler }),
+                element: buildNode("div", { className: "col-5 col-md-3 col-lg-2" }),
                 children: [
                     {
-                        element: buildNode("span", { className: "span" }),
+                        element: buildNode("div", { className: "row justify-content-end" }),
                         children: [
                             {
-                                element: document.createTextNode(text),
+                                element: buildNode("div", { className: "col-md-12 col-xl-10 col-xxl-9 px-0" }),
+                                children: [
+                                    new Button({ text: "Categories", icon: { type: "arrow-left", className: "me-1" }, handler: back })
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                element: buildNode("div", { className: "col-6 col-md-7 col-lg-8 col-xxl-7" }),
+                children: [
+                    {
+                        element: buildNode("div", { className: "row justify-content-end" }),
+                        children: [
+                            {
+                                element: buildNode("div", { className: "col-0 col-sm" }),
                                 children: null
                             },
+                            ...gamestate.board[gamestate.board.length - 1] !== "unanswered" ? [
+                                {
+                                    element: buildNode("div", { className: "col-auto pe-0 ps-1 ps-sm-2" }),
+                                    children: [
+                                        new Button({ text: "Play Again", icon: { type: "arrow-repeat", className: "me-1" }, handler: playAgain })
+                                    ]
+                                }
+                            ] : [],
                             {
-                                element: buildNode("i", { className: "bi bi-arrow-right ms-1" }),
-                                children: null
+                                element: buildNode("div", { className: "col-auto pe-0 ps-1 ps-sm-2" }),
+                                children: [
+                                    new Button({ text, icon: { type: "arrow-right", className: "ms-1", behindText: true }, handler: next })
+                                ]
                             }
                         ]
                     }
                 ]
             }
-        ];
+        ]
+    }
+}
+
+class Button {
+    constructor({ id, className, style, text, icon, spanClassName, handler }) {
+        this.element = buildNode("button", {
+            id: id ? id : null,
+            className: `btn btn-outline-dark${className ? ` ${className}` : ""}`,
+            style: style ? style : null,
+            textContent: icon ? null : text,
+            onclick: handler
+        });
+        this.children = icon ? [
+            {
+                element: buildNode("i", { className: `bi bi-${icon.type}${icon.className ? ` ${icon.className}` : ""}` }),
+                children: null
+            },
+            {
+                element: buildNode("span", { textContent: text, className: spanClassName ? spanClassName : null }),
+                children: null
+            }
+        ] : null;
+        if (icon && icon.behindText) this.children.reverse();
     }
 }
 
@@ -2275,7 +2188,7 @@ for (let i = 0; i < 4; i++) {
     testQuestionsD.push(testQuestionsC[i]);
 }
 
-quiz.init(testQuestionsD);
+//quiz.init(testQuestionsD);
 
 
 //const testQuestionsC = testQuestions.map((question) => new Question(question));
