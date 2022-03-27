@@ -1582,10 +1582,7 @@ class InfoHeader {
                                 children: null
                             }
                         ]
-                    },
-                    // {
-                    //     element: buildNode("p", { className: "px-0 my-2 text-center small-font d-lg-none", textContent: `${answered + 1} of ${total}` })
-                    // }
+                    }
                 ]
             }
         ]
@@ -1613,102 +1610,11 @@ class Timer {
                         element: buildNode("div", { id: "timer-container" }),
                         children: [
                             new Time({ category, timer })
-                            // {
-                            //     element: buildNode("div", { className: "radial-timer" }),
-                            //     children: [
-                            //         {
-                            //             element: buildNode("div", { className: `first-half-js bg-${category.color}` }),
-                            //             children: null
-                            //         },
-                            //         {
-                            //             element: buildNode("div", { className: "half-mask" }),
-                            //             children: null
-                            //         },
-                            //         {
-                            //             element: buildNode("div", { className: `second-half-js bg-${category.color}` }),
-                            //             children: null
-                            //         },
-                            //         {
-                            //             element: buildNode("div", { className: "seconds d-flex align-items-center justify-content-center lead" }),
-                            //             children: [
-                            //                 {
-                            //                     element: buildNode("h4", { id: "seconds-js" }),
-                            //                     children: [
-                            //                         {
-                            //                             element: document.createTextNode(`${secs}`),
-                            //                             children: null
-                            //                         }
-                            //                     ]
-                            //                 }
-                            //             ]
-                            //         }
-                            //     ]
-                            // }
                         ]
                     }
                 ]
             }
         ];
-        this.state = {
-            secondHalf: this.children[0].children[1].children[0].children[2].element,
-            firstHalf: this.children[0].children[1].children[0].children[0].element,
-            seconds: this.children[0].children[1].children[0].children[3].children[0].element
-            // start: undefined,
-            // timeInterval: undefined,
-            // time: undefined,
-            // degree: undefined,
-            // elapsed: undefined,
-            // object: undefined,
-        }
-    }
-    componentDidMount() {
-
-        // this.state.secondHalf = document.querySelector(".second-half-js");
-        // this.state.firstHalf = document.querySelector(".first-half-js");
-        // this.state.seconds = document.querySelector("#seconds-js");
-
-        // let start;
-        // let timeInterval;
-        // let time;
-
-        const grabAsync = () => {
-            return new Promise((resolve, reject) => {
-                document.querySelector
-            })
-        }
-
-        const selectAsync = async (selector) => {
-            while (document.querySelector(selector) === null) {
-                await grabAsync()
-            }
-        }
-
-        this.state.start = Date.now();
-        this.state.degree = 0;
-        this.state.object = this.state.secondHalf;
-
-        this.state.timeInterval = setInterval(function () {
-
-            this.state.time = Date.now() - this.state.start;
-
-            this.state.elapsed = Math.floor(this.state.time / 1000);
-
-            this.state.seconds.textContent--;
-
-            this.state.object.style.transform = `rotate(${this.state.degree += 30}deg)`;
-
-            if (this.state.elapsed === 6) {
-                //clearInterval(timeInterval)
-                this.state.secondHalf.style.display = "none";
-                this.state.object = this.state.firstHalf;
-                this.state.degree = 0;
-            }
-
-            if (this.state.elapsed === 12) {
-                clearInterval(this.state.timeInterval);
-            }
-
-        }.bind(this), 1000);
     }
 }
 
