@@ -1250,7 +1250,6 @@ class UIForQuiz {
 
 class Quiz {
     constructor() {
-        // this._questions = questions.map((question) => new Question(question));
         this._questions = [];
         this._gamestate = {
             answered: 0,
@@ -1282,20 +1281,15 @@ class Quiz {
         this.startTimer();
     }
 
-    set gamestate({ answered, points, board }) {
-        this._gamestate.answered = answered;
-        this._gamestate.points = points;
-        // set board
-    }
+    // Probably never called anywhere
+    // set gamestate({ answered, points, board }) {
+    //     this._gamestate.answered = answered;
+    //     this._gamestate.points = points;
+    // }
 
     get gamestate() {
         return this._gamestate;
     }
-
-    // set questions(questions) {
-    //     this._questions = questions.map((question) => new Question(question));
-    //     this.ui = new UIForQuiz(this._questions[0], this._gamestate);
-    // }
 
     get questions() {
         return this._questions;
