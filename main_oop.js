@@ -150,7 +150,7 @@ class UIForSettings {
         this._selectionMenuElement = new SelectionMenu({ selected, amount });
         this._spinnerElement;
 
-        this.render(this.mainElement, this._selectionMenuElement);
+        //this.render(this.mainElement, this._selectionMenuElement);
     }
 
     set selectionMenuElement(menuComp) {
@@ -456,7 +456,7 @@ class Modal {
                                 element: buildNode("div", { className: "modal-body" }),
                                 children: [
                                     {
-                                        element: buildNode("div", { id: contentID ? contentID : "", className: "container-fluid" }),
+                                        element: buildNode("div", { id: contentID ? contentID : null, className: "container-fluid" }),
                                         children: [
                                             ...typeof body === "object" && !Array.isArray(body) ? [body] : [],
                                             ...Array.isArray(body) ? [...body] : []
@@ -1715,12 +1715,6 @@ class Timer {
 class Time {
     constructor({ category, timer }) {
 
-        const noDisplay = () => {
-            if (timer.elapsed > timer.total / 2) {
-                return "d-none";
-            }
-        }
-
         const secondHalf = timer.elapsed <= timer.total / 2 ? `rotate(${timer.elapsed * (360 / timer.total)}deg)` : "";
         const firstHalf = timer.elapsed > timer.total / 2 ? `rotate(${(timer.elapsed - timer.total / 2) * (360 / timer.total)}deg)` : "";
 
@@ -1735,7 +1729,7 @@ class Time {
                 children: null
             },
             {
-                element: buildNode("div", { className: `second-half-js bg-${category.color} ${noDisplay()}`, style: { transform: secondHalf } }),
+                element: buildNode("div", { className: `second-half-js bg-${category.color}${timer.elapsed > timer.total / 2 ? " d-none" : ""}`, style: { transform: secondHalf } }),
                 children: null
             },
             {
@@ -1938,63 +1932,35 @@ class QuestionText {
 class Answers {
     constructor({ question }) {
 
-        // let answers;
-
-        // if (question.result === "correct") {
-        //     answers = question.multipleChoice.map((answer) => {
-        //         if (answer === question.correctAnswer.title && answer === question.userAnswer) {
-        //             return new Answer({ answer: answer, result: "correct", category: { color: undefined }, handler: handler });
-        //         } else {
-        //             return new Answer({ answer: answer, result: "white", category: question.category, handler: handler });
-        //         }
-        //     });
-        // } else if (question.result === "wrong") {
-        //     if (answer === question.correctAnswer.title && answer === question.userAnswer) {
-        //         return new Answer({ answer: answer, result: "correct", category: { color: undefined }, handler: handler });
-
-        // }
-
-        // const answers = [];
-
-        // for (let i = 0; i < question.multipleChoice.length; i++) {
-        //     if ()
-
-        //     answers.push(new Answer({
-        //         answer: question.multipleChoice[i],
-        //         result: question.result,
-        //         category: question.category,
-        //         handler }));
-        // }
-
         const handler = question.result === "unanswered" && !question.switch ? (event) => quiz.validate(event.target.textContent) : null;
 
         const answers = question.multipleChoice.map((answer, index) => {
 
             if (question.result === "correct" && answer === question.correctAnswer) {
-                return new Answer({ answer, color: "correct", category: { color: undefined }, handler });
+                return new Answer({ answer, color: "correct", handler });
             }
 
             if (question.result === "wrong" && answer === question.userAnswer) {
-                return new Answer({ answer, color: "wrong", category: { color: undefined }, handler });
+                return new Answer({ answer, color: "wrong", handler });
             }
 
             if (question.result === "wrong" && answer === question.correctAnswer) {
-                return new Answer({ answer, color: "actually-correct", category: { color: undefined }, handler });
+                return new Answer({ answer, color: "actually-correct", handler });
             }
 
             if (question.fifty && (index === question.fifty.random1 || index === question.fifty.random2)) {
-                return new Answer({ answer: null, color: null, category: null, handler: null });
+                return new Answer({});
             }
 
             if (question.switch && answer === question.correctAnswer) {
-                return new Answer({ answer, color: "actually-correct", category: { color: undefined }, handler })
+                return new Answer({ answer, color: "actually-correct", handler })
             }
 
             if (question.result !== "unanswered" || question.switch) {
-                return new Answer({ answer, color: "white", category: { color: undefined }, handler })
+                return new Answer({ answer, color: "white", handler })
             }
 
-            return new Answer({ answer, color: "white", category: question.category, handler });
+            return new Answer({ answer, color: "white", highlight: question.category.color, handler });
 
         })
 
@@ -2016,13 +1982,13 @@ class Answers {
 }
 
 class Answer {
-    constructor({ answer, color, category, handler }) {
+    constructor({ answer, color, highlight, handler }) {
 
         this.element = buildNode("div", { className: "col-md-6 px-3 px-md-2 answer-box" });
         this.children = [
             ...answer ?
                 [{
-                    element: buildNode("p", { className: `rounded-lg p-2 py-md-5 my-0 bg-answer-${color} border answer-highlight-${category.color}`, onclick: handler }),
+                    element: buildNode("p", { className: `rounded-lg border p-2 py-md-5 my-0 bg-answer-${color}${highlight ? ` answer-highlight-${highlight}` : ""}`, onclick: handler }),
                     children: [
                         {
                             element: document.createTextNode(answer),
@@ -2667,7 +2633,7 @@ for (let i = 0; i < 4; i++) {
     testQuestionsD.push(testQuestionsC[i]);
 }
 
-//quiz.init(testQuestionsD);
+quiz.init(testQuestionsD);
 
 const secondHalf = document.querySelector(".second-half-js");
 const firstHalf = document.querySelector(".first-half-js");
