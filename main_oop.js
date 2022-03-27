@@ -1067,33 +1067,6 @@ class AdvancedSettings {
     }
 }
 
-// class Switch {
-//     constructor({ type }) {
-
-//         const handler = (e) => {
-//             if (e.target.checked === true) {
-//                 if (e.target.parentElement.nextElementSibling) {
-//                     e.target.parentElement.nextElementSibling.firstElementChild.checked = false;
-//                 } else {
-//                     e.target.parentElement.previousElementSibling.firstElementChild.checked = false;
-//                 }
-//             }
-//         }
-
-//         this.element = buildNode("div", { className: "form-check form-check-inline form-switch" });
-//         this.children = [
-//             {
-//                 element: buildNode("input", { className: "form-check-input", type: "checkbox", id: type.toLowerCase(), oninput: handler }),
-//                 children: null
-//             },
-//             {
-//                 element: buildNode("label", { htmlFor: type.toLowerCase(), className: "form-check-label no-select", textContent: type }),
-//                 children: null
-//             }
-//         ]
-//     }
-// }
-
 class StartButton {
     constructor() {
 
@@ -1176,12 +1149,6 @@ class Question {
         return choices;
     }
 
-    // validate(answer) {
-    //     this.userAnswer = answer;
-    //     this.result = answer === this.correctAnswer ? "correct" : "wrong";
-    //     return this.result;
-    // }
-
     fixLowerCase(answerOrArray) {
         if (typeof answerOrArray === "object") {
             return answerOrArray.map((answer) => {
@@ -1198,8 +1165,6 @@ class Question {
                 return answerOrArray;
             }
         }
-
-
     }
 
 }
@@ -1230,10 +1195,6 @@ class UIForQuiz {
     render(rootNode, startingNode) {
 
         rootNode.append(startingNode.element);
-
-        // if (startingNode.componentDidMount) {
-        //     startingNode.componentDidMount();
-        // }
 
         if (startingNode.children) {
             startingNode.children.forEach((child) => {
