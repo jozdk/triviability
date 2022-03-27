@@ -813,7 +813,6 @@ class SelectionMenu {
         this.children = [
             new Welcome(),
             new Categories({ selected }),
-            //new SettingsModal({ amount }),
             new Modal({ id: "advanced-settings-modal", title: "How Many Questions?", body: new AdvancedSettings({ amount }), centered: true }),
             new StartButton()
         ];
@@ -849,15 +848,6 @@ class Welcome {
 
 class Categories {
     constructor({ selected }) {
-
-        // const handler = (event) => {
-        //     if (!event.target.classList.contains("col-8") && !event.target.classList.contains("row")) {
-        //         const elements = event.composedPath();
-        //         const targetElement = elements.find(element => element.classList && element.classList.contains("category"));
-        //         const category = targetElement ? targetElement.firstElementChild.lastElementChild.innerText : null;
-        //         settings.toggleSelection(targetElement, category);
-        //     }
-        // }
 
         const categories = Settings.allCategories.map((category) => {
             return new Category({ category, selected: selected.includes(toUnderscore(category)) })
@@ -972,70 +962,6 @@ class ParamsButtons {
                             {
                                 element: buildNode("i", { className: "bi fs-4 cursor bi-gear", dataset: { bsToggle: "modal", bsTarget: "#advanced-settings-modal" }, onmouseover: fill, onmouseout: unfill }),
                                 children: null
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    }
-}
-
-class SettingsModal {
-    constructor({ amount }) {
-
-        const handler = (e) => {
-            e.target.previousElementSibling.textContent = `${e.target.value} Questions`;
-            settings.amount = parseInt(e.target.value);
-        }
-
-        this.element = buildNode("div", { className: "modal fade", id: "quiz-settings", tabIndex: -1, });
-        this.children = [
-            {
-                element: buildNode("div", { className: "modal-dialog" }),
-                children: [
-                    {
-                        element: buildNode("div", { className: "modal-content" }),
-                        children: [
-                            {
-                                element: buildNode("div", { className: "modal-header" }),
-                                children: [
-                                    {
-                                        element: buildNode("h5", { className: "modal-title", textContent: "How many Questions?" }),
-                                        children: null
-                                    },
-                                    {
-                                        element: buildNode("button", { className: "btn-close", type: "button", dataset: { bsDismiss: "modal" } }),
-                                        children: null
-                                    }
-                                ]
-                            },
-                            {
-                                element: buildNode("div", { className: "modal-body" }),
-                                children: [
-                                    {
-                                        element: buildNode("div", { className: "container-fluid" }),
-                                        children: [
-                                            {
-                                                element: buildNode("label", { htmlFor: "amount", className: "form-label", textContent: `${amount} Questions` }),
-                                                children: null
-                                            },
-                                            {
-                                                element: buildNode("input", { type: "range", className: "form-range", id: "amount", min: "6", max: "20", value: amount, oninput: handler }),
-                                                children: null
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                element: buildNode("div", { className: "modal-footer" }),
-                                children: [
-                                    {
-                                        element: buildNode("button", { type: "button", className: "btn btn-outline-dark", dataset: { bsDismiss: "modal" }, textContent: "Close" }),
-                                        children: null
-                                    }
-                                ]
                             }
                         ]
                     }
