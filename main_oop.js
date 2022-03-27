@@ -340,7 +340,7 @@ class StatsBox {
 
         const props = { className: "fw-bold" };
 
-        this.element = buildNode("div", { className: `${title === "Categories" ? "col-auto" : "col-auto"} mt-5` });
+        this.element = buildNode("div", { className: "col-auto mt-5" });
         this.children = [
             {
                 element: buildNode("div", { className: "card p-3 bg-light rounded-lg", style: { minWidth: "300px" } }),
