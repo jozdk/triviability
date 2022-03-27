@@ -1326,7 +1326,6 @@ class Quiz {
     }
 
     validate(answer) {
-
         // Stop timer
         clearInterval(this.timer.timeInterval);
 
@@ -1347,14 +1346,10 @@ class Quiz {
             this._questions[this._gamestate.answered].points = 0;
         }
 
-        // this.ui.updateComponent("stats", currentQuestion, this._gamestate);
-        // this.ui.updateComponent("answers", currentQuestion);
-
         // Update UI
         this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
 
         this._gamestate.answered++;
-
     }
 
     advance() {
@@ -1376,15 +1371,8 @@ class Quiz {
         this.ui = {};
     }
 
-    // Highly preliminary. It is to be considered if there should be one more controlling Stats Object next to Settings and Quiz, where the calculations of 
-    // stats take place and which passes them to the stats component. Or the UI Objects for Quiz and Settings need to be incorporated by the components, that
-    // would be responsible for their own rendering then
-    showResults() {
-        // document.querySelector("#main").innerHTML = "";
-        // this.ui.render(document.querySelector("#main"), new StatsComponent({ questions: this._questions, gamestate: this._gamestate, discarded: this._discardedQuestion }));
-
+    showResults() {       
         stats.init(this._questions, this._gamestate, this._discardedQuestion);
-
     }
 
     useJoker(joker) {
@@ -1400,12 +1388,6 @@ class Quiz {
             this._questions[this._gamestate.answered].fifty = { random1, random2 };
             this._gamestate.jokers.fifty = false;
             this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
-        } else if (joker === "time" && this._gamestate.jokers.time) {
-            this.resetTimer();
-            this._questions[this._gamestate.answered].time = true;
-            this._gamestate.jokers.time = false;
-            this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
-            this.startTimer();
         } else if (joker === "switch" && this._gamestate.jokers.switch) {
             clearInterval(this.timer.timeInterval);
             this._questions[this._gamestate.answered].time = Date.now() - this.timer.start;
@@ -1423,9 +1405,6 @@ class Quiz {
         } else if (joker === "lookup") {
             this._gamestate.jokers.lookup = false;
             this._questions[this._gamestate.answered].lookup = true;
-            //const queryString = this._questions[this._gamestate.answered].question.replace(/\s/gm, "+").replace(/\?/gm, "%3F");
-            //const url = `https://google.com/search?q=${queryString}`;
-            //window.open(url, "", "width=900,height=600,noopener,noreferrer");
             this.resetTimer();
             this.ui.quizElement = new QuizComponent({ question: this._questions[this._gamestate.answered], gamestate: this._gamestate, timer: this.timer });
             this.startTimer();
