@@ -915,6 +915,10 @@ class ParamsButtons {
                         ]
                     }
                 ]
+            },
+            {
+                element: buildNode("div", { className: "col-2 d-sm-none" }),
+                children: null
             }
         ]
     }
@@ -957,7 +961,27 @@ class StartButton {
             {
                 element: buildNode("div", { className: "col-md-9 col-xl-8 col-xxl-7" }),
                 children: [
-                    new Button({ text: "Start Quiz!", className: "w-100", handler })
+                    {
+                        element: buildNode("div", { className: "row" }),
+                        children: [
+                            {
+                                element: buildNode("div", { className: "col-2 d-sm-none" }),
+                                children: null
+                            },
+                            {
+                                element: buildNode("div", { className: "col" }),
+                                children: [
+                                    new Button({ text: "Start Quiz!", className: "w-100", handler })
+                                ]
+                            },
+                            {
+                                element: buildNode("div", { className: "col-2 d-sm-none" }),
+                                children: null
+                            }
+                        ]
+                    }
+
+                    
                 ]
             }
         ]
