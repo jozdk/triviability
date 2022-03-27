@@ -1900,9 +1900,6 @@ class NextButton {
 
 // Local Storage Class: Handles Local Storage
 
-// Events?
-
-
 // const ui = new UIForSettings;
 const settings = new Settings();
 const quiz = new Quiz();
@@ -2350,45 +2347,6 @@ for (let i = 0; i < 4; i++) {
 
 quiz.init(testQuestionsD);
 
-const secondHalf = document.querySelector(".second-half-js");
-const firstHalf = document.querySelector(".first-half-js");
-const seconds = document.querySelector("#seconds-js");
-
-let start;
-let timeInterval;
-
-
-function rotate() {
-    start = Date.now();
-    let degree = 0;
-    //secondHalf.style.transform = `rotate(${degree}deg)`
-    let object = secondHalf;
-    timeInterval = setInterval(function () {
-        time = Date.now() - start;
-
-        let elapsed = Math.floor(time / 1000);
-
-        seconds.innerHTML--;
-
-        object.style.transform = `rotate(${degree += 30}deg)`;
-
-        if (elapsed === 6) {
-            //clearInterval(timeInterval)
-            secondHalf.style.display = "none";
-            object = firstHalf;
-            degree = 0;
-        }
-
-        if (elapsed === 12) {
-            clearInterval(timeInterval);
-        }
-
-    }, 1000);
-
-
-}
-
-//rotate();
 
 //const testQuestionsC = testQuestions.map((question) => new Question(question));
 //const stats = new Stats({ questions: testQuestionsC, gamestate: { points: 132 } });
