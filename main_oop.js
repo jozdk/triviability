@@ -165,22 +165,6 @@ class UIForSettings {
         this.render(this.mainElement, this._spinnerElement);
     }
 
-    // get selectionMenuElement() {
-    //     return this._selectionMenuElement;
-    // }
-
-    // toggleSelection(element, category) {
-    //     if (element.classList.contains("category-highlight")) {
-    //         element.classList.add("selected");
-    //         element.classList.remove("category-highlight");
-    //         settings.categories = category;
-    //     } else if (element.classList.contains("selected")) {
-    //         element.classList.remove("selected");
-    //         element.classList.add("category-highlight");
-    //         settings.categories = category;      
-    //     }
-    // }
-
     render(rootNode, startingNode) {
 
         rootNode.append(startingNode.element);
@@ -247,7 +231,6 @@ class Stats {
         const categoryCount = {};
         questions.forEach((q) => categoryCount[q.category.title] = categoryCount[q.category.title] ? categoryCount[q.category.title] + 1 : 1);
         const categories = [];
-        //const categories = questions.map(question => question.category.title).filter((category, index, arr) => arr.indexOf(category) === index);
         Object.keys(categoryCount).forEach(cat => {
             const amountCat = categoryCount[cat];
             const share = Math.round(amountCat / amountTotal * 100);
@@ -1784,7 +1767,6 @@ class Controls {
                                 element: buildNode("div", { className: "col-0 col-sm" }),
                                 children: null
                             },
-                            //new BackButtonB(),
                             ...gamestate.board[gamestate.board.length - 1] !== "unanswered" ? [new AgainButton()] : [],
                             //new AgainButton(),
                             new NextButton({ result: result, text: text })
@@ -1793,39 +1775,6 @@ class Controls {
                 ]
             }
         ]
-    }
-}
-
-class BackButtonB {
-    constructor() {
-
-        const handler = () => {
-            quiz.reset();
-            settings.reset();
-            settings.ui.selectionMenuElement = new SelectionMenu({ selected: settings.categories, amount: settings.amount });
-        }
-
-        this.element = buildNode("div", { className: "col-auto pe-0 ps-1 ps-sm-2" });
-        this.children = [
-            {
-                element: buildNode("button", { className: "btn btn-outline-dark", onclick: handler }),
-                children: [
-                    {
-                        element: buildNode("i", { className: "bi bi-arrow-left me-1" }),
-                        children: null
-                    },
-                    {
-                        element: buildNode("span"),
-                        children: [
-                            {
-                                element: document.createTextNode("Categories"),
-                                children: null
-                            }
-                        ]
-                    }
-                ]
-            }
-        ];
     }
 }
 
