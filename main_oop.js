@@ -1898,13 +1898,12 @@ class NextButton {
     }
 }
 
-// Local Storage Class: Handles Local Storage
-
-// const ui = new UIForSettings;
 const settings = new Settings();
 const quiz = new Quiz();
 const stats = new Stats();
-//const quizBox = new QuizBoxComponent()
+
+
+// Local Storage Class: Handles Local Storage
 
 
 // function depthFirstTraversalTest(rootNode, indexOfStartingNode, startingNode) {
@@ -1923,7 +1922,6 @@ const stats = new Stats();
 // }
 
 
-
 function depthFirstTraversalTest(rootNode, startingNode) {
 
     rootNode.append(startingNode.element);
@@ -1937,43 +1935,7 @@ function depthFirstTraversalTest(rootNode, startingNode) {
 
 }
 
-//depthFirstTraversalTest(document.querySelector("#main"), quizComponent.root);
-
-// Render test
-
-// depthFirstTraversalTest(document.querySelector("#main"), new QuizComponent({
-//     category: {
-//         title: "Geography",
-//         color: "geography"
-//     },
-//     question: "Togo is located on which continent?",
-//     multipleChoice: ["South America", "Europe", "Asia", "Africa"],
-//     answered: 0,
-//     points: 0,
-//     board: ["unanswered", "unanswered", "unanswered", "unanswered", "unanswered", "unanswered", "unanswered", "unanswered", "unanswered"],
-//     handler: function (event) {
-
-//         const userAnswer = event.target.textContent;
-
-//         if (userAnswer === "Africa") {
-//             event.target.classList.add("correct");
-//             event.target.classList.remove("answer-highlight-geography");
-//         } else {
-//             // updateAnswers(userAnswer, correctAnswer);
-//             // For now let's just do
-//             event.target.classList.add("incorrect");
-//         }
-
-//     }
-// }).root);
-
-
-
-
-
-
 const testQuestionsA = [{ "category": "Geography", "correctAnswer": "Africa", "id": 6696, "incorrectAnswers": ["South America", "Oceania", "Europe", "Asia", "North America"], "question": "Togo is located on which continent?", "type": "Multiple Choice" }, { "category": "Music", "correctAnswer": "Sudan", "id": 6549, "incorrectAnswers": ["South Sudan", "Egypt", "Republic of the Congo", "Equatorial Guinea", "Gabon", "Benin", "Democratic Republic of the Congo", "Eritrea", "Uganda", "Togo", "São Tomé and Príncipe", "Rwanda", "Tunisia", "Malta"], "question": "Which of these countries borders Chad?", "type": "Multiple Choice" }, { "category": "Arts & Literature", "correctAnswer": "Asia", "id": 22872, "incorrectAnswers": ["Europe", "Africa", "North America", "South America"], "question": "Which is the Earth's largest continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "South America", "id": 6683, "incorrectAnswers": ["Oceania", "Europe", "Asia", "Africa", "North America"], "question": "Suriname is located on which continent?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Spain", "id": 5713, "incorrectAnswers": ["Portugal", "Andorra", "Mali", "Tunisia", "France", "Monaco", "Senegal", "Burkina Faso", "Switzerland", "The Gambia", "Malta", "Ireland", "Italy", "Belgium", "Luxembourg", "Liechtenstein", "Niger"], "question": "Morocco shares a land border with which of these countries?", "type": "Multiple Choice" }, { "category": "History", "correctAnswer": "Tripoli", "id": 19272, "incorrectAnswers": ["Benghazi", "Tunis", "Alexandria"], "question": "What is the capital of Libya?", "type": "Multiple Choice" }, { "category": "History", "correctAnswer": "Europe", "id": 6685, "incorrectAnswers": ["South America", "Oceania", "Asia", "Africa", "North America"], "question": "Andorra is located on which continent?", "type": "Multiple Choice" }, { "category": "Arts & Literature", "correctAnswer": "East Timor", "id": 5609, "incorrectAnswers": ["Solomon Islands", "Vanuatu", "Palau", "Brunei", "Nauru", "Federated States of Micronesia", "Fiji", "Philippines", "Malaysia", "Singapore", "Tuvalu", "Kiribati", "Marshall Islands", "Cambodia", "Vietnam", "Thailand"], "question": "Which of these countries borders Australia?", "type": "Multiple Choice" }, { "category": "Geography", "correctAnswer": "Austria", "id": 19550, "incorrectAnswers": ["Croatia", "San Marino", "Bosnia and Herzegovina", "Romania", "Poland"], "question": "Which country borders Italy, Switzerland, Germany, Czech Republic, Hungary, Slovenia, and Liechtenstein?", "type": "Multiple Choice" }];
-
 
 const testQuestionsB = [{ "category": "Science", "id": "622a1c3a7cc59eab6f95106f", "correctAnswer": "Dynamite", "incorrectAnswers": ["The combustion engine", "Plastic", "The printing press"], "question": "What Did Alfred Nobel Invent Before Initiating His Nobel Peace Prize Award Scheme?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950553", "correctAnswer": "the relationship between electric phenomena and bodily processes", "incorrectAnswers": ["animals", "the practice of escaping from restraints or other traps", "plant diseases"], "question": "What is Electrophysiology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950504", "correctAnswer": "the signification and application of words", "incorrectAnswers": ["statistics such as births, deaths, income, or the incidence of disease, which illustrate the changing structure of human populations", "crayfish", "butterflies and moths"], "question": "What is Lexicology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "unknown", "correctAnswer": "4", "incorrectAnswers": ["2", "3", "1"], "question": "How Many Chambers Are There In Your Heart?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f9510b3", "correctAnswer": "Jupiter", "incorrectAnswers": ["Venus", "Neptune", "Saturn"], "question": "Name the largest planet in the solar system.", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950559", "correctAnswer": "interactions among organisms and the water cycle", "incorrectAnswers": ["a variant of physiognomy", "the structure of cells", "the effect of evolution on ethology"], "question": "What is Ecohydrology the study of?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f950fd4", "correctAnswer": "Asbestos", "incorrectAnswers": ["Bleach", "Ethanol", "Methadone"], "question": "Which substance takes its name from the Greek for `not flammable'?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c3a7cc59eab6f950fd8", "correctAnswer": "Kidney", "incorrectAnswers": ["Liver", "Lung"], "question": "Which vital organ does the adjective renal refer to?", "tags": [], "type": "Multiple Choice" }, { "category": "Science", "id": "622a1c377cc59eab6f950544", "correctAnswer": "race", "incorrectAnswers": ["parasites", "in ethics, duty", "rocks"], "question": "What is Ethnology the study of?", "tags": [], "type": "Multiple Choice" }];
 
@@ -2307,38 +2269,6 @@ const substitutes = [
         "type": "Multiple Choice"
     }
 ]
-
-// function findDuplicates(arr) {
-//     const count = {};
-//     const duplicates = [];
-//     const questions = arr.map((question) => question.id);
-//     questions.forEach((qn) => {
-//         if (count[qn]) {
-//             count[qn] += 1;
-//             return;
-//         }
-//         count[qn] = 1;
-//     });
-//     for (let qn in count) {
-//         if (count[qn] >= 2) {
-//             duplicates.push(qn);
-//         }
-//     }
-//     return duplicates;
-// }
-
-// function substituteQuestions(questions, duplicates) {
-//     if (duplicates.length) {
-
-//         for (let i = 0; i < duplicates.length; i++) {
-//             const index = questions.findIndex((question) => question.id === duplicates[i]);
-//             const newQuestion = [substitutes[i]];
-//             questions.splice(index, 1, newQuestion[0]);
-//             console.log(`Substituted question at index ${index} with new question: "${newQuestion[0].question}"`);
-//         }
-
-//     }
-// }
 
 const testQuestionsD = [];
 for (let i = 0; i < 4; i++) {
