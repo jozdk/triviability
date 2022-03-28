@@ -962,21 +962,13 @@ class StartButton {
                 element: buildNode("div", { className: "col-md-9 col-xl-8 col-xxl-7" }),
                 children: [
                     {
-                        element: buildNode("div", { className: "row" }),
+                        element: buildNode("div", { className: "row justify-content-center" }),
                         children: [
                             {
-                                element: buildNode("div", { className: "col-2 d-sm-none" }),
-                                children: null
-                            },
-                            {
-                                element: buildNode("div", { className: "col" }),
+                                element: buildNode("div", { className: "col-8 col-sm" }),
                                 children: [
                                     new Button({ text: "Start Quiz!", className: "w-100", handler })
                                 ]
-                            },
-                            {
-                                element: buildNode("div", { className: "col-2 d-sm-none" }),
-                                children: null
                             }
                         ]
                     }
