@@ -465,40 +465,32 @@ class Modal {
 }
 
 class CategoriesTable {
-    constructor({ categories, unused, index, chevron }) {
+    constructor({ categories, unused, column, chevron }) {
         
         const sortCategories = (e) => {
             const column = e.target.previousElementSibling.textContent;
-            const sortUp = e.target.classList.contains("bi-chevron-up") || e.target.classList.contains("bi-chevron-expand");
-            const chevron = sortUp ? "down" : "up";
-            let index;
+            const sortDown = e.target.classList.contains("bi-chevron-up") || e.target.classList.contains("bi-chevron-expand");
+            const chevron = sortDown ? "down" : "up";
             if (column === "Category") {
-                sortUp ? categories.sort((a, b) => a.category < b.category ? -1 : 1) : categories.sort((a, b) => a.category > b.category ? -1 : 1);
-                index = 0;
+                sortDown ? categories.sort((a, b) => a.category < b.category ? -1 : 1) : categories.sort((a, b) => a.category > b.category ? -1 : 1);
             } else if (column === "Questions") {
-                sortUp ? categories.sort((a, b) => b.amount - a.amount) : categories.sort((a, b) => a.amount - b.amount);
-                index = 1;
+                sortDown ? categories.sort((a, b) => b.amount - a.amount) : categories.sort((a, b) => a.amount - b.amount);
             } else if (column === "Questions (%)") {
-                sortUp ? categories.sort((a, b) => b.percent - a.percent) : categories.sort((a, b) => a.percent - b.percent);
-                index = 2;
+                sortDown ? categories.sort((a, b) => b.percent - a.percent) : categories.sort((a, b) => a.percent - b.percent);
             } else if (column === "Correct") {
-                sortUp ? categories.sort((a, b) => b.correct - a.correct) : categories.sort((a, b) => a.correct - b.correct);
-                index = 3;
+                sortDown ? categories.sort((a, b) => b.correct - a.correct) : categories.sort((a, b) => a.correct - b.correct);
             } else if (column === "Correct (%)") {
-                sortUp ? categories.sort((a, b) => b.correctPercent - a.correctPercent) : categories.sort((a, b) => a.correctPercent - b.correctPercent);
-                index = 4;
+                sortDown ? categories.sort((a, b) => b.correctPercent - a.correctPercent) : categories.sort((a, b) => a.correctPercent - b.correctPercent);
             } else if (column === "Time per answer ⌀") {
-                sortUp ? categories.sort((a, b) => a.averageTime - b.averageTime) : categories.sort((a, b) => b.averageTime - a.averageTime);
-                index = 5;
+                sortDown ? categories.sort((a, b) => a.averageTime - b.averageTime) : categories.sort((a, b) => b.averageTime - a.averageTime);
             } else if (column === "Points ⌀") {
-                sortUp ? categories.sort((a, b) => b.points - a.points) : categories.sort((a, b) => a.points - b.points);
-                index = 6;
+                sortDown ? categories.sort((a, b) => b.points - a.points) : categories.sort((a, b) => a.points - b.points);
             }
-            new CategoriesTable({ categories, unused, index, chevron }).render();
+            new CategoriesTable({ categories, unused, column, chevron }).render();
         }
 
         return new Table({
-            tableHead: ["Category", "Questions", "Questions (%)", "Correct", "Correct (%)", "Time per answer ⌀", "Points ⌀"].map((header, i) => {
+            tableHead: ["Category", "Questions", "Questions (%)", "Correct", "Correct (%)", "Time per answer ⌀", "Points ⌀"].map((header) => {
                 return {
                     data: [
                         {
@@ -506,7 +498,7 @@ class CategoriesTable {
                             children: null
                         },
                         {
-                            element: buildNode("i", { className: `bi bi-chevron-${i === index ? chevron : "expand"} cursor small-font align-top ms-2`, onclick: sortCategories }),
+                            element: buildNode("i", { className: `bi bi-chevron-${header === column ? chevron : "expand"} cursor small-font align-top ms-2`, onclick: sortCategories }),
                             children: null
                         }
                     ],
@@ -1909,7 +1901,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "Film & TV",
+        "category": "Geography",
         "id": "622a1c357cc59eab6f94fc58",
         "correctAnswer": "Whippersnapper",
         "incorrectAnswers": [
@@ -1922,7 +1914,7 @@ const testQuestionsC = [
         "type": "Multiple Choice"
     },
     {
-        "category": "Arts & Literature",
+        "category": "History",
         "id": "622a1c347cc59eab6f94fb9f",
         "correctAnswer": "\"Hooked on a Feeling\" by B.J. Thomas",
         "incorrectAnswers": [
@@ -2200,7 +2192,7 @@ const substitutes = [
 ]
 
 const testQuestionsD = [];
-for (let i = 0; i < 4; i++) {
+for (let i = 0; i < 7; i++) {
     testQuestionsD.push(testQuestionsC[i]);
 }
 
