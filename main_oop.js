@@ -1249,7 +1249,9 @@ function buildNode(tag, properties) {
             if (properties[propertyName] && typeof properties[propertyName] === "object") {
                 //const nestedObj = properties[propertyName];
                 Object.keys(properties[propertyName]).forEach((nestedProperty) => {
-                    element[propertyName][nestedProperty] = properties[propertyName][nestedProperty];
+                    if (properties[propertyName][nestedProperty]) {
+                        element[propertyName][nestedProperty] = properties[propertyName][nestedProperty];
+                    }
                 })
             } else if (properties[propertyName]) {
                 element[propertyName] = properties[propertyName];
