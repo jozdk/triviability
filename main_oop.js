@@ -104,7 +104,8 @@ class Settings {
 
             const amountPerCat = this.getAmountPerCategory();
             const categories = Object.keys(amountPerCat);
-            const shortestCat = categories.find((cat) => amountPerCat[cat] === Math.min(...categories.map((cat) => amountPerCat[cat])));
+            const shortestCat = categories.find((cat) => amountPerCat[cat] === Math.min(...Object.values(amountPerCat)));
+            console.log(shortestCat);
             amountPerCat[shortestCat] += 1;
             const urls = categories.filter((cat) => amountPerCat[cat] !== 0).map((cat) => {
                 return this.url(cat, amountPerCat[cat]);
