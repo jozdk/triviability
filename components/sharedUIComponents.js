@@ -98,3 +98,65 @@ export class Spinner {
         ]
     }
 }
+
+export class Header {
+    constructor() {
+        this.element = buildNode("header", { className: "bg-light d-none d-md-block" });
+        this.children = [
+            {
+                element: buildNode("div", { className: "container" }),
+                children: [
+                    {
+                        element: buildNode("div", { className: "row justify-content-center" }),
+                        children: [
+                            {
+                                element: buildNode("div", { className: "col-lg-10" }),
+                                children: [
+                                    {
+                                        element: buildNode("div", { className: "navbar navbar-light" }),
+                                        children: [
+                                            {
+                                                element: buildNode("a", { className: "navbar-brand", textContent: "Triviablity" })
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+export class Footer {
+    constructor() {
+        this.element = buildNode("footer", { className: "bg-light mt-5 text-center text-lg-start overflow-hidden d-none d-md-block" }),
+        this.children = [
+            {
+                element: buildNode("div", { className: "row" }),
+                children: [
+                    {
+                        element: buildNode("div", { className: "col pe-0" }),
+                        children: [
+                            {
+                                element: buildNode("p", { className: "p-3 mb-0" }),
+                                children: [
+                                    {
+                                        element: buildNode("span", { textContent: "Questions from" }),
+                                        children: null
+                                    },
+                                    {
+                                        element: buildNode("a", { href: "https://the-trivia-api.com/", textContent: "The Trivia API" }),
+                                        children: null
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
