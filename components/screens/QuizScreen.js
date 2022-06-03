@@ -13,12 +13,13 @@ export class QuizScreen {
                     children: [
                         new InfoRail({ question, gamestate, timer }),
                         {
-                            element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-8 col-xxl-7 mt-5 d-flex flex-column" }),
+                            element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-8 col-xxl-7 mt-md-5 mt-3 d-flex flex-column" }),
                             children: [
-                                new QuestionComponent({ question, jokers: gamestate.jokers }),
+                                new QuestionComponent({ question, jokers: gamestate.jokers, gamestate }),
                                 new Answers({ question })
                             ]
-                        }
+                        },
+                        new TimerSmallScreen({ category: question.category, timer })
                     ]
                 },
                 new Controls({ gamestate, result: question.result })
@@ -30,7 +31,7 @@ export class QuizScreen {
 
 class InfoRail {
     constructor({ question, gamestate, timer }) {
-        this.element = buildNode("div", { id: "info-rail-component", className: "col-md-2 d-flex me-2 mt-5" });
+        this.element = buildNode("div", { id: "info-rail-component", className: "col-md-2 d-flex me-2 mt-md-5" });
         this.children = [
             {
                 element: buildNode("div", { className: "row justify-content-end" }),
@@ -139,6 +140,38 @@ export class Time {
     }
 }
 
+class TimerSmallScreen {
+    constructor({ category, timer }) {
+        this.element = buildNode("div", { id: "timer-container-small", className: "d-md-none col-11 p-0 mt-3" });
+        this.children = [
+            new TimeSmallScreen({ category, timer })
+        ];
+    }
+}
+
+export class TimeSmallScreen {
+    constructor({ category, timer }) {
+        const width = timer.elapsed * 5;
+
+        this.element = buildNode("div", { className: "progress bg-light position-relative", style: { height: "20px" } });
+        this.children = [
+            {
+                element: buildNode("div", { className: "position-absolute zindex-fixed start-50" }),
+                children: [
+                    {
+                        element: document.createTextNode(`${timer.total - timer.elapsed}`),
+                        children: null
+                    }
+                ]
+            },
+            {
+                element: buildNode("div", { className: `progress-bar text-dark bg-${category.color}`, role: "progressbar", style: { width: `${width}%` } }),
+                children: null
+            }
+        ]
+    }
+}
+
 class Score {
     constructor({ points, board }) {
 
@@ -206,13 +239,13 @@ class BoardField {
 }
 
 class QuestionComponent {
-    constructor({ question, jokers }) {
+    constructor({ question, jokers, gamestate }) {
         this.element = buildNode("div", { id: "question-component", className: "row flex-grow-1" });
         this.children = [
             {
                 element: buildNode("div", { className: "col bg-light rounded-lg" }),
                 children: [
-                    new QuestionHeader({ question, jokers }),
+                    new QuestionHeader({ question, jokers, answered: gamestate.answered, total: gamestate.board.length, points: gamestate.points }),
                     new QuestionText({ question: question.question })
                 ]
             }
@@ -221,7 +254,7 @@ class QuestionComponent {
 }
 
 class QuestionHeader {
-    constructor({ question, jokers }) {
+    constructor({ question, jokers, answered, total, points }) {
 
         const queryString = jokers.lookup && question.result === "unanswered" ? question.question.replace(/\s/gm, "+").replace(/\?/gm, "%3F") : "";
 
@@ -232,22 +265,25 @@ class QuestionHeader {
         this.element = buildNode("div", { id: "question-header-component", className: "row p-3" });
         this.children = [
             {
-                element: buildNode("div", { className: `col-12 rounded-lg p-2 bg-${question.category.color}` }),
+                element: buildNode("div", { className: `col-12 rounded-lg p-md-2 p-1 bg-${question.category.color}` }),
                 children: [
                     {
                         element: buildNode("div", { className: "row px-2" }),
                         children: [
                             {
-                                element: buildNode("div", { className: "col-6 text-start" }),
+                                element: buildNode("div", { className: "col-6 text-start d-flex d-md-block" }),
                                 children: [
                                     {
-                                        element: buildNode("p", { className: "my-2" }),
-                                        children: [
-                                            {
-                                                element: document.createTextNode(question.category.title),
-                                                children: null
-                                            }
-                                        ]
+                                        element: buildNode("p", { className: "my-2 d-md-block d-none", textContent: question.category.title }),
+                                        children: null
+                                    },
+                                    {
+                                        element: buildNode("p", { className: "my-2 d-md-none col-8 fw-bolder", textContent: `${answered + 1} / ${total}` }),
+                                        children: null
+                                    },
+                                    {
+                                        element: buildNode("p", { className: "my-2 d-md-none col-4 fw-bolder", textContent: points === 0 ? "0" : points }),
+                                        children: null
                                     }
                                 ]
                             },
@@ -275,7 +311,7 @@ class QuestionHeader {
                                 ]
                             },
                             {
-                                element: buildNode("div", { className: "col-2 d-flex align-items-center justify-content-end px-0 px-sm-2" }),
+                                element: buildNode("div", { className: "col-2 d-flex align-items-center justify-content-end px-1 px-sm-2" }),
                                 children: [
                                     {
                                         element: buildNode("strong", { id: "fifty", className: `border border-dark p-1 cursor fifty-fifty ${jokers.fifty ? "joker-highlight" : "selected"}`, onclick: jokers.fifty && question.result === "unanswered" && !question.switch ? handler : null }),
@@ -304,7 +340,7 @@ class QuestionText {
                 element: buildNode("div", { className: "col text-center p-4 p-md-5" }),
                 children: [
                     {
-                        element: buildNode("p", { className: "lead", style: { userSelect: "none" } }),
+                        element: buildNode("p", { className: "md-lead", style: { userSelect: "none" } }),
                         children: [
                             {
                                 element: document.createTextNode(question),
@@ -359,7 +395,7 @@ class Answers {
                 element: buildNode("div", { className: "col bg-light rounded-lg mt-2" }),
                 children: [
                     {
-                        element: buildNode("div", { className: "row text-center lead px-md-2 py-3 gy-3" }),
+                        element: buildNode("div", { className: "row text-center md-lead px-md-2 py-3 gy-3" }),
                         children: [
                             ...answers
                         ]
@@ -450,7 +486,7 @@ class Controls {
                             },
                             ...gamestate.board[gamestate.board.length - 1] !== "unanswered" ? [
                                 {
-                                    element: buildNode("div", { className: "col-auto pe-0 ps-1 ps-sm-2" }),
+                                    element: buildNode("div", { className: "col-auto pe-0 ps-1 ps-sm-2 mb-md-0 mb-2" }),
                                     children: [
                                         new Button({ text: "Play Again", icon: { type: "arrow-repeat", className: "me-1" }, handler: playAgain })
                                     ]

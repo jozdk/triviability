@@ -1,5 +1,5 @@
 import { SettingsScreen } from "./components/screens/SettingsScreen.js";
-import { QuizScreen, Time } from "./components/screens/QuizScreen.js";
+import { QuizScreen, Time, TimeSmallScreen } from "./components/screens/QuizScreen.js";
 import { StatsScreen } from "./components/screens/StatsScreen.js";
 import { Spinner } from "./components/sharedUIComponents.js";
 import { toUnderscore, capitalize, shuffleArray } from "./helpers.js";
@@ -306,8 +306,13 @@ class UIForQuiz extends UI {
 
     set timeElement(timeComp) {
         this._timeElement = timeComp;
-        document.querySelector("#timer-container").innerHTML = "";
-        this.render(document.querySelector("#timer-container"), this._timeElement);
+        if (window.innerWidth >= 768) {
+            document.querySelector("#timer-container").innerHTML = "";
+            this.render(document.querySelector("#timer-container"), this._timeElement);
+        } else {
+            document.querySelector("#timer-container-small").innerHTML = "";
+            this.render(document.querySelector("#timer-container-small"), this._timeElement);
+        }
     }
 }
 
@@ -366,7 +371,8 @@ class Quiz {
             this.timer.time = Date.now() - this.timer.start;
             this.timer.elapsed = Math.floor(this.timer.time / 1000);
 
-            this.ui.timeElement = new Time({ category: this._questions[this._gamestate.answered].category, timer: this.timer });
+            this.ui.timeElement = window.innerWidth >= 768 ? new Time({ category: this._questions[this._gamestate.answered].category, timer: this.timer }) : new TimeSmallScreen({ category: this._questions[this._gamestate.answered].category, timer: this.timer })
+
 
             if (this.timer.elapsed === this.timer.total) {
                 clearInterval(this.timer.timeInterval);
