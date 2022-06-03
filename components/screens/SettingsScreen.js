@@ -89,7 +89,7 @@ class Category {
                                 element: buildNode("div", { className: "h1 mb-3" }),
                                 children: [
                                     {
-                                        element: buildNode("img", { src: `/icons/${cat}.svg`, alt: category, className: "w-50" }),
+                                        element: buildNode("img", { src: `/assets/icons/${cat}.svg`, alt: category, className: "w-50" }),
                                         children: null
                                     }
                                 ]

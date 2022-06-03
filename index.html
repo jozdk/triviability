@@ -5,11 +5,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"> -->
-    <link rel="stylesheet" href="bootstrap.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/vendor/bootstrap/bootstrap.css">
+    <link rel="stylesheet" href="/assets/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/stylesheets/style.css">
     <title>Triviability</title>
 </head>
 
@@ -33,7 +31,7 @@
 
         <!-- Main Content -->
 
-        <div id="main" class="flex-grow-1 d-flex flex-column px-0">
+        <div id="main" class="flex-grow-1 d-flex flex-column px-0 mb-2 mb-md-0">
 
             <div id="selection-menu" class="container d-none">
 
@@ -44,8 +42,7 @@
                         <p class="lead text-center">
                             <strong>
                                 Welcome to Triviability! Choose your Categorie(s) and Click the Button below to Start
-                                your
-                                Quiz!
+                                your Quiz!
                             </strong>
 
                         </p>
@@ -912,7 +909,7 @@
         <footer class="bg-light mt-5 text-center text-lg-start overflow-hidden d-none d-md-block">
             <div class="row">
                 <div class="col pe-0">
-                    <p class="p-3 mb-0">Questions from <a href="https://trivia.willfry.co.uk/">Trivia API</a></p>
+                    <p class="p-3 mb-0">Questions from <a href="https://trivia.willfry.co.uk/">The Trivia API</a></p>
                 </div>
             </div>
 
@@ -921,10 +918,7 @@
     </div>
 
     <script type="module" src="main_oop.js"></script>
-    <!-- <script src="main.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
+    <script src="/assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
     <script>
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
