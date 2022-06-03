@@ -1,4 +1,4 @@
-import { quiz, settings } from "../../main_oop.js";
+import { quiz, settings } from "../../index.js";
 import { Button, Modal } from "../sharedUIComponents.js";
 import { buildNode, compileDOMTree } from "../../ui.js";
 import { hexColors, shuffleArray } from "../../helpers.js";

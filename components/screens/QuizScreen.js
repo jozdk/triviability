@@ -1,4 +1,4 @@
-import { quiz, settings } from "../../main_oop.js";
+import { quiz, settings } from "../../index.js";
 import { SettingsScreen } from "./SettingsScreen.js";
 import { Button } from "../sharedUIComponents.js";
 import { buildNode } from "../../ui.js";

@@ -1,4 +1,4 @@
-import { Settings, settings } from "../../main_oop.js";
+import { Settings, settings } from "../../index.js";
 import { buildNode } from "../../ui.js";
 import { toUnderscore } from "../../helpers.js";
 import { Button, Modal } from "../sharedUIComponents.js";
