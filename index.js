@@ -402,7 +402,7 @@ class Quiz {
 
         // Calculate score based on time elapsed
         if (this._questions[this._gamestate.answered].result === "correct") {
-            const bonus = Math.round((20000 - exactTime) / 2000);
+            const bonus = Math.ceil((20000 - exactTime) / 2000);
             this._questions[this._gamestate.answered].points = 10 + bonus;
             this._gamestate.points += 10 + bonus;
         } else {
