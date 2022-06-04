@@ -96,41 +96,32 @@ export class Settings {
                 }
                 loops++;
             }
-            console.log(`${this._amount} questions / ${this._categories.length} categories. It took ${loops} loops`, amountPerCat);
+            // console.log(`${this._amount} questions / ${this._categories.length} categories. It took ${loops} loops`, amountPerCat);
             return amountPerCat;
         }
     }
 
     async fetchQuestions() {
         try {
-            // const categories = this._categories;
-            // const url = this.url(categories, this._amount + 1);
-            // this.ui.spinnerElement = new Spinner();
-            // let result = await fetch(url);
-            // this.originalQuestions = await result.json();
-
             const amountPerCat = this.getAmountPerCategory();
             const categories = Object.keys(amountPerCat);
             const shortestCat = categories.find((cat) => amountPerCat[cat] === Math.min(...Object.values(amountPerCat)));
-            console.log(shortestCat);
             amountPerCat[shortestCat] += 1;
             const urls = categories.filter((cat) => amountPerCat[cat] !== 0).map((cat) => {
                 return this.url(cat, amountPerCat[cat]);
             })
-            console.log(amountPerCat);
-            console.log(urls);
             this.originalQuestions = [];
             this.ui.spinnerElement = new Spinner();
 
             for (let url of urls) {
                 const result = await fetch(url);
                 this.originalQuestions.push(...await result.json());
-                console.log("Fetch request has been made");
+                // console.log("Fetch request has been made");
             }
 
             const duplicates = this.findDuplicates();
             if (duplicates.length) {
-                console.log(`Found ${duplicates.length} duplicate(s)`);
+                // console.log(`Found ${duplicates.length} duplicate(s)`);
 
                 for (let dup of duplicates) {
                     const index = this.originalQuestions.findIndex((question) => question.question === dup);
@@ -138,7 +129,7 @@ export class Settings {
                     const result = await fetch(this.url(category, 1));
                     const newQuestion = await result.json();
                     this.originalQuestions.splice(index, 1, newQuestion[0]);
-                    console.log(`Exchanged duplicate at index ${index} with a new question from category ${category}`);
+                    // console.log(`Exchanged duplicate at index ${index} with a new question from category ${category}`);
                 }
 
             }
@@ -289,7 +280,6 @@ class Question {
 class UIForQuiz extends UI {
     constructor(question, gamestate, timer) {
         super();
-        console.log(timer)
         this.mainElement = document.querySelector("#main");
         this._quizElement = new QuizScreen({ question, gamestate, timer });
         this._timeElement;
@@ -344,16 +334,10 @@ class Quiz {
         this._questions.forEach((question, index) => {
             this._gamestate.board[index] = question.result;
         });
-        console.log(this.timer)
+        // console.log(this.timer)
         this.ui = new UIForQuiz(this._questions[0], this._gamestate, this.timer);
         this.startTimer();
     }
-
-    // Probably never called anywhere
-    // set gamestate({ answered, points, board }) {
-    //     this._gamestate.answered = answered;
-    //     this._gamestate.points = points;
-    // }
 
     get gamestate() {
         return this._gamestate;
