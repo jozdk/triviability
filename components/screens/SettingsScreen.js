@@ -20,7 +20,7 @@ class Welcome {
         this.element = buildNode("div", { className: "row mb-4 mt-5 justify-content-center" });
         this.children = [
             {
-                element: buildNode("div", { className: "col-12" }),
+                element: buildNode("div", { className: "col-lg-10" }),
                 children: [
                     {
                         element: buildNode("p", { className: "text-center lead" }),
