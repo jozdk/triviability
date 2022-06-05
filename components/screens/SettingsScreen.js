@@ -200,6 +200,9 @@ class StartButton {
             if (settings.categories.length) {
                 settings.fetchQuestions();
                 //quiz.init(testQuestions);
+            } else {
+                settings.calcRandom();
+                settings.fetchQuestions();
             }
         }
 

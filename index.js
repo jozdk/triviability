@@ -41,13 +41,17 @@ export class Settings {
     }
 
     selectRandom() {
+        this.calcRandom();
+        this.ui.selectionMenuElement = new SettingsScreen({ selected: this._categories, amount: this._amount });
+    }
+
+    calcRandom() {
         this._categories = [];
         const pool = Settings.allCategories.map(cat => toUnderscore(cat));
         const amount = Math.floor(Math.random() * (Settings.allCategories.length - 1) + 1);
         while (this._categories.length < amount) {
             this._categories.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
         }
-        this.ui.selectionMenuElement = new SettingsScreen({ selected: this._categories, amount: this._amount });
     }
 
     reset() {
