@@ -2,11 +2,13 @@
 
 Colorful trivia quiz with different categories to choose from, a countdown clock, three kinds of jokers and a result overview and statistics. You can also set the number of questions and compare statistics from different categories in a sortable table.
 
-The questions are from [The Trivia API](https://the-trivia-api.com/).
+Questions from [The Trivia API](https://the-trivia-api.com/).
+
+![Screenshot](documentation/triviability-selection-menu.png)
 
 ## Architecture
 
-Triviablity is a single-page-application, written in Vanilla JavaScript. All of the HTML is rendered dynamically on the client-side via JavaScript. For this the app makes use of a small custom UI framework, inspired by React (see below for details).
+Triviability is a single-page-application, written in Vanilla JavaScript. All of the HTML is rendered dynamically on the client-side via JavaScript. For this the app makes use of a small custom UI framework, inspired by React (see below for details).
 
 The application makes AJAX calls to a third-party API using JavaScript's Fetch API.
 
@@ -30,7 +32,17 @@ Clone or download the repository. For the ES6 modules to work, you need to serve
 
 ### Settings
 
-You can select one or multiple quiz categories by clicking on their cards. Unselect them by clicking again.
+You can select one or several of the following quiz categories. Select and unselect them by clicking on the colored cards.
+
+- Science :microscope:
+- History :scroll:
+- Geography :earth_americas:
+- Film & TV :movie_camera:
+- Arts & Literature :art:
+- Music :notes:
+- Sport & Leisure :golf:
+- General Knowledge :book:
+- Society & Culture :european_castle:
 
 The **shuffle icon** selects categories randomly.  
 The **double checkmarks icon** selects/unselects all categories.  
