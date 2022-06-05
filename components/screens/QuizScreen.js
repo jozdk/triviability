@@ -294,7 +294,7 @@ class QuestionHeader {
                                         element: buildNode("a", { href: jokers.lookup && question.result === "unanswered" && !question.switch ? `https://google.com/search?q=${queryString}` : "", target: "_blank", rel: "noopener noreferrer", style: { color: "black" } }),
                                         children: [
                                             {
-                                                element: buildNode("i", { id: "lookup", className: `bi bi-search fs-4 p-1 cursor ${jokers.lookup ? "joker-highlight" : "selected"}`, onclick: jokers.lookup && question.result === "unanswered" && !question.switch ? handler : null }),
+                                                element: buildNode("i", { id: "lookup", className: `bi bi-search fs-4 p-1 cursor ${jokers.lookup ? "joker-highlight" : "selected"}`, title: "Look-Up", onclick: jokers.lookup && question.result === "unanswered" && !question.switch ? handler : null }),
                                                 children: null
                                             }
                                         ]
@@ -305,7 +305,7 @@ class QuestionHeader {
                                 element: buildNode("div", { className: "col-2 text-start text-sm-end px-1 px-sm-2" }),
                                 children: [
                                     {
-                                        element: buildNode("i", { id: "switch", className: `bi bi-arrow-left-right fs-4 p-1 cursor ${jokers.switch ? "joker-highlight" : "selected"}`, onclick: jokers.switch && question.result === "unanswered" && !question.switch ? handler : null }),
+                                        element: buildNode("i", { id: "switch", className: `bi bi-arrow-left-right fs-4 p-1 cursor ${jokers.switch ? "joker-highlight" : "selected"}`, title: "Switch", onclick: jokers.switch && question.result === "unanswered" && !question.switch ? handler : null }),
                                         children: null
                                     }
                                 ]
@@ -314,7 +314,7 @@ class QuestionHeader {
                                 element: buildNode("div", { className: "col-2 d-flex align-items-center justify-content-end px-1 px-sm-2" }),
                                 children: [
                                     {
-                                        element: buildNode("strong", { id: "fifty", className: `border border-dark p-1 cursor fifty-fifty ${jokers.fifty ? "joker-highlight" : "selected"}`, onclick: jokers.fifty && question.result === "unanswered" && !question.switch ? handler : null }),
+                                        element: buildNode("strong", { id: "fifty", className: `border border-dark p-1 cursor fifty-fifty ${jokers.fifty ? "joker-highlight" : "selected"}`, title: "50:50", onclick: jokers.fifty && question.result === "unanswered" && !question.switch ? handler : null }),
                                         children: [
                                             {
                                                 element: document.createTextNode("50:50"),
