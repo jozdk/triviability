@@ -135,7 +135,7 @@ class ParamsButtons {
                 element: buildNode("div", { className: "col-auto" }),
                 children: [
                     {
-                        element: buildNode("i", { className: "bi bi-shuffle fs-4 cursor", onclick: () => settings.selectRandom() }),
+                        element: buildNode("i", { className: "bi bi-shuffle fs-4 cursor", title: "Random", onclick: () => settings.selectRandom() }),
                         children: null
                     }
                 ]
@@ -144,7 +144,7 @@ class ParamsButtons {
                 element: buildNode("div", { className: "col-auto" }),
                 children: [
                     {
-                        element: buildNode("i", { className: "bi bi-check2-all fs-4 cursor", onclick: () => settings.selectAll() }),
+                        element: buildNode("i", { className: "bi bi-check2-all fs-4 cursor", title: "Select All", onclick: () => settings.selectAll() }),
                         children: null
                     }
                 ]
@@ -153,7 +153,7 @@ class ParamsButtons {
                 element: buildNode("div", { className: "col-auto" }),
                 children: [
                     {
-                        element: buildNode("span"),
+                        element: buildNode("span", { title: "Settings" }),
                         children: [
                             {
                                 element: buildNode("i", { className: "bi fs-4 cursor bi-gear", dataset: { bsToggle: "modal", bsTarget: "#advanced-settings-modal" }, onmouseover: fill, onmouseout: unfill }),
