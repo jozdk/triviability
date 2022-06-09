@@ -8,7 +8,7 @@ export function capitalize(cat) {
     let category = cat
         .replace("and", "&")
         .replace(/_/g, " ")
-        .replace(/(?<=\s)[a-z]|^[a-z]/g, (match) => match.toUpperCase());
+        .replace(/\b[a-z]/g, (match) => match.toUpperCase());
     if (category === "Movies") category = "Film & TV";
     if (category === "Literature") category = "Arts & Literature";
     return category;
