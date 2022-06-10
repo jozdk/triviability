@@ -3,9 +3,6 @@ import { buildNode } from "../../ui.js";
 import { toUnderscore } from "../../helpers.js";
 import { Button, Modal } from "../sharedUIComponents.js";
 
-import { quiz } from "../../index.js";
-import { testQuestionsD as testQuestions } from "../../tests.js"
-
 export class SettingsScreen {
     constructor({ selected, amount }) {
         this.element = buildNode("div", { id: "selection-menu", className: "container" });
@@ -201,8 +198,8 @@ class StartButton {
 
         const handler = () => {
             if (settings.categories.length) {
-                //settings.fetchQuestions();
-                quiz.init(testQuestions);
+                settings.fetchQuestions();
+                //quiz.init(testQuestions);
             } else {
                 settings.calcRandom();
                 settings.fetchQuestions();

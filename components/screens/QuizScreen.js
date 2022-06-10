@@ -6,14 +6,14 @@ import { buildNode } from "../../ui.js";
 export class QuizScreen {
     constructor({ question, gamestate, timer }) {
         this.root = {
-            element: buildNode("div", { id: "quiz-element", className: "container-lg" }),
+            element: buildNode("div", { id: "quiz-element", className: "container-xl" }),
             children: [
                 {
                     element: buildNode("div", { className: "row justify-content-center" }),
                     children: [
                         new InfoRail({ question, gamestate, timer }),
                         {
-                            element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-8 col-xxl-7 mt-md-5 mt-3 d-flex flex-column" }),
+                            element: buildNode("div", { id: "quizbox-component", className: "col-11 col-md-8 col-xxl-7 mt-xxl-5 mt-4 d-flex flex-column" }),
                             children: [
                                 new QuestionComponent({ question, jokers: gamestate.jokers, gamestate }),
                                 new Answers({ question })
@@ -31,7 +31,7 @@ export class QuizScreen {
 
 class InfoRail {
     constructor({ question, gamestate, timer }) {
-        this.element = buildNode("div", { id: "info-rail-component", className: "col-md-2 d-flex me-2 mt-md-5" });
+        this.element = buildNode("div", { id: "info-rail-component", className: "col-md-2 d-flex me-2 mt-4 mt-xxl-5" });
         this.children = [
             {
                 element: buildNode("div", { className: "row justify-content-end" }),
@@ -56,7 +56,7 @@ class InfoHeader {
         this.element = buildNode("div", { className: "row p-3" });
         this.children = [
             {
-                element: buildNode("div", { className: `col rounded-lg p-2 bg-${category.color}` }),
+                element: buildNode("div", { className: `col rounded-lg p-xl-2 p-1 bg-${category.color}` }),
                 children: [
                     {
                         element: buildNode("p", { className: "px-0 my-2 text-center" }),
@@ -76,7 +76,7 @@ class InfoHeader {
 class Timer {
     constructor({ category, timer, amount }) {
 
-        this.element = buildNode("div", { id: "timer-component", className: `row ${amount <= 12 ? "py-3" : "pb-3 pt-2"}` });
+        this.element = buildNode("div", { id: "timer-component", className: `row ${amount <= 12 ? "py-2 py-xl-3" : "pb-2 pb-xl-3 pt-2"}` });
         this.children = [
             {
                 element: buildNode("div", { className: "col text-center d-flex flex-column align-items-center" }),
@@ -185,7 +185,7 @@ class Score {
                 element: buildNode("div", { className: "col-12" }),
                 children: [
                     {
-                        element: buildNode("h5"),
+                        element: buildNode("h5", { className: "mb-0 mb-xl-2" }),
                         children: [
                             {
                                 element: document.createTextNode("Score"),
@@ -231,7 +231,7 @@ class BoardField {
         this.element = buildNode("div", { className: length < 13 ? "col-4 px-0" : "col-3 px-0" });
         this.children = [
             {
-                element: buildNode("i", { className: `bi bi-${icon(field)}-fill board-${field} fs-${length <= 12 ? "3" : "4"}` }),
+                element: buildNode("i", { className: `bi bi-${icon(field)}-fill board-${field} ${length <= 12 ? "board-field-lg" : "board-field-sm"}` }),
                 children: null
             }
         ]
@@ -265,7 +265,7 @@ class QuestionHeader {
         this.element = buildNode("div", { id: "question-header-component", className: "row p-3" });
         this.children = [
             {
-                element: buildNode("div", { className: `col-12 rounded-lg p-md-2 p-1 bg-${question.category.color}` }),
+                element: buildNode("div", { className: `col-12 rounded-lg p-xl-2 p-1 bg-${question.category.color}` }),
                 children: [
                     {
                         element: buildNode("div", { className: "row px-2" }),
@@ -337,10 +337,10 @@ class QuestionText {
         this.element = buildNode("div", { id: "question-question-component", className: "row" });
         this.children = [
             {
-                element: buildNode("div", { className: "col text-center p-4 p-md-5" }),
+                element: buildNode("div", { className: "col text-center p-4 p-xl-5" }),
                 children: [
                     {
-                        element: buildNode("p", { className: "md-lead", style: { userSelect: "none" } }),
+                        element: buildNode("p", { className: "xl-lead", style: { userSelect: "none" } }),
                         children: [
                             {
                                 element: document.createTextNode(question),
@@ -395,7 +395,7 @@ class Answers {
                 element: buildNode("div", { className: "col bg-light rounded-lg mt-2" }),
                 children: [
                     {
-                        element: buildNode("div", { className: "row text-center md-lead px-md-2 py-3 gy-3" }),
+                        element: buildNode("div", { className: "row text-center xl-lead px-md-2 py-3 gy-3" }),
                         children: [
                             ...answers
                         ]
