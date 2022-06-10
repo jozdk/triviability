@@ -3,6 +3,9 @@ import { buildNode } from "../../ui.js";
 import { toUnderscore } from "../../helpers.js";
 import { Button, Modal } from "../sharedUIComponents.js";
 
+import { quiz } from "../../index.js";
+import { testQuestionsD as testQuestions } from "../../tests.js"
+
 export class SettingsScreen {
     constructor({ selected, amount }) {
         this.element = buildNode("div", { id: "selection-menu", className: "container" });
@@ -17,7 +20,7 @@ export class SettingsScreen {
 
 class Welcome {
     constructor() {
-        this.element = buildNode("div", { className: "row mb-4 mt-5 justify-content-center" });
+        this.element = buildNode("div", { className: "d-none d-xl-flex row mb-3 mt-5 justify-content-center" });
         this.children = [
             {
                 element: buildNode("div", { className: "col-lg-10" }),
@@ -49,14 +52,14 @@ class Categories {
             return new Category({ category, selected: selected.includes(toUnderscore(category)) })
         });
 
-        this.element = buildNode("div", { id: "category-selection", className: "row mt-3 justify-content-center" });
+        this.element = buildNode("div", { id: "category-selection", className: "row mt-md-4 mt-xl-3 mt-5 justify-content-center" });
         this.children = [
             {
-                element: buildNode("div", { className: "col-md-9 col-xl-8 col-xxl-7" }),
+                element: buildNode("div", { className: "col-md-8 col-xxl-7" }),
                 children: [
                     new ParamsButtons(),
                     {
-                        element: buildNode("div", { className: "row justify-content-center gy-4" }),
+                        element: buildNode("div", { className: "row justify-content-center g-xl-3 g-2" }),
                         children: [
                             ...categories
                         ]
@@ -89,13 +92,13 @@ class Category {
                                 element: buildNode("div", { className: "h1 mb-3" }),
                                 children: [
                                     {
-                                        element: buildNode("img", { src: `/assets/icons/${cat}.svg`, alt: category, className: "w-50" }),
+                                        element: buildNode("img", { src: `/assets/icons/${cat}.svg`, alt: category, className: "cat-icon" }),
                                         children: null
                                     }
                                 ]
                             },
                             {
-                                element: buildNode("h5", { className: "card-title" }),
+                                element: buildNode("h5", { className: "card-title cat-title" }),
                                 children: [
                                     {
                                         element: document.createTextNode(category),
@@ -198,8 +201,8 @@ class StartButton {
 
         const handler = () => {
             if (settings.categories.length) {
-                settings.fetchQuestions();
-                //quiz.init(testQuestions);
+                //settings.fetchQuestions();
+                quiz.init(testQuestions);
             } else {
                 settings.calcRandom();
                 settings.fetchQuestions();
@@ -209,7 +212,7 @@ class StartButton {
         this.element = buildNode("div", { className: "row justify-content-center mt-3" });
         this.children = [
             {
-                element: buildNode("div", { className: "col-md-9 col-xl-8 col-xxl-7" }),
+                element: buildNode("div", { className: "col-md-8 col-xxl-7" }),
                 children: [
                     {
                         element: buildNode("div", { className: "row justify-content-center" }),
