@@ -80,7 +80,7 @@ export class Settings {
     }
 
     url(categories, amount) {
-        return `https://the-trivia-api.com/questions?categories=${categories}&limit=${amount}`
+        return `https://the-trivia-api.com/api/questions?categories=${categories}&limit=${amount}`
     }
 
     getAmountPerCategory() {
